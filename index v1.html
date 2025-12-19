@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bridge - Презентация для инвестора</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            border: 0;
+            box-sizing: border-box;
+        }
+
+        *:before,
+        *:after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            font-family: "Play", sans-serif;
+            background: #fff;
+            color: #000;
+            overflow: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .presentation-wrapper {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .slide {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: clamp(40px, calc(40px + 40 * ((100vw - 375px) / (1230 - 375))), 80px);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .container {
+            max-width: 1260px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 15px;
+        }
+
+        /* Типографика точно как в dist */
+        h1 {
+            font-size: clamp(30px, calc(30px + 20 * ((100vw - 375px) / (1230 - 375))), 50px);
+            line-height: clamp(34px, calc(34px + 24 * ((100vw - 375px) / (1230 - 375))), 58px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(30px, calc(30px + 20 * ((100vw - 375px) / (1230 - 375))), 50px);
+        }
+
+        h2 {
+            font-size: clamp(30px, calc(30px + 20 * ((100vw - 375px) / (1230 - 375))), 50px);
+            line-height: clamp(34px, calc(34px + 24 * ((100vw - 375px) / (1230 - 375))), 58px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+        }
+
+        h3 {
+            font-size: clamp(24px, calc(24px + 10 * ((100vw - 375px) / (1230 - 375))), 34px);
+            line-height: clamp(28px, calc(28px + 12 * ((100vw - 375px) / (1230 - 375))), 40px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+        }
+
+        h4 {
+            font-size: clamp(20px, calc(20px + 4 * ((100vw - 375px) / (1230 - 375))), 24px);
+            line-height: clamp(24px, calc(24px + 2 * ((100vw - 375px) / (1230 - 375))), 26px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(5px, calc(5px + 5 * ((100vw - 375px) / (1230 - 375))), 10px);
+        }
+
+        p {
+            font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px);
+            line-height: clamp(16px, calc(16px + 3 * ((100vw - 375px) / (1230 - 375))), 19px);
+            color: #000;
+            margin-bottom: clamp(15px, calc(15px + 5 * ((100vw - 375px) / (1230 - 375))), 20px);
+        }
+
+        ul,
+        ol {
+            list-style: none;
+            margin-bottom: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+        }
+
+        li {
+            font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px);
+            line-height: clamp(16px, calc(16px + 3 * ((100vw - 375px) / (1230 - 375))), 19px);
+            color: #000;
+            margin-bottom: clamp(10px, calc(10px + 2 * ((100vw - 375px) / (1230 - 375))), 12px);
+            padding-left: clamp(30px, calc(30px + 10 * ((100vw - 375px) / (1230 - 375))), 40px);
+            position: relative;
+        }
+
+        ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #0095ff;
+            font-weight: 700;
+            font-size: 1.5em;
+        }
+
+        ol {
+            counter-reset: item;
+        }
+
+        ol li {
+            counter-increment: item;
+        }
+
+        ol li::before {
+            content: counter(item) ".";
+            position: absolute;
+            left: 0;
+            color: #0095ff;
+            font-weight: 700;
+        }
+
+        /* Титульный слайд */
+        .intro-slide {
+            text-align: center;
+            background: linear-gradient(135deg, #fafafa 0%, #fff 50%, #fafafa 100%);
+        }
+
+        .intro-slide h1 {
+            font-size: clamp(32px, calc(32px + 28 * ((100vw - 375px) / (1230 - 375))), 60px);
+            line-height: clamp(36px, calc(36px + 33 * ((100vw - 375px) / (1230 - 375))), 69px);
+            background: linear-gradient(135deg, #0095ff 0%, #000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px);
+        }
+
+        .intro-slide .subtitle {
+            font-size: clamp(20px, calc(20px + 20 * ((100vw - 375px) / (1230 - 375))), 40px);
+            line-height: clamp(24px, calc(24px + 22 * ((100vw - 375px) / (1230 - 375))), 46px);
+            color: #000;
+            margin-bottom: clamp(30px, calc(30px + 25 * ((100vw - 375px) / (1230 - 375))), 55px);
+        }
+
+        .intro-slide .subtitle span {
+            color: #0095ff;
+        }
+
+        .intro-slide .author {
+            font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px);
+            line-height: clamp(16px, calc(16px + 3 * ((100vw - 375px) / (1230 - 375))), 19px);
+            color: #97999c;
+        }
+
+        /* Заголовки секций в стиле dist title */
+        .section-title {
+            color: #000;
+            font-weight: 700;
+            margin-bottom: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            position: relative;
+            padding-bottom: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px);
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: #0095ff;
+            border-radius: 2px;
+        }
+
+        /* Контентные блоки в стиле dist tenders-item */
+        .content-box {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: clamp(20px, calc(20px + 4 * ((100vw - 375px) / (1230 - 375))), 24px) clamp(15px, calc(15px + 15 * ((100vw - 375px) / (1230 - 375))), 30px);
+            margin-bottom: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px);
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .content-box:hover {
+            box-shadow: 0 10px 30px 0 rgba(22, 38, 47, 0.1);
+            transform: translateY(-5px);
+        }
+
+        /* Выделенные блоки в стиле dist */
+        .highlight-box {
+            background: #0095ff;
+            color: #fff;
+            border-radius: 10px;
+            padding: clamp(20px, calc(20px + 4 * ((100vw - 375px) / (1230 - 375))), 24px) clamp(15px, calc(15px + 15 * ((100vw - 375px) / (1230 - 375))), 30px);
+            margin: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-box::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) rotate(180deg);
+            }
+        }
+
+        .highlight-box h3,
+        .highlight-box h4,
+        .highlight-box p,
+        .highlight-box li {
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .highlight-box ul li::before {
+            color: #fff;
+        }
+
+        /* Сетки */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px);
+            margin: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px) 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px);
+            margin: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px) 0;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px);
+            margin: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px) 0;
+        }
+
+        /* Карточки в стиле dist tenders-item */
+        .card {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: clamp(20px, calc(20px + 4 * ((100vw - 375px) / (1230 - 375))), 24px) clamp(15px, calc(15px + 15 * ((100vw - 375px) / (1230 - 375))), 30px);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card::after {
+            content: "→";
+            position: absolute;
+            top: clamp(20px, calc(20px + 4 * ((100vw - 375px) / (1230 - 375))), 24px);
+            right: clamp(15px, calc(15px + 15 * ((100vw - 375px) / (1230 - 375))), 30px);
+            color: #0095ff;
+            font-size: clamp(16px, calc(16px + 6 * ((100vw - 375px) / (1230 - 375))), 22px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-weight: 700;
+        }
+
+        .card.animate {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 30px 0 rgba(22, 38, 47, 0.1);
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .card:hover::after {
+            opacity: 1;
+            transform: translateX(5px);
+        }
+
+        .card h4 {
+            color: #000;
+            margin-bottom: clamp(5px, calc(5px + 5 * ((100vw - 375px) / (1230 - 375))), 10px);
+            font-size: clamp(20px, calc(20px + 4 * ((100vw - 375px) / (1230 - 375))), 24px);
+            line-height: clamp(24px, calc(24px + 2 * ((100vw - 375px) / (1230 - 375))), 26px);
+        }
+
+        .card p {
+            color: #97999c;
+            font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px);
+            line-height: clamp(16px, calc(16px + 3 * ((100vw - 375px) / (1230 - 375))), 19px);
+            margin: 0;
+        }
+
+        /* Модальное окно в стиле dist popup */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: clamp(15px, calc(15px + 235 * ((100vw - 375px) / (1230 - 375))), 250px) clamp(15px, calc(15px + 235 * ((100vw - 375px) / (1230 - 375))), 250px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes modalFadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 10px;
+            padding: clamp(40px, calc(40px + 30 * ((100vw - 375px) / (1230 - 375))), 70px);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9) translateY(50px);
+            animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            box-shadow: 0 14px 24px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        @keyframes modalSlideUp {
+            to {
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            right: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            width: clamp(36px, calc(36px + 4 * ((100vw - 375px) / (1230 - 375))), 40px);
+            height: clamp(36px, calc(36px + 4 * ((100vw - 375px) / (1230 - 375))), 40px);
+            border-radius: 4px;
+            background: #f3f3f3;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(24px, calc(24px + 6 * ((100vw - 375px) / (1230 - 375))), 30px);
+            color: #000;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: #0095ff;
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        .modal-content h3 {
+            color: #0095ff;
+            margin-bottom: clamp(25px, calc(25px + 15 * ((100vw - 375px) / (1230 - 375))), 40px);
+            padding-right: clamp(50px, calc(50px + 20 * ((100vw - 375px) / (1230 - 375))), 70px);
+        }
+
+        /* Навигация в стиле dist btn--blue */
+        .navigation {
+            position: fixed;
+            bottom: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: clamp(15px, calc(15px + 5 * ((100vw - 375px) / (1230 - 375))), 20px);
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: clamp(14px, calc(14px + 6 * ((100vw - 375px) / (1230 - 375))), 20px) clamp(15px, calc(15px + 45 * ((100vw - 375px) / (1230 - 375))), 60px);
+            border-radius: 4px;
+            background: #0095ff;
+            font-size: clamp(16px, calc(16px + 2 * ((100vw - 375px) / (1230 - 375))), 18px);
+            line-height: clamp(19px, calc(19px + 2 * ((100vw - 375px) / (1230 - 375))), 21px);
+            font-weight: 700;
+            color: #fff;
+            border: 1px solid #0095ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .nav-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 0, 0, 0);
+            color: #0095ff;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-btn:disabled:hover {
+            transform: none;
+            background: #0095ff;
+            color: #fff;
+        }
+
+        /* Счётчик слайдов */
+        .slide-counter {
+            position: fixed;
+            top: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            right: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            background: #fff;
+            padding: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px) clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            border-radius: 4px;
+            font-weight: 700;
+            color: #0095ff;
+            font-size: clamp(16px, calc(16px + 2 * ((100vw - 375px) / (1230 - 375))), 18px);
+            box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .slide-counter:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px 0 rgba(0, 149, 255, 0.2);
+        }
+
+        /* Инвестиционный блок */
+        .investment-box {
+            background: #0095ff;
+            color: #fff;
+            border-radius: 10px;
+            padding: clamp(40px, calc(40px + 20 * ((100vw - 375px) / (1230 - 375))), 60px);
+            text-align: center;
+            margin: clamp(30px, calc(30px + 20 * ((100vw - 375px) / (1230 - 375))), 50px) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .investment-box::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+            animation: rotateShimmer 4s linear infinite;
+        }
+
+        @keyframes rotateShimmer {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        .investment-box h3 {
+            color: #fff;
+            font-size: clamp(28px, calc(28px + 12 * ((100vw - 375px) / (1230 - 375))), 40px);
+            margin-bottom: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            position: relative;
+            z-index: 1;
+        }
+
+        .investment-box p {
+            color: #fff;
+            font-size: clamp(22px, calc(22px + 6 * ((100vw - 375px) / (1230 - 375))), 28px);
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            margin: 0;
+        }
+
+        /* Анимации появления */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.3s;
+        }
+
+        .stagger-4 {
+            animation-delay: 0.4s;
+        }
+
+        .stagger-5 {
+            animation-delay: 0.5s;
+        }
+
+        .stagger-6 {
+            animation-delay: 0.6s;
+        }
+
+        @media (max-width: 768px) {
+
+            .grid-2,
+            .grid-3,
+            .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">9</span>
+    </div>
+
+    <div class="presentation-wrapper">
+        <!-- Слайд 1: Титульный -->
+        <div class="slide active intro-slide">
+            <div class="container">
+                <h1>Bridge</h1>
+                <p class="subtitle fade-in">Цифровая инфраструктура <span>международной торговли</span></p>
+                <p class="author fade-in stagger-1">Артур Авсиевич<br>Менеджер по развитию проекта</p>
+            </div>
+        </div>
+
+        <!-- Слайд 2: Контекст -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">1. Контекст</h2>
+                <p class="fade-in">Рынок растёт, но участие в тендерах остаётся сложным:</p>
+                <ul>
+                    <li class="fade-in stagger-1">ручной анализ тендеров</li>
+                    <li class="fade-in stagger-2">поиск поставщиков</li>
+                    <li class="fade-in stagger-3">расчёт логистики и таможни</li>
+                    <li class="fade-in stagger-4">контроль сроков и документов</li>
+                </ul>
+                <div class="highlight-box">
+                    <p style="font-weight: 700; margin: 0;">Результат: долго, дорого, высокий риск ошибок.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 3: Боль бизнеса -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">2. Боль бизнеса</h2>
+                <p class="fade-in">Компании теряют время и деньги из-за:</p>
+                <div class="content-box">
+                    <ul>
+                        <li class="fade-in stagger-1">сложности анализа тендеров</li>
+                        <li class="fade-in stagger-2">отсутствия доступа к производителям Китая</li>
+                        <li class="fade-in stagger-3">непрозрачной логистики</li>
+                        <li class="fade-in stagger-4">отсутствия единого центра управления сделкой</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 4: Решение -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">3. Решение — Bridge</h2>
+                <p class="fade-in">Единая цифровая платформа, объединяющая:</p>
+                <div class="highlight-box">
+                    <ul>
+                        <li class="fade-in stagger-1">тендерные площадки Казахстана</li>
+                        <li class="fade-in stagger-2">производителей Китая</li>
+                        <li class="fade-in stagger-3">автоматический расчёт логистики, таможни и финальной цены</li>
+                    </ul>
+                </div>
+                <p class="fade-in stagger-4" style="text-align: center; font-weight: 700; margin-top: 40px;">
+                    Мы превращаем сложный процесс в простой цифровой сервис.
+                </p>
+            </div>
+        </div>
+
+        <!-- Слайд 5: Архитектура -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">4. Архитектура платформы</h2>
+                <p class="fade-in">Bridge состоит из семи основных модулей. Нажмите на модуль для подробной информации:
+                </p>
+                <div class="grid-4">
+                    <div class="card" data-modal="modal-1">
+                        <h4>4.1. Казахстанская платформа</h4>
+                        <p>B2B для юридических лиц</p>
+                    </div>
+                    <div class="card" data-modal="modal-2">
+                        <h4>4.2. Китайская платформа</h4>
+                        <p>Работа с производителями</p>
+                    </div>
+                    <div class="card" data-modal="modal-3">
+                        <h4>4.3. Операционный модуль КНР</h4>
+                        <p>Расчёт логистики и цен</p>
+                    </div>
+                    <div class="card" data-modal="modal-4">
+                        <h4>4.4. Операционный модуль РК</h4>
+                        <p>Расчёт таможни и финальная цена</p>
+                    </div>
+                    <div class="card" data-modal="modal-5">
+                        <h4>4.5. Цепочка исполнения</h4>
+                        <p>От заказа до доставки</p>
+                    </div>
+                    <div class="card" data-modal="modal-6">
+                        <h4>4.6. Административный модуль</h4>
+                        <p>Управление процессами</p>
+                    </div>
+                    <div class="card" data-modal="modal-7" style="grid-column: 1 / -1;">
+                        <h4>4.7. Экосистема внешних операторов</h4>
+                        <p>Диверсификация и масштабирование</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 6: Ценность для клиента -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">5. Ценность для клиента</h2>
+                <div class="highlight-box">
+                    <ul>
+                        <li class="fade-in stagger-1">Снижение затрат</li>
+                        <li class="fade-in stagger-2">Заводские цены</li>
+                        <li class="fade-in stagger-3">Минимум ручной работы</li>
+                        <li class="fade-in stagger-4">Полная прозрачность сделки</li>
+                        <li class="fade-in stagger-5">Рост конкурентоспособности</li>
+                    </ul>
+                </div>
+                <p class="fade-in stagger-6" style="text-align: center; font-weight: 700; margin-top: 40px;">
+                    Больше выигранных тендеров — меньше рисков.
+                </p>
+            </div>
+        </div>
+
+        <!-- Слайд 7: Бизнес-модель -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">6. Бизнес-модель</h2>
+                <p class="fade-in">Bridge зарабатывает на нескольких источниках. Нажмите на источник для подробной
+                    информации:</p>
+                <div class="grid-2">
+                    <div class="card" data-modal="modal-biz-1">
+                        <h4>Комиссия с сделок</h4>
+                    </div>
+                    <div class="card" data-modal="modal-biz-2">
+                        <h4>Подписки</h4>
+                    </div>
+                    <div class="card" data-modal="modal-biz-3">
+                        <h4>Дополнительные услуги</h4>
+                    </div>
+                    <div class="card" data-modal="modal-biz-4">
+                        <h4>Транспортные услуги</h4>
+                    </div>
+                    <div class="card" data-modal="modal-biz-5" style="grid-column: 1 / -1;">
+                        <h4>Возврат НДС (КНР)</h4>
+                    </div>
+                </div>
+                <p class="fade-in" style="text-align: center; font-weight: 700; margin-top: 30px;">
+                    Модель масштабируется и выходит за рамки РК — особенно в рамках экономических союзов.
+                </p>
+            </div>
+        </div>
+
+        <!-- Слайд 8: Дорожная карта -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">7. Дорожная карта</h2>
+                <p class="fade-in">Развитие проекта проходит в три фазы. Нажмите на фазу для подробной информации:</p>
+                <div class="grid-3">
+                    <div class="card" data-modal="modal-phase-1">
+                        <h4>Фаза 1</h4>
+                        <p>MVP, компания в КНР, интеграции</p>
+                    </div>
+                    <div class="card" data-modal="modal-phase-2">
+                        <h4>Фаза 2</h4>
+                        <p>Команда, первые клиенты, расширение функций</p>
+                    </div>
+                    <div class="card" data-modal="modal-phase-3">
+                        <h4>Фаза 3</h4>
+                        <p>Масштабирование, новые рынки</p>
+                    </div>
+                </div>
+                <div class="investment-box">
+                    <h3>200 млн ₸ за 50%</h3>
+                    <p>Окупаемость: 1 год</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 9: Финал -->
+        <div class="slide intro-slide">
+            <div class="container">
+                <h2 style="border: none; margin-bottom: 40px;" class="fade-in">8. Финал</h2>
+                <p class="fade-in stagger-1"
+                    style="font-size: clamp(20px, calc(20px + 20 * ((100vw - 375px) / (1230 - 375))), 40px); line-height: clamp(24px, calc(24px + 22 * ((100vw - 375px) / (1230 - 375))), 46px); margin-bottom: 40px;">
+                    Bridge — это не просто IT-сервис.
+                </p>
+                <div class="highlight-box">
+                    <p class="fade-in stagger-2"
+                        style="font-size: clamp(20px, calc(20px + 20 * ((100vw - 375px) / (1230 - 375))), 40px); line-height: clamp(24px, calc(24px + 22 * ((100vw - 375px) / (1230 - 375))), 46px); margin: 0;">
+                        Это инфраструктура международной торговли Казахстан—Китай.
+                    </p>
+                </div>
+                <p class="fade-in stagger-3"
+                    style="font-size: clamp(20px, calc(20px + 20 * ((100vw - 375px) / (1230 - 375))), 40px); line-height: clamp(24px, calc(24px + 22 * ((100vw - 375px) / (1230 - 375))), 46px); margin-top: 40px; font-weight: 700;">
+                    Мы соединяем рынок, производителей и логистику в одну экосистему.
+                </p>
+                <p class="fade-in stagger-4"
+                    style="font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px); line-height: clamp(16px, calc(16px + 3 * ((100vw - 375px) / (1230 - 375))), 19px); margin-top: 60px; color: #0095ff; font-weight: 700;">
+                    Готов обсудить детали сотрудничества.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна для архитектуры -->
+    <div class="modal" id="modal-1">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-1')">×</button>
+            <h3>4.1. Казахстанская платформа (B2B)</h3>
+            <p>Платформа для юридических лиц, заинтересованных в участии в тендерах и закупке товаров на международном
+                рынке.</p>
+            <h4 style="margin-top: 30px; color: #0095ff;">Функционал для пользователей:</h4>
+            <p style="font-weight: 700; margin-top: 20px;">1. Регистрация и личный кабинет</p>
+            <p>Пользователь проходит авторизацию, выбирает язык интерфейса и получает доступ к личному кабинету.</p>
+            <p style="font-weight: 700; margin-top: 20px;">2. Доступ к рынку тендеров</p>
+            <p>Пользователь может:</p>
+            <ul>
+                <li>видеть актуальные тендеры Казахстана, собранные с различных электронных площадок</li>
+                <li>размещать собственные запросы на поставку товара</li>
+            </ul>
+            <p style="font-weight: 700; margin-top: 20px;">3. Получение готовых коммерческих предложений</p>
+            <p>По каждому тендеру или запросу пользователь получает:</p>
+            <ul>
+                <li>итоговую цену товара</li>
+                <li>сроки производства и доставки</li>
+                <li>условия поставки</li>
+                <li>прозрачную структуру расходов</li>
+            </ul>
+            <p style="font-style: italic; color: #666; margin-top: 15px;">Все данные отображаются на выбранном языке и
+                не требуют дополнительной обработки со стороны пользователя.</p>
+            <p style="font-weight: 700; margin-top: 20px;">4. Онлайн-размещение заказа</p>
+            <p>В случае готовности к сделке пользователь может разместить заказ непосредственно на платформе.</p>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-2">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-2')">×</button>
+            <h3>4.2. Китайская платформа</h3>
+            <p>Платформа ориентирована на производителей и поставщиков КНР.</p>
+            <h4 style="margin-top: 30px; color: #0095ff;">Функционал:</h4>
+            <p style="font-weight: 700; margin-top: 20px;">1. Синхронизация данных</p>
+            <p>Все тендеры и пользовательские запросы автоматически передаются из казахстанской системы и переводятся на
+                китайский язык.</p>
+            <p style="font-weight: 700; margin-top: 20px;">2. Рассылка и публикация запросов</p>
+            <p>Адаптированные запросы публикуются на китайской платформе и рассылаются зарегистрированным производителям
+                и поставщикам.</p>
+            <p style="font-weight: 700; margin-top: 20px;">3. Подача ценовых предложений</p>
+            <p>Поставщики и производители предоставляют цены и условия поставки для китайской компании Bridge,
+                зарегистрированной в КНР.</p>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <p style="margin: 0; font-weight: 700;">Это формирует конкурентную среду и увеличивает количество
+                    предложений по каждому лоту.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-3">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-3')">×</button>
+            <h3>4.3. Операционный модуль китайской компании</h3>
+            <p>Китайская компания Bridge выступает операционным центром между производителем и рынком Казахстана.</p>
+            <h4 style="margin-top: 30px; color: #0095ff;">Функционал:</h4>
+            <ul>
+                <li>автоматическое добавление операционных расходов</li>
+                <li>расчёт транспортно-логистических затрат</li>
+                <li>формирование цены поставки до склада компании</li>
+            </ul>
+            <p style="font-weight: 700; margin-top: 20px; color: #0095ff;">После обработки предложения в автоматическом
+                режиме передаются в казахстанскую компанию.</p>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-4">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-4')">×</button>
+            <h3>4.4. Операционный модуль казахстанской компании</h3>
+            <p>Казахстанская компания выполняет финальную коммерческую и юридическую обработку сделки.</p>
+            <h4 style="margin-top: 30px; color: #0095ff;">Функционал:</h4>
+            <ul>
+                <li>автоматический расчёт таможенных платежей под конкретный товар</li>
+                <li>добавление маржи компании</li>
+                <li>формирование окончательной цены и сроков поставки</li>
+            </ul>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <p style="margin: 0; font-weight: 700;">Пользователь получает готовое коммерческое предложение «под
+                    ключ».</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-5">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-5')">×</button>
+            <h3>4.5. Цепочка исполнения заказа</h3>
+            <p>После размещения заказа пользователем процесс проходит в обратном порядке по всей цепочке:</p>
+            <ol>
+                <li>Заказ пользователя</li>
+                <li>Казахстан → Китай</li>
+                <li>Фабрика → производство</li>
+                <li>Логистика + таможня</li>
+                <li>Доставка и закрытие сделки</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-6">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-6')">×</button>
+            <h3>4.6. Административный модуль</h3>
+            <p>Закрытый модуль для сотрудников компании:</p>
+            <ul>
+                <li>Менеджеры по снабжению</li>
+                <li>Логисты</li>
+                <li>Таможенные брокеры</li>
+                <li>Финансовые специалисты</li>
+                <li>Главный администратор</li>
+            </ul>
+            <p style="font-weight: 700; margin-top: 20px; color: #0095ff;">Обеспечивает контроль, управление и
+                прозрачность всех процессов внутри системы.</p>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-7">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-7')">×</button>
+            <h3>4.7. Экосистема внешних операторов</h3>
+            <p><strong>Цель:</strong> диверсификация доходов и снижение операционных рисков.</p>
+            <p>Структурированная экосистема сервисных компаний, работающих по единым правилам внутри платформы.</p>
+            <h4 style="margin-top: 30px; color: #0095ff;">Потенциальные категории участников:</h4>
+            <ul>
+                <li>компании в КНР, осуществляющие обработку и консолидацию грузов</li>
+                <li>внутренние перевозчики по территории Китая</li>
+                <li>международные перевозчики, обеспечивающие трансграничную логистику</li>
+                <li>операторы и склады временного хранения в Казахстане</li>
+                <li>логистические и сервисные компании, предоставляющие специализированные услуги</li>
+            </ul>
+            <h4 style="margin-top: 30px; color: #0095ff;">Механика участия:</h4>
+            <ul>
+                <li>сторонние компании регистрируются на платформе</li>
+                <li>получают доступ к релевантным этапам цепочки</li>
+                <li>предоставляют тарифы и условия работы</li>
+                <li>участвуют в автоматическом расчёте логистики и сроков</li>
+            </ul>
+            <p style="font-weight: 700; margin-top: 20px;">Выбор конкретного исполнителя может осуществляться:</p>
+            <ul>
+                <li>автоматически по заданным параметрам цены и сроков</li>
+                <li>либо вручную менеджерами компании</li>
+            </ul>
+            <h4 style="margin-top: 30px; color: #0095ff;">Ценность этой модели:</h4>
+            <ul>
+                <li>снижение зависимости от одного подрядчика</li>
+                <li>конкурентная среда между операторами</li>
+                <li>гибкость логистических маршрутов</li>
+                <li>масштабируемость без роста постоянных затрат</li>
+                <li>дополнительные источники дохода за счёт комиссии с сервисных компаний</li>
+            </ul>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <p style="margin: 0; font-weight: 700;">Платформа Bridge постепенно трансформируется из закрытого
+                    решения в маркетплейс сервисов международной торговли, оставаясь при этом единым окном для конечного
+                    клиента.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна для бизнес-модели -->
+    <div class="modal" id="modal-biz-1">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-biz-1')">×</button>
+            <h3>Комиссия с успешных сделок</h3>
+            <p>Основной источник дохода платформы Bridge — комиссия с каждой успешно завершённой сделки между заказчиком
+                и поставщиком.</p>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <p style="margin: 0; font-weight: 700;">Модель "win-win": платформа получает доход только при успешном
+                    завершении сделки, что мотивирует качественный сервис на всех этапах.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-biz-2">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-biz-2')">×</button>
+            <h3>Платные подписки</h3>
+            <p>Пользователи могут выбрать тарифный план с расширенным функционалом:</p>
+            <ul>
+                <li>Премиум-доступ к расширенной аналитике</li>
+                <li>Приоритетная поддержка</li>
+                <li>Дополнительные инструменты для работы с тендерами</li>
+                <li>Расширенные возможности фильтрации и поиска</li>
+            </ul>
+            <p style="font-weight: 700; margin-top: 20px; color: #0095ff;">Обеспечивает стабильный регулярный доход и
+                предсказуемость финансовых потоков.</p>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-biz-3">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-biz-3')">×</button>
+            <h3>Дополнительные сервисы</h3>
+            <p>Платформа предлагает расширенные услуги для участников:</p>
+            <ul>
+                <li>Консультационные услуги по таможенному оформлению</li>
+                <li>Юридическое сопровождение сделок</li>
+                <li>Аналитика и отчёты по рынку тендеров</li>
+                <li>Персональные менеджеры для крупных клиентов</li>
+                <li>Обучение работе с платформой</li>
+            </ul>
+            <p style="font-weight: 700; margin-top: 20px; color: #0095ff;">Диверсификация доходов и повышение ценности
+                платформы для пользователей.</p>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-biz-4">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-biz-4')">×</button>
+            <h3>Транспортные услуги</h3>
+            <p>Bridge предоставляет логистические услуги как напрямую, так и через партнёрскую сеть:</p>
+            <ul>
+                <li>Организация доставки грузов из Китая в Казахстан</li>
+                <li>Таможенное оформление</li>
+                <li>Складские услуги</li>
+                <li>Страхование грузов</li>
+            </ul>
+            <p style="font-weight: 700; margin-top: 20px; color: #0095ff;">Интеграция логистики в платформу создаёт
+                дополнительную ценность и новые источники дохода.</p>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-biz-5">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-biz-5')">×</button>
+            <h3>Возврат НДС при экспорте через китайскую компанию</h3>
+            <p>Китайская компания Bridge, зарегистрированная в КНР, имеет право на возврат НДС при экспорте товаров.</p>
+            <p style="font-weight: 700; margin-top: 20px;">Это позволяет:</p>
+            <ul>
+                <li>Снизить финальную стоимость товаров для заказчиков</li>
+                <li>Повысить конкурентоспособность предложений</li>
+                <li>Создать дополнительный источник дохода через оптимизацию налоговых схем</li>
+            </ul>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <p style="margin: 0; font-weight: 700;">Уникальное конкурентное преимущество, недоступное большинству
+                    участников рынка.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальные окна для дорожной карты -->
+    <div class="modal" id="modal-phase-1">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-phase-1')">×</button>
+            <h3>Фаза 1: Старт и базовая инфраструктура</h3>
+            <p>Начальная фаза развития проекта, направленная на создание работоспособной платформы и необходимой
+                инфраструктуры.</p>
+            <h4 style="margin-top: 30px; color: #0095ff;">Основные задачи:</h4>
+            <ul>
+                <li>Разработка MVP (Minimum Viable Product) платформы</li>
+                <li>Регистрация компании в КНР</li>
+                <li>Интеграция с тендерными площадками Казахстана (ГосЗакуп, Самрук)</li>
+                <li>Создание базовой функциональности для пользователей</li>
+                <li>Настройка операционных процессов</li>
+            </ul>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <p style="margin: 0; font-weight: 700;">Цель фазы: запуск рабочей версии платформы и начало приёма
+                    первых заказов.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-phase-2">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-phase-2')">×</button>
+            <h3>Фаза 2: Рост и развитие</h3>
+            <p>Фаза активного развития бизнеса, привлечения клиентов и расширения функциональности платформы.</p>
+            <h4 style="margin-top: 30px; color: #0095ff;">Основные задачи:</h4>
+            <ul>
+                <li>Формирование команды специалистов (менеджеры, логисты, брокеры, финансисты)</li>
+                <li>Привлечение первых клиентов и формирование базы пользователей</li>
+                <li>Расширение функциональности платформы на основе обратной связи</li>
+                <li>Развитие партнёрской сети в Китае</li>
+                <li>Оптимизация операционных процессов</li>
+                <li>Масштабирование инфраструктуры</li>
+            </ul>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <p style="margin: 0; font-weight: 700;">Цель фазы: достижение устойчивого роста и формирование репутации
+                    на рынке.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-phase-3">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('modal-phase-3')">×</button>
+            <h3>Фаза 3: Масштабирование</h3>
+            <p>Фаза активного расширения бизнеса и выхода на новые рынки.</p>
+            <h4 style="margin-top: 30px; color: #0095ff;">Основные задачи:</h4>
+            <ul>
+                <li>Масштабирование платформы на новые регионы</li>
+                <li>Выход на рынки других стран (в рамках экономических союзов)</li>
+                <li>Развитие экосистемы внешних операторов</li>
+                <li>Трансформация в маркетплейс сервисов международной торговли</li>
+                <li>Автоматизация процессов и снижение операционных затрат</li>
+                <li>Развитие дополнительных сервисов и продуктов</li>
+            </ul>
+            <div class="highlight-box" style="margin-top: 30px;">
+                <p style="margin: 0; font-weight: 700;">Цель фазы: стать ведущей платформой для международной торговли в
+                    регионе и достижение полной окупаемости проекта.</p>
+            </div>
+            <p style="font-weight: 700; margin-top: 30px; color: #0095ff; text-align: center;">
+                Общая окупаемость проекта: до 3 лет
+            </p>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)">← Назад</button>
+        <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Вперёд →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function animateSlide(slide) {
+            const cards = slide.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('animate');
+                }, index * 150);
+            });
+        }
+
+        function showSlide(n) {
+            if (n >= totalSlides) {
+                currentSlide = 0;
+            } else if (n < 0) {
+                currentSlide = totalSlides - 1;
+            } else {
+                currentSlide = n;
+            }
+
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                    slide.querySelectorAll('.card').forEach(card => card.classList.remove('animate'));
+                    setTimeout(() => animateSlide(slide), 100);
+                }
+            });
+
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            document.getElementById('prev-btn').disabled = currentSlide === 0;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+            slides[currentSlide].scrollTop = 0;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        document.querySelectorAll('.card[data-modal]').forEach(card => {
+            card.addEventListener('click', function () {
+                const modalId = this.getAttribute('data-modal');
+                openModal(modalId);
+            });
+        });
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function (e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+            if (e.key === 'ArrowLeft' && !document.querySelector('.modal.active')) {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight' && !document.querySelector('.modal.active')) {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+
+</html>

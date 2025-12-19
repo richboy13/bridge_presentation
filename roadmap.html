@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge Kazakhstan - Дорожная карта проекта</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .progress-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .progress-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .progress-percent {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .goals-section {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .goal-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .goal-label {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .goal-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .goal-condition {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid var(--border);
+        }
+
+        .filters {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .filter-group {
+            margin-bottom: 24px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: var(--shadow);
+        }
+
+        .topbar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        /* Roadmap Timeline */
+        .roadmap {
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .roadmap-line {
+            position: absolute;
+            left: 120px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .stage {
+            position: relative;
+            margin-bottom: 48px;
+            padding-left: 160px;
+        }
+
+        .stage-marker {
+            position: absolute;
+            left: 100px;
+            top: 8px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 4px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--text-light);
+            font-size: 14px;
+            z-index: 2;
+            box-shadow: 0 0 0 8px var(--bg);
+            transition: all 0.3s;
+        }
+
+        .stage.has-progress .stage-marker {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .stage.completed .stage-marker {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .stage-content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+        }
+
+        .stage-content:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .stage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stage-info {
+            flex: 1;
+        }
+
+        .stage-number {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stage-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .stage-description {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .stage-meta {
+            text-align: right;
+        }
+
+        .stage-progress {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        .stage-deadline {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .actions-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .action {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .action:hover {
+            border-left-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .action.completed {
+            opacity: 0.7;
+            background: #f0fdf4;
+        }
+
+        .action.completed .action-title {
+            text-decoration: line-through;
+            color: var(--text-light);
+        }
+
+        .action-checkbox {
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--success);
+        }
+
+        .action-content {
+            padding-left: 36px;
+        }
+
+        .action-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .action-info {
+            flex: 1;
+        }
+
+        .action-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+
+        .action-description {
+            font-size: 12px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .action-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .action-responsible {
+            font-size: 11px;
+            color: var(--text-light);
+            padding: 4px 10px;
+            background: var(--surface);
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .action-deadline {
+            font-size: 11px;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .action-deliverables {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .deliverables-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .deliverables-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .deliverable {
+            font-size: 11px;
+            padding: 4px 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+        }
+
+        .milestone {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .milestone-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #92400e;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .milestone-content {
+            font-size: 13px;
+            color: #78350f;
+            font-weight: 500;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 260px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .roadmap-line {
+                left: 20px;
+            }
+
+            .stage {
+                padding-left: 60px;
+            }
+
+            .stage-marker {
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">Bridge Kazakhstan</div>
+                <div class="logo-subtitle">Дорожная карта проекта</div>
+            </div>
+
+            <div class="progress-section">
+                <div class="progress-card">
+                    <div class="progress-header">
+                        <div class="progress-label">Общий прогресс</div>
+                        <div class="progress-percent" id="overallProgress">0%</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="overallProgressBar" style="width: 0%"></div>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="totalActions">0</div>
+                            <div class="stat-label">Всего</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="completedActions">0</div>
+                            <div class="stat-label">Выполнено</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="goals-section">
+                <div class="section-title">Конечные цели</div>
+                
+                <div class="goal-item">
+                    <div class="goal-label">Первый инвестор</div>
+                    <div class="goal-value" id="goalInvestor">Q2 2025</div>
+                    <div class="goal-condition" id="goalInvestorCondition">
+                        Сумма: $500K | Формат: Seed | Продукт: MVP готов | Клиенты: 3 пилота
+                    </div>
+                </div>
+
+                <div class="goal-item">
+                    <div class="goal-label">Первые доходы</div>
+                    <div class="goal-value" id="goalRevenue">Q3 2025</div>
+                    <div class="goal-condition" id="goalRevenueCondition">
+                        MRR: $10K | Клиенты: 10 активных | Конверсия: 15%
+                    </div>
+                </div>
+
+                <div class="goal-item">
+                    <div class="goal-label">Выплата зарплат</div>
+                    <div class="goal-value" id="goalSalary">Q4 2025</div>
+                    <div class="goal-condition" id="goalSalaryCondition">
+                        Доходы покрывают 80% расходов | Команда: 8 человек
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <div class="filter-label">Поиск</div>
+                    <input type="text" class="filter-input" id="searchInput" placeholder="Название действия...">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Статус</div>
+                    <select class="filter-input" id="statusFilter">
+                        <option value="">Все</option>
+                        <option value="completed">Выполнено</option>
+                        <option value="pending">В работе</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Ответственный</div>
+                    <select class="filter-input" id="responsibleFilter">
+                        <option value="">Все</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Этап</div>
+                    <select class="filter-input" id="stageFilter">
+                        <option value="">Все этапы</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="topbar">
+                <div class="topbar-title">Дорожная карта развития проекта</div>
+                <div class="topbar-actions">
+                    <button class="btn" onclick="exportData()">Экспорт</button>
+                    <button class="btn btn-primary" onclick="resetProgress()">Сбросить прогресс</button>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="roadmap">
+                    <div class="roadmap-line"></div>
+                    <div id="roadmapContent">
+                        <!-- Roadmap will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const roadmapData = [
+            {
+                id: 1,
+                number: "I",
+                title: "Подготовительный этап",
+                description: "Формирование команды, регистрация компаний, подготовка инфраструктуры",
+                deadline: "Июль 2024",
+                actions: [
+                    {
+                        id: "1-1",
+                        title: "Регистрация компаний в РК и КНР",
+                        description: "Завершить регистрацию в МФЦА и Гуанчжоу, открыть расчетные счета",
+                        responsible: "Учредители",
+                        deadline: "25 июля 2024",
+                        deliverables: ["Свидетельства о регистрации", "Открытые счета", "Учредительные документы"],
+                        completed: false
+                    },
+                    {
+                        id: "1-2",
+                        title: "Поиск и аренда помещений",
+                        description: "Найти офисные и складские помещения в Алматы и Гуанчжоу",
+                        responsible: "CEO",
+                        deadline: "29 августа 2024",
+                        deliverables: ["Договоры аренды", "Помещения готовы к работе"],
+                        completed: false
+                    },
+                    {
+                        id: "1-3",
+                        title: "Формирование команды",
+                        description: "Найти и нанять ключевых сотрудников для обеих стран",
+                        responsible: "CEO, HR-директор",
+                        deadline: "31 октября 2024",
+                        deliverables: ["8 сотрудников нанято", "Трудовые договоры подписаны"],
+                        completed: false
+                    }
+                ],
+                milestones: [
+                    {
+                        label: "Контрольная точка",
+                        content: "Компании зарегистрированы, команда собрана, помещения готовы"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                number: "II",
+                title: "Этап упаковки проекта",
+                description: "Подготовка презентаций, бизнес-плана, финансовой модели и питч-дека",
+                deadline: "Декабрь 2024",
+                actions: [
+                    {
+                        id: "2-1",
+                        title: "Подготовка презентации для инвесторов",
+                        description: "Создать 15-слайдовую презентацию с описанием продукта, рынка, команды и финансов",
+                        responsible: "CEO, Директор по маркетингу",
+                        deadline: "15 ноября 2024",
+                        deliverables: ["Презентация в PDF", "Презентация в Keynote/PowerPoint", "Одностраничный питч"],
+                        completed: false
+                    },
+                    {
+                        id: "2-2",
+                        title: "Разработка финансовой модели",
+                        description: "Построить финансовую модель на 3 года с прогнозами доходов, расходов и потребности в инвестициях",
+                        responsible: "CFO, Главный аналитик",
+                        deadline: "30 ноября 2024",
+                        deliverables: ["Excel модель", "Сценарии (консервативный, базовый, оптимистичный)", "Презентация финансов"],
+                        completed: false
+                    },
+                    {
+                        id: "2-3",
+                        title: "Подготовка бизнес-плана",
+                        description: "Написать детальный бизнес-план на 30-40 страниц с анализом рынка, конкурентов и стратегией",
+                        responsible: "CEO, Руководитель стратегии",
+                        deadline: "15 декабря 2024",
+                        deliverables: ["Бизнес-план PDF", "Executive Summary", "Резюме на 2 страницы"],
+                        completed: false
+                    },
+                    {
+                        id: "2-4",
+                        title: "Репетиция питча",
+                        description: "Провести 5 репетиций питча с командой, получить обратную связь и отточить выступление",
+                        responsible: "CEO",
+                        deadline: "20 декабря 2024",
+                        deliverables: ["Записанное видео питча", "Список FAQ", "Готовность к выступлениям"],
+                        completed: false
+                    }
+                ],
+                milestones: [
+                    {
+                        label: "Контрольная точка",
+                        content: "Все материалы готовы, питч отрепетирован, команда готова к встречам с инвесторами"
+                    }
+                ]
+            },
+            {
+                id: 3,
+                number: "III",
+                title: "Этап общения с инвесторами",
+                description: "Составление списка целевых инвесторов, организация встреч и проведение питчей",
+                deadline: "Март 2025",
+                actions: [
+                    {
+                        id: "3-1",
+                        title: "Составление списка целевых инвесторов",
+                        description: "Исследовать и составить список из 30-50 потенциальных инвесторов (VC, бизнес-ангелы, корпоративные фонды)",
+                        responsible: "CEO, Инвестиционный директор",
+                        deadline: "10 января 2025",
+                        deliverables: ["Список инвесторов в Excel", "Краткие профили каждого", "Приоритизация списка"],
+                        completed: false
+                    },
+                    {
+                        id: "3-2",
+                        title: "Подготовка пакета документов",
+                        description: "Собрать полный пакет документов для отправки инвесторам: презентация, бизнес-план, финансовая модель",
+                        responsible: "CEO, Юрист",
+                        deadline: "15 января 2025",
+                        deliverables: ["Пакет документов", "NDA шаблон", "Список вопросов для инвесторов"],
+                        completed: false
+                    },
+                    {
+                        id: "3-3",
+                        title: "Организация первых встреч",
+                        description: "Отправить запросы на встречи первым 10 инвесторам из приоритетного списка",
+                        responsible: "CEO, Ассистент",
+                        deadline: "25 января 2025",
+                        deliverables: ["5-7 встреч назначено", "Календарь встреч", "Подготовка к каждой встрече"],
+                        completed: false
+                    },
+                    {
+                        id: "3-4",
+                        title: "Проведение питч-сессий",
+                        description: "Провести питчи с первыми 10 инвесторами, собрать обратную связь и доработать материалы",
+                        responsible: "CEO",
+                        deadline: "28 февраля 2025",
+                        deliverables: ["10 питчей проведено", "Обратная связь собрана", "Материалы доработаны"],
+                        completed: false
+                    },
+                    {
+                        id: "3-5",
+                        title: "Follow-up и переговоры",
+                        description: "Поддерживать контакт с заинтересованными инвесторами, отвечать на вопросы, проводить due diligence",
+                        responsible: "CEO, CFO",
+                        deadline: "15 марта 2025",
+                        deliverables: ["Активные переговоры с 3-5 инвесторами", "Due diligence материалы готовы"],
+                        completed: false
+                    }
+                ],
+                milestones: [
+                    {
+                        label: "Контрольная точка",
+                        content: "Проведено 10+ встреч, есть 3-5 заинтересованных инвесторов, начаты переговоры"
+                    }
+                ]
+            },
+            {
+                id: 4,
+                number: "IV",
+                title: "Этап первых договорённостей",
+                description: "Заключение предварительных соглашений, согласование условий инвестирования",
+                deadline: "Май 2025",
+                actions: [
+                    {
+                        id: "4-1",
+                        title: "Согласование условий инвестирования",
+                        description: "Обсудить и согласовать основные условия: оценка компании, размер инвестиций, доля, права инвестора",
+                        responsible: "CEO, Юрист, CFO",
+                        deadline: "10 апреля 2025",
+                        deliverables: ["Term Sheet согласован", "Основные условия зафиксированы"],
+                        completed: false
+                    },
+                    {
+                        id: "4-2",
+                        title: "Подписание Term Sheet",
+                        description: "Подписать предварительное соглашение с выбранным инвестором",
+                        responsible: "CEO, Юрист",
+                        deadline: "20 апреля 2025",
+                        deliverables: ["Term Sheet подписан", "Эксклюзивность на 60 дней"],
+                        completed: false
+                    },
+                    {
+                        id: "4-3",
+                        title: "Due Diligence",
+                        description: "Провести полную проверку компании инвестором: финансы, юридические вопросы, команда, продукт",
+                        responsible: "Вся команда",
+                        deadline: "15 мая 2025",
+                        deliverables: ["Due Diligence завершен", "Все вопросы закрыты", "Инвестор готов к инвестированию"],
+                        completed: false
+                    },
+                    {
+                        id: "4-4",
+                        title: "Подготовка инвестиционных документов",
+                        description: "Подготовить все необходимые документы для закрытия сделки: инвестиционное соглашение, уставные документы",
+                        responsible: "Юрист, CFO",
+                        deadline: "25 мая 2025",
+                        deliverables: ["Инвестиционное соглашение", "Обновленные уставные документы", "Все документы готовы к подписанию"],
+                        completed: false
+                    }
+                ],
+                milestones: [
+                    {
+                        label: "Контрольная точка",
+                        content: "Term Sheet подписан, Due Diligence завершен, документы готовы к закрытию сделки"
+                    }
+                ]
+            },
+            {
+                id: 5,
+                number: "V",
+                title: "Этап запуска и первых денег",
+                description: "Закрытие инвестиционной сделки, получение средств, запуск активных продаж",
+                deadline: "Август 2025",
+                actions: [
+                    {
+                        id: "5-1",
+                        title: "Закрытие инвестиционной сделки",
+                        description: "Подписать все документы и получить первые инвестиции",
+                        responsible: "CEO, Юрист, CFO",
+                        deadline: "15 июня 2025",
+                        deliverables: ["Сделка закрыта", "$500K получено", "Инвестор в совете директоров"],
+                        completed: false
+                    },
+                    {
+                        id: "5-2",
+                        title: "Запуск активных продаж",
+                        description: "Нанять менеджеров по продажам, запустить маркетинговые кампании, начать активный поиск клиентов",
+                        responsible: "Директор по продажам, Директор по маркетингу",
+                        deadline: "1 июля 2025",
+                        deliverables: ["2 менеджера по продажам нанято", "Маркетинговая кампания запущена", "10 потенциальных клиентов в воронке"],
+                        completed: false
+                    },
+                    {
+                        id: "5-3",
+                        title: "Заключение первых пилотных договоров",
+                        description: "Подписать пилотные договоры с первыми 3 клиентами",
+                        responsible: "Директор по продажам, CEO",
+                        deadline: "15 июля 2025",
+                        deliverables: ["3 пилотных договора подписано", "Клиенты начали использовать платформу"],
+                        completed: false
+                    },
+                    {
+                        id: "5-4",
+                        title: "Генерация первых доходов",
+                        description: "Получить первые платежи от клиентов, достичь MRR $10K",
+                        responsible: "Вся команда",
+                        deadline: "31 августа 2025",
+                        deliverables: ["MRR $10K достигнут", "10 активных клиентов", "Конверсия 15%"],
+                        completed: false
+                    }
+                ],
+                milestones: [
+                    {
+                        label: "Контрольная точка",
+                        content: "Инвестиции получены, первые клиенты платят, проект генерирует доходы"
+                    }
+                ]
+            }
+        ];
+
+        // Load progress from localStorage
+        function loadProgress() {
+            const saved = localStorage.getItem('roadmapProgress');
+            if (saved) {
+                try {
+                    const progress = JSON.parse(saved);
+                    roadmapData.forEach(stage => {
+                        stage.actions.forEach(action => {
+                            if (progress[action.id]) {
+                                action.completed = progress[action.id];
+                            }
+                        });
+                    });
+                } catch (e) {
+                    console.error('Error loading progress:', e);
+                }
+            }
+        }
+
+        // Save progress to localStorage
+        function saveProgress() {
+            const progress = {};
+            roadmapData.forEach(stage => {
+                stage.actions.forEach(action => {
+                    progress[action.id] = action.completed;
+                });
+            });
+            localStorage.setItem('roadmapProgress', JSON.stringify(progress));
+        }
+
+        // Calculate statistics
+        function calculateStats() {
+            let totalActions = 0;
+            let completedActions = 0;
+            const stageProgress = {};
+
+            roadmapData.forEach(stage => {
+                let stageCompleted = 0;
+                stage.actions.forEach(action => {
+                    totalActions++;
+                    if (action.completed) {
+                        completedActions++;
+                        stageCompleted++;
+                    }
+                });
+                stageProgress[stage.id] = {
+                    total: stage.actions.length,
+                    completed: stageCompleted,
+                    percent: stage.actions.length > 0 ? Math.round((stageCompleted / stage.actions.length) * 100) : 0
+                };
+            });
+
+            return {
+                totalActions,
+                completedActions,
+                completionRate: totalActions > 0 ? Math.round((completedActions / totalActions) * 100) : 0,
+                stageProgress
+            };
+        }
+
+        function updateProgress() {
+            const stats = calculateStats();
+            
+            document.getElementById('totalActions').textContent = stats.totalActions;
+            document.getElementById('completedActions').textContent = stats.completedActions;
+            document.getElementById('overallProgress').textContent = `${stats.completionRate}%`;
+            document.getElementById('overallProgressBar').style.width = `${stats.completionRate}%`;
+
+            // Update stage markers
+            roadmapData.forEach(stage => {
+                const progress = stats.stageProgress[stage.id];
+                const stageElement = document.querySelector(`[data-stage-id="${stage.id}"]`);
+                if (stageElement) {
+                    if (progress.percent === 100) {
+                        stageElement.classList.add('completed');
+                        stageElement.classList.remove('has-progress');
+                    } else if (progress.percent > 0) {
+                        stageElement.classList.add('has-progress');
+                        stageElement.classList.remove('completed');
+                    } else {
+                        stageElement.classList.remove('has-progress', 'completed');
+                    }
+                }
+            });
+        }
+
+        // Collect all responsibles
+        const allResponsibles = new Set();
+        roadmapData.forEach(stage => {
+            stage.actions.forEach(action => {
+                if (action.responsible) {
+                    action.responsible.split(',').forEach(r => allResponsibles.add(r.trim()));
+                }
+            });
+        });
+
+        // Populate filters
+        const responsibleSelect = document.getElementById('responsibleFilter');
+        Array.from(allResponsibles).sort().forEach(resp => {
+            const option = document.createElement('option');
+            option.value = resp;
+            option.textContent = resp;
+            responsibleSelect.appendChild(option);
+        });
+
+        const stageSelect = document.getElementById('stageFilter');
+        roadmapData.forEach(stage => {
+            const option = document.createElement('option');
+            option.value = stage.id;
+            option.textContent = `Этап ${stage.number}: ${stage.title}`;
+            stageSelect.appendChild(option);
+        });
+
+        // Render roadmap
+        function renderRoadmap(data) {
+            const content = document.getElementById('roadmapContent');
+            const stats = calculateStats();
+            
+            content.innerHTML = data.map(stage => {
+                const progress = stats.stageProgress[stage.id];
+                const progressClass = progress.percent === 100 ? 'completed' : 
+                                    progress.percent > 0 ? 'has-progress' : '';
+
+                return `
+                    <div class="stage ${progressClass}" data-stage-id="${stage.id}">
+                        <div class="stage-marker">${stage.number}</div>
+                        <div class="stage-content">
+                            <div class="stage-header">
+                                <div class="stage-info">
+                                    <div class="stage-number">Этап ${stage.number}</div>
+                                    <div class="stage-title">${stage.title}</div>
+                                    <div class="stage-description">${stage.description}</div>
+                                </div>
+                                <div class="stage-meta">
+                                    <div class="stage-progress">${progress.completed}/${progress.total} выполнено (${progress.percent}%)</div>
+                                    <div class="stage-deadline">${stage.deadline}</div>
+                                </div>
+                            </div>
+
+                            <div class="actions-list">
+                                ${stage.actions.map(action => {
+                                    const actionClass = action.completed ? 'action completed' : 'action';
+                                    return `
+                                        <div class="${actionClass}" 
+                                             data-action-id="${action.id}"
+                                             data-action-title="${action.title.toLowerCase()}"
+                                             data-responsible="${action.responsible}"
+                                             data-stage-id="${stage.id}"
+                                             data-completed="${action.completed}">
+                                            <input type="checkbox" 
+                                                   class="action-checkbox" 
+                                                   ${action.completed ? 'checked' : ''}
+                                                   onchange="toggleAction('${action.id}', this.checked)">
+                                            <div class="action-content">
+                                                <div class="action-header">
+                                                    <div class="action-info">
+                                                        <div class="action-title">${action.title}</div>
+                                                        <div class="action-description">${action.description}</div>
+                                                    </div>
+                                                    <div class="action-meta">
+                                                        <div class="action-responsible">${action.responsible}</div>
+                                                        <div class="action-deadline">${action.deadline}</div>
+                                                    </div>
+                                                </div>
+                                                ${action.deliverables && action.deliverables.length > 0 ? `
+                                                    <div class="action-deliverables">
+                                                        <div class="deliverables-label">Результаты</div>
+                                                        <div class="deliverables-list">
+                                                            ${action.deliverables.map(d => `<div class="deliverable">${d}</div>`).join('')}
+                                                        </div>
+                                                    </div>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+
+                            ${stage.milestones && stage.milestones.length > 0 ? `
+                                ${stage.milestones.map(milestone => `
+                                    <div class="milestone">
+                                        <div class="milestone-label">${milestone.label}</div>
+                                        <div class="milestone-content">${milestone.content}</div>
+                                    </div>
+                                `).join('')}
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleAction(actionId, completed) {
+            roadmapData.forEach(stage => {
+                const action = stage.actions.find(a => a.id === actionId);
+                if (action) {
+                    action.completed = completed;
+                    saveProgress();
+                    updateProgress();
+                    
+                    // Update visual state
+                    const actionElement = document.querySelector(`[data-action-id="${actionId}"]`);
+                    if (actionElement) {
+                        if (completed) {
+                            actionElement.classList.add('completed');
+                        } else {
+                            actionElement.classList.remove('completed');
+                        }
+                    }
+                }
+            });
+        }
+
+        function filterContent() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const responsibleFilter = document.getElementById('responsibleFilter').value;
+            const stageFilter = document.getElementById('stageFilter').value;
+
+            const allActions = document.querySelectorAll('.action');
+            let visibleCount = 0;
+
+            allActions.forEach(action => {
+                const title = action.dataset.actionTitle || '';
+                const responsible = action.dataset.responsible || '';
+                const stageId = action.dataset.stageId || '';
+                const completed = action.dataset.completed === 'true';
+
+                const matchesSearch = !searchTerm || title.includes(searchTerm);
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'completed' && completed) ||
+                    (statusFilter === 'pending' && !completed);
+                const matchesResponsible = !responsibleFilter || responsible.includes(responsibleFilter);
+                const matchesStage = !stageFilter || stageId === stageFilter;
+
+                if (matchesSearch && matchesStatus && matchesResponsible && matchesStage) {
+                    action.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    action.classList.add('hidden');
+                }
+            });
+
+            // Hide stages if all actions are hidden
+            document.querySelectorAll('.stage').forEach(stage => {
+                const visibleActions = stage.querySelectorAll('.action:not(.hidden)').length;
+                if (visibleActions === 0) {
+                    stage.style.display = 'none';
+                } else {
+                    stage.style.display = 'block';
+                }
+            });
+
+            // Show empty state
+            const content = document.getElementById('roadmapContent');
+            const hasVisibleContent = content.querySelectorAll('.stage[style*="block"]').length > 0;
+            let emptyState = content.querySelector('.empty-state');
+            
+            if (!hasVisibleContent) {
+                if (!emptyState) {
+                    emptyState = document.createElement('div');
+                    emptyState.className = 'empty-state';
+                    emptyState.innerHTML = `
+                        <div class="empty-state-icon">🔍</div>
+                        <h3>Ничего не найдено</h3>
+                        <p>Попробуйте изменить параметры фильтрации</p>
+                    `;
+                    content.appendChild(emptyState);
+                }
+            } else {
+                if (emptyState) {
+                    emptyState.remove();
+                }
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('Вы уверены, что хотите сбросить весь прогресс?')) {
+                localStorage.removeItem('roadmapProgress');
+                roadmapData.forEach(stage => {
+                    stage.actions.forEach(action => {
+                        action.completed = false;
+                    });
+                });
+                renderRoadmap(roadmapData);
+                updateProgress();
+            }
+        }
+
+        function exportData() {
+            const stats = calculateStats();
+            const data = {
+                progress: stats,
+                roadmap: roadmapData.map(stage => ({
+                    stage: stage.title,
+                    actions: stage.actions.map(action => ({
+                        title: action.title,
+                        completed: action.completed,
+                        deadline: action.deadline,
+                        responsible: action.responsible
+                    }))
+                }))
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `roadmap-progress-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize
+        loadProgress();
+        renderRoadmap(roadmapData);
+        updateProgress();
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', filterContent);
+        document.getElementById('statusFilter').addEventListener('change', filterContent);
+        document.getElementById('responsibleFilter').addEventListener('change', filterContent);
+        document.getElementById('stageFilter').addEventListener('change', filterContent);
+    </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge - Презентации</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Play', sans-serif;
+            background: linear-gradient(135deg, #fafafa 0%, #fff 50%, #fafafa 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: clamp(32px, 5vw, 48px);
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #0095ff 0%, #000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #97999c;
+            font-size: clamp(16px, 2.5vw, 20px);
+            margin-bottom: 50px;
+        }
+
+        .presentations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .presentation-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .presentation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 149, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .presentation-card:hover::before {
+            left: 100%;
+        }
+
+        .presentation-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 149, 255, 0.2);
+        }
+
+        .presentation-card h3 {
+            color: #0095ff;
+            font-size: clamp(20px, 2.5vw, 24px);
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .presentation-card p {
+            color: #97999c;
+            font-size: clamp(14px, 1.8vw, 16px);
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .presentation-card .icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #0095ff;
+            color: #fff;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .presentations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bridge</h1>
+        <p class="subtitle">Презентации и документация проекта</p>
+
+        <div class="presentations-grid">
+            <a href="index.html" class="presentation-card">
+                <div class="icon">📊</div>
+                <h3>Презентация для инвестора</h3>
+                <p>Полная презентация проекта Bridge для потенциальных инвесторов. Включает анализ рынка, бизнес-модель, финансовые прогнозы и предложение.</p>
+                <span class="badge">Инвестиции</span>
+            </a>
+
+            <a href="logistics_partner.html" class="presentation-card">
+                <div class="icon">🚚</div>
+                <h3>Партнёрство в логистике</h3>
+                <p>Презентация для потенциального логистического партнёра. Эксклюзивное партнёрство, гарантированные объёмы перевозок КНР-РК.</p>
+                <span class="badge">Логистика</span>
+            </a>
+
+            <a href="database_structure.html" class="presentation-card">
+                <div class="icon">🗄️</div>
+                <h3>Структура базы данных</h3>
+                <p>Подробная документация структуры базы данных проекта Bridge. Модели, связи, поля и описание всех таблиц.</p>
+                <span class="badge">Техническая</span>
+            </a>
+
+            <a href="project_plan.html" class="presentation-card">
+                <div class="icon">📋</div>
+                <h3>План проекта</h3>
+                <p>Детальный план развития проекта Bridge с этапами, сроками и ключевыми метриками.</p>
+                <span class="badge">Планирование</span>
+            </a>
+
+            <a href="roadmap.html" class="presentation-card">
+                <div class="icon">🗺️</div>
+                <h3>Дорожная карта</h3>
+                <p>Roadmap проекта с основными вехами, функциями и направлениями развития платформы.</p>
+                <span class="badge">Развитие</span>
+            </a>
+
+            <a href="index v1.html" class="presentation-card">
+                <div class="icon">📄</div>
+                <h3>Презентация v1</h3>
+                <p>Первая версия презентации проекта Bridge (архивная версия).</p>
+                <span class="badge">Архив</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

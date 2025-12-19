@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bridge - Партнёрство в логистике</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            border: 0;
+            box-sizing: border-box;
+        }
+
+        *:before,
+        *:after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            font-family: "Play", sans-serif;
+            background: #fff;
+            color: #000;
+            overflow: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .presentation-wrapper {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .slide {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: clamp(40px, calc(40px + 40 * ((100vw - 375px) / (1230 - 375))), 80px);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .container {
+            max-width: 1260px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 15px clamp(90px, calc(90px + 30 * ((100vw - 375px) / (1230 - 375))), 120px) 15px;
+        }
+
+        /* Типографика */
+        h1 {
+            font-size: clamp(30px, calc(30px + 20 * ((100vw - 375px) / (1230 - 375))), 50px);
+            line-height: clamp(34px, calc(34px + 24 * ((100vw - 375px) / (1230 - 375))), 58px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+        }
+
+        h2 {
+            font-size: clamp(28px, calc(28px + 18 * ((100vw - 375px) / (1230 - 375))), 46px);
+            line-height: clamp(32px, calc(32px + 22 * ((100vw - 375px) / (1230 - 375))), 54px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(15px, calc(15px + 8 * ((100vw - 375px) / (1230 - 375))), 23px);
+        }
+
+        h3 {
+            font-size: clamp(24px, calc(24px + 10 * ((100vw - 375px) / (1230 - 375))), 34px);
+            line-height: clamp(28px, calc(28px + 12 * ((100vw - 375px) / (1230 - 375))), 40px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(15px, calc(15px + 5 * ((100vw - 375px) / (1230 - 375))), 20px);
+        }
+
+        h4 {
+            font-size: clamp(20px, calc(20px + 4 * ((100vw - 375px) / (1230 - 375))), 24px);
+            line-height: clamp(24px, calc(24px + 2 * ((100vw - 375px) / (1230 - 375))), 26px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(5px, calc(5px + 5 * ((100vw - 375px) / (1230 - 375))), 10px);
+        }
+
+        p {
+            font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px);
+            line-height: clamp(16px, calc(16px + 3 * ((100vw - 375px) / (1230 - 375))), 19px);
+            color: #000;
+            margin-bottom: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px);
+        }
+
+        ul,
+        ol {
+            list-style: none;
+            margin-bottom: clamp(10px, calc(10px + 3 * ((100vw - 375px) / (1230 - 375))), 13px);
+        }
+
+        li {
+            font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px);
+            line-height: clamp(16px, calc(16px + 3 * ((100vw - 375px) / (1230 - 375))), 19px);
+            color: #000;
+            margin-bottom: clamp(6px, calc(6px + 1 * ((100vw - 375px) / (1230 - 375))), 7px);
+            padding-left: clamp(25px, calc(25px + 8 * ((100vw - 375px) / (1230 - 375))), 33px);
+            position: relative;
+        }
+
+        ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #0095ff;
+            font-weight: 700;
+            font-size: 1.5em;
+        }
+
+        ol {
+            counter-reset: item;
+        }
+
+        ol li {
+            counter-increment: item;
+        }
+
+        ol li::before {
+            content: counter(item) ".";
+            position: absolute;
+            left: 0;
+            color: #0095ff;
+            font-weight: 700;
+        }
+
+        /* Титульный слайд */
+        .intro-slide {
+            text-align: center;
+            background: linear-gradient(135deg, #fafafa 0%, #fff 50%, #fafafa 100%);
+        }
+
+        .intro-slide h1 {
+            font-size: clamp(32px, calc(32px + 28 * ((100vw - 375px) / (1230 - 375))), 60px);
+            line-height: clamp(36px, calc(36px + 33 * ((100vw - 375px) / (1230 - 375))), 69px);
+            background: linear-gradient(135deg, #0095ff 0%, #000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px);
+        }
+
+        .intro-slide .subtitle {
+            font-size: clamp(18px, calc(18px + 10 * ((100vw - 375px) / (1230 - 375))), 28px);
+            line-height: clamp(22px, calc(22px + 12 * ((100vw - 375px) / (1230 - 375))), 34px);
+            color: #000;
+            margin-bottom: clamp(15px, calc(15px + 5 * ((100vw - 375px) / (1230 - 375))), 20px);
+            font-weight: 700;
+        }
+
+        .intro-slide .subtitle-small {
+            font-size: clamp(14px, calc(14px + 4 * ((100vw - 375px) / (1230 - 375))), 18px);
+            line-height: clamp(18px, calc(18px + 4 * ((100vw - 375px) / (1230 - 375))), 22px);
+            color: #97999c;
+            margin-bottom: clamp(30px, calc(30px + 20 * ((100vw - 375px) / (1230 - 375))), 50px);
+        }
+
+        .intro-slide .author {
+            font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px);
+            line-height: clamp(16px, calc(16px + 3 * ((100vw - 375px) / (1230 - 375))), 19px);
+            color: #97999c;
+        }
+
+        /* Заголовки секций */
+        .section-title {
+            color: #000;
+            font-weight: 700;
+            margin-bottom: clamp(15px, calc(15px + 8 * ((100vw - 375px) / (1230 - 375))), 23px);
+            position: relative;
+            padding-bottom: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px);
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: #0095ff;
+            border-radius: 2px;
+        }
+
+        /* Контентные блоки */
+        .content-box {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: clamp(15px, calc(15px + 3 * ((100vw - 375px) / (1230 - 375))), 18px) clamp(12px, calc(12px + 10 * ((100vw - 375px) / (1230 - 375))), 22px);
+            margin-bottom: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px);
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .content-box:hover {
+            box-shadow: 0 10px 30px 0 rgba(22, 38, 47, 0.1);
+            transform: translateY(-5px);
+        }
+
+        /* Выделенные блоки */
+        .highlight-box {
+            background: #0095ff;
+            color: #fff;
+            border-radius: 10px;
+            padding: clamp(15px, calc(15px + 3 * ((100vw - 375px) / (1230 - 375))), 18px) clamp(12px, calc(12px + 10 * ((100vw - 375px) / (1230 - 375))), 22px);
+            margin: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .highlight-box::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) rotate(180deg);
+            }
+        }
+
+        .highlight-box h3,
+        .highlight-box h4,
+        .highlight-box p,
+        .highlight-box li {
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .highlight-box ul li::before {
+            color: #fff;
+        }
+
+        /* Финансовые блоки */
+        .financial-box {
+            background: linear-gradient(135deg, #0095ff 0%, #0077cc 100%);
+            color: #fff;
+            border-radius: 10px;
+            padding: clamp(18px, calc(18px + 10 * ((100vw - 375px) / (1230 - 375))), 28px);
+            margin: clamp(10px, calc(10px + 3 * ((100vw - 375px) / (1230 - 375))), 13px) 0;
+            text-align: center;
+        }
+
+        .financial-box .big-number {
+            font-size: clamp(26px, calc(26px + 12 * ((100vw - 375px) / (1230 - 375))), 38px);
+            line-height: clamp(30px, calc(30px + 14 * ((100vw - 375px) / (1230 - 375))), 44px);
+            font-weight: 700;
+            margin-bottom: clamp(6px, calc(6px + 3 * ((100vw - 375px) / (1230 - 375))), 9px);
+        }
+
+        .financial-box .label {
+            font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px);
+            opacity: 0.9;
+        }
+
+        /* Сетки */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px);
+            margin: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px) 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px);
+            margin: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px) 0;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px);
+            margin: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px) 0;
+        }
+
+        /* Карточки */
+        .card {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: clamp(20px, calc(20px + 4 * ((100vw - 375px) / (1230 - 375))), 24px) clamp(15px, calc(15px + 15 * ((100vw - 375px) / (1230 - 375))), 30px);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card::after {
+            content: "→";
+            position: absolute;
+            top: clamp(20px, calc(20px + 4 * ((100vw - 375px) / (1230 - 375))), 24px);
+            right: clamp(15px, calc(15px + 15 * ((100vw - 375px) / (1230 - 375))), 30px);
+            color: #0095ff;
+            font-size: clamp(16px, calc(16px + 6 * ((100vw - 375px) / (1230 - 375))), 22px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-weight: 700;
+        }
+
+        .card.animate {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 30px 0 rgba(22, 38, 47, 0.1);
+            transform: translateY(-10px) scale(1.02);
+        }
+
+        .card:hover::after {
+            opacity: 1;
+            transform: translateX(5px);
+        }
+
+        .card h4 {
+            color: #000;
+            margin-bottom: clamp(5px, calc(5px + 5 * ((100vw - 375px) / (1230 - 375))), 10px);
+            font-size: clamp(20px, calc(20px + 4 * ((100vw - 375px) / (1230 - 375))), 24px);
+            line-height: clamp(24px, calc(24px + 2 * ((100vw - 375px) / (1230 - 375))), 26px);
+        }
+
+        .card p {
+            color: #97999c;
+            font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px);
+            line-height: clamp(16px, calc(16px + 3 * ((100vw - 375px) / (1230 - 375))), 19px);
+            margin: 0;
+        }
+
+        /* Команда */
+        .team-member {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: clamp(15px, calc(15px + 5 * ((100vw - 375px) / (1230 - 375))), 20px);
+            text-align: center;
+            margin-bottom: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px);
+        }
+
+        .team-member h4 {
+            color: #0095ff;
+            margin-bottom: clamp(5px, calc(5px + 2 * ((100vw - 375px) / (1230 - 375))), 7px);
+        }
+
+        .team-member p {
+            color: #97999c;
+            font-size: clamp(12px, calc(12px + 2 * ((100vw - 375px) / (1230 - 375))), 14px);
+            margin: 0;
+        }
+
+        /* Навигация */
+        .navigation {
+            position: fixed;
+            bottom: clamp(15px, calc(15px + 8 * ((100vw - 375px) / (1230 - 375))), 23px);
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: clamp(12px, calc(12px + 4 * ((100vw - 375px) / (1230 - 375))), 16px);
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            padding: clamp(12px, calc(12px + 4 * ((100vw - 375px) / (1230 - 375))), 16px) clamp(12px, calc(12px + 35 * ((100vw - 375px) / (1230 - 375))), 47px);
+            border-radius: 4px;
+            background: #0095ff;
+            font-size: clamp(14px, calc(14px + 2 * ((100vw - 375px) / (1230 - 375))), 16px);
+            line-height: clamp(16px, calc(16px + 2 * ((100vw - 375px) / (1230 - 375))), 18px);
+            font-weight: 700;
+            color: #fff;
+            border: 1px solid #0095ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .nav-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(0, 0, 0, 0);
+            color: #0095ff;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-btn:disabled:hover {
+            transform: none;
+            background: #0095ff;
+            color: #fff;
+        }
+
+        /* Счётчик слайдов */
+        .slide-counter {
+            position: fixed;
+            top: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            right: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            background: #fff;
+            padding: clamp(10px, calc(10px + 5 * ((100vw - 375px) / (1230 - 375))), 15px) clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            border-radius: 4px;
+            font-weight: 700;
+            color: #0095ff;
+            font-size: clamp(16px, calc(16px + 2 * ((100vw - 375px) / (1230 - 375))), 18px);
+            box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .slide-counter:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px 0 rgba(0, 149, 255, 0.2);
+        }
+
+        /* Анимации */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.3s;
+        }
+
+        .stagger-4 {
+            animation-delay: 0.4s;
+        }
+
+        .stagger-5 {
+            animation-delay: 0.5s;
+        }
+
+        .stagger-6 {
+            animation-delay: 0.6s;
+        }
+
+        /* Специальные стили для финансовых слайдов */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(10px, calc(10px + 3 * ((100vw - 375px) / (1230 - 375))), 13px);
+            margin: clamp(15px, calc(15px + 5 * ((100vw - 375px) / (1230 - 375))), 20px) 0;
+        }
+
+        .stat-item {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: clamp(15px, calc(15px + 7 * ((100vw - 375px) / (1230 - 375))), 22px);
+            text-align: center;
+        }
+
+        .stat-item .number {
+            font-size: clamp(28px, calc(28px + 12 * ((100vw - 375px) / (1230 - 375))), 40px);
+            font-weight: 700;
+            color: #0095ff;
+            margin-bottom: clamp(5px, calc(5px + 2 * ((100vw - 375px) / (1230 - 375))), 7px);
+        }
+
+        .stat-item .label {
+            font-size: clamp(12px, calc(12px + 2 * ((100vw - 375px) / (1230 - 375))), 14px);
+            color: #97999c;
+        }
+
+        @media (max-width: 768px) {
+
+            .grid-2,
+            .grid-3,
+            .grid-4,
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">9</span>
+    </div>
+
+    <div class="presentation-wrapper">
+        <!-- Слайд 1: Титульный -->
+        <div class="slide active intro-slide">
+            <div class="container">
+                <h1>Bridge</h1>
+                <p class="subtitle fade-in">Эксклюзивное партнёрство в логистике Казахстан-Китай</p>
+                <p class="subtitle-small fade-in stagger-1">Инновационная платформа международной торговли, открывающая доступ к крупнейшему рынку грузоперевозок</p>
+                <p class="author fade-in stagger-2">Артур Авсиевич<br>CEO & Основатель Bridge</p>
+            </div>
+        </div>
+
+        <!-- Слайд 2: Рыночная возможность -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">РЫНОК ГРУЗОПЕРЕВОЗОК: $2,3 млрд в год</h2>
+                <p class="fade-in" style="font-weight: 700; margin-bottom: 20px;">Почему это уникальная возможность:</p>
+                <div class="content-box">
+                    <ul>
+                        <li class="fade-in stagger-1"><strong>Рост товарооборота КНР-РК:</strong> +25% ежегодно</li>
+                        <li class="fade-in stagger-2"><strong>Объём грузоперевозок:</strong> более 10 млн тонн в год</li>
+                        <li class="fade-in stagger-3"><strong>Неиспользованный потенциал:</strong> $800 млн в логистике</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p
+                        style="font-weight: 700; margin: 0; font-size: clamp(18px, calc(18px + 4 * ((100vw - 375px) / (1230 - 375))), 22px);">
+                        Мы открываем доступ к этому рынку</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 3: Объёмы грузов -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">ГАРАНТИРОВАННЫЕ ОБЪЁМЫ ПЕРЕВОЗОК</h2>
+                <div class="stat-grid">
+                    <div class="stat-item fade-in">
+                        <div class="number">500+</div>
+                        <div class="label">Заказов в месяц</div>
+                    </div>
+                    <div class="stat-item fade-in stagger-1">
+                        <div class="number">10,000+</div>
+                        <div class="label">Тонн грузов в месяц</div>
+                    </div>
+                    <div class="stat-item fade-in stagger-2">
+                        <div class="number">$5-10 млн</div>
+                        <div class="label">Оборот логистики в год</div>
+                    </div>
+                    <div class="stat-item fade-in stagger-3">
+                        <div class="number">100%</div>
+                        <div class="label">Эксклюзивность для партнёра</div>
+                    </div>
+                </div>
+                <div class="financial-box">
+                    <div class="big-number">🚚 Готовы к таким объёмам?</div>
+                    <div class="label">Стабильный поток заказов гарантирован</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 4: Эксклюзивное партнёрство -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">ЭКСКЛЮЗИВНОЕ ПАРТНЁРСТВО</h2>
+                <p class="fade-in" style="font-weight: 700; margin-bottom: 20px;">Что вы получаете как эксклюзивный партнёр:</p>
+                <div class="grid-2">
+                    <div class="content-box fade-in">
+                        <h4 style="color: #0095ff;">1. Эксклюзивные права</h4>
+                        <p>100% всех грузоперевозок платформы Bridge</p>
+                    </div>
+                    <div class="content-box fade-in stagger-1">
+                        <h4 style="color: #0095ff;">2. Стабильные объёмы</h4>
+                        <p>Гарантированный поток заказов без конкуренции</p>
+                    </div>
+                    <div class="content-box fade-in stagger-2">
+                        <h4 style="color: #0095ff;">3. Преимущество первопроходца</h4>
+                        <p>Вы становитесь первым партнёром на новом рынке</p>
+                    </div>
+                    <div class="content-box fade-in stagger-3">
+                        <h4 style="color: #0095ff;">4. Рост вместе с платформой</h4>
+                        <p>Масштабирование объёмов по мере развития</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <p style="font-weight: 700; margin: 0;">Эксклюзивность = гарантированные объёмы без конкуренции</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 5: Логистическая цепочка -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">ЛОГИСТИЧЕСКАЯ ЦЕПОЧКА</h2>
+                <p class="fade-in">Как работает наша система перевозок:</p>
+                <div class="grid-2">
+                    <div class="content-box fade-in">
+                        <h4 style="color: #0095ff;">📍 Китай (склад партнёра)</h4>
+                        <p>Приём и консолидация грузов на вашем складе в КНР</p>
+                    </div>
+                    <div class="content-box fade-in stagger-1">
+                        <h4 style="color: #0095ff;">🚛 Транспортировка</h4>
+                        <p>Перевозка грузов по маршруту КНР → РК</p>
+                    </div>
+                    <div class="content-box fade-in stagger-2">
+                        <h4 style="color: #0095ff;">🏢 Казахстан (склад партнёра)</h4>
+                        <p>Доставка и хранение на вашем складе в РК</p>
+                    </div>
+                    <div class="content-box fade-in stagger-3">
+                        <h4 style="color: #0095ff;">📊 Автоматизация</h4>
+                        <p>Интеграция с нашей платформой для отслеживания</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <p style="font-weight: 700; margin: 0;">Используем ваши склады в Китае и Казахстане</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 6: Преимущества для перевозчика -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">ПРЕИМУЩЕСТВА ДЛЯ ВАС</h2>
+                <div class="highlight-box">
+                    <ul>
+                        <li class="fade-in stagger-1">Стабильный поток заказов без поиска клиентов</li>
+                        <li class="fade-in stagger-2">Эксклюзивные права на все перевозки платформы</li>
+                        <li class="fade-in stagger-3">Использование вашей инфраструктуры (склады в КНР и РК)</li>
+                        <li class="fade-in stagger-4">Автоматизация процессов через нашу платформу</li>
+                        <li class="fade-in stagger-5">Рост объёмов вместе с развитием платформы</li>
+                    </ul>
+                </div>
+                <p class="fade-in stagger-6" style="text-align: center; font-weight: 700; margin-top: 40px;">
+                    Вы получаете гарантированные объёмы, мы получаем надёжного партнёра.
+                </p>
+            </div>
+        </div>
+
+        <!-- Слайд 7: Готовность к объёмам -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">ГОТОВЫ ЛИ ВЫ К ТАКИМ ОБЪЁМАМ?</h2>
+                <p class="fade-in" style="font-weight: 700; margin-bottom: 20px;">Требования к партнёру:</p>
+                <div class="grid-2">
+                    <div class="content-box fade-in">
+                        <h4 style="color: #0095ff;">🏭 Инфраструктура</h4>
+                        <p>Склады в Китае и Казахстане, транспортный парк</p>
+                    </div>
+                    <div class="content-box fade-in stagger-1">
+                        <h4 style="color: #0095ff;">📈 Масштабирование</h4>
+                        <p>Способность увеличивать объёмы перевозок</p>
+                    </div>
+                    <div class="content-box fade-in stagger-2">
+                        <h4 style="color: #0095ff;">⚡ Надёжность</h4>
+                        <p>Соблюдение сроков и качество сервиса</p>
+                    </div>
+                    <div class="content-box fade-in stagger-3">
+                        <h4 style="color: #0095ff;">🤝 Партнёрство</h4>
+                        <p>Готовность быть первым и расти вместе с нами</p>
+                    </div>
+                </div>
+                <div class="financial-box" style="margin-top: 30px;">
+                    <div class="big-number">Готовы стать первым?</div>
+                    <div class="label">Эксклюзивное партнёрство с гарантированными объёмами</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 8: Команда -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">НАША КОМАНДА — гарантия успеха</h2>
+                <div class="grid-2">
+                    <div class="team-member fade-in">
+                        <h4>👨‍💼 Артур Авсиевич</h4>
+                        <p>CEO — 10+ лет в международной торговле</p>
+                    </div>
+                    <div class="team-member fade-in stagger-1">
+                        <h4>👨‍💼 [Имя]</h4>
+                        <p>CTO — экс-лид разработки [известная компания]</p>
+                    </div>
+                    <div class="team-member fade-in stagger-2">
+                        <h4>👨‍💼 [Имя]</h4>
+                        <p>COO Китай — 15 лет работы с фабриками в Гуанчжоу</p>
+                    </div>
+                    <div class="team-member fade-in stagger-3">
+                        <h4>👨‍💼 [Имя]</h4>
+                        <p>Логистический директор — опыт организации крупных перевозок</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <p style="font-weight: 700; margin: 0;">Мы уже вложили $150k своих средств в развитие платформы</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 9: Призыв к действию -->
+        <div class="slide intro-slide">
+            <div class="container">
+                <h2 style="border: none; margin-bottom: clamp(15px, calc(15px + 5 * ((100vw - 375px) / (1230 - 375))), 20px);"
+                    class="fade-in">ЭКСКЛЮЗИВНОЕ ПАРТНЁРСТВО — ВАШ ШАНС ЗАХВАТИТЬ РЫНОК</h2>
+                <div class="financial-box fade-in stagger-1">
+                    <div class="big-number">100% эксклюзивность</div>
+                    <div class="label">= все грузоперевозки платформы Bridge</div>
+                </div>
+                <div class="content-box fade-in stagger-2"
+                    style="margin-top: clamp(10px, calc(10px + 3 * ((100vw - 375px) / (1230 - 375))), 13px);">
+                    <h4
+                        style="color: #0095ff; margin-bottom: clamp(8px, calc(8px + 2 * ((100vw - 375px) / (1230 - 375))), 10px);">
+                        Что вы получаете:</h4>
+                    <ul>
+                        <li>✅ Эксклюзивные права на все перевозки</li>
+                        <li>✅ Гарантированные объёмы: 500+ заказов/месяц</li>
+                        <li>✅ Стабильный поток без конкуренции</li>
+                        <li>✅ Рост вместе с платформой</li>
+                    </ul>
+                </div>
+                <div class="content-box fade-in stagger-3"
+                    style="margin-top: clamp(10px, calc(10px + 3 * ((100vw - 375px) / (1230 - 375))), 13px);">
+                    <h4
+                        style="color: #0095ff; margin-bottom: clamp(8px, calc(8px + 2 * ((100vw - 375px) / (1230 - 375))), 10px);">
+                        СЛЕДУЮЩИЙ ШАГ:</h4>
+                    <ol>
+                        <li>Обсуждение условий эксклюзивного партнёрства</li>
+                        <li>Оценка вашей готовности к объёмам</li>
+                        <li>Подписание соглашения о партнёрстве</li>
+                    </ol>
+                </div>
+                <p class="fade-in stagger-4"
+                    style="text-align: center; font-weight: 700; margin-top: clamp(15px, calc(15px + 5 * ((100vw - 375px) / (1230 - 375))), 20px); font-size: clamp(16px, calc(16px + 2 * ((100vw - 375px) / (1230 - 375))), 18px); color: #0095ff;">
+                    Готовы стать нашим эксклюзивным партнёром в логистике?
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)">← Назад</button>
+        <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Вперёд →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function animateSlide(slide) {
+            const cards = slide.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('animate');
+                }, index * 150);
+            });
+        }
+
+        function showSlide(n) {
+            if (n >= totalSlides) {
+                currentSlide = 0;
+            } else if (n < 0) {
+                currentSlide = totalSlides - 1;
+            } else {
+                currentSlide = n;
+            }
+
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                    slide.querySelectorAll('.card').forEach(card => card.classList.remove('animate'));
+                    setTimeout(() => animateSlide(slide), 100);
+                }
+            });
+
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            document.getElementById('prev-btn').disabled = currentSlide === 0;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+            slides[currentSlide].scrollTop = 0;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+
+</html>

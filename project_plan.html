@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge Kazakhstan - План проекта</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .app {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .sidebar-stats {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-mini {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+
+        .stat-mini-label {
+            color: var(--text-light);
+        }
+
+        .stat-mini-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .filters {
+            padding: 20px;
+            flex: 1;
+        }
+
+        .filter-group {
+            margin-bottom: 24px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: var(--shadow);
+        }
+
+        .topbar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 4px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 8px;
+        }
+
+        .view-btn {
+            padding: 6px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .content {
+            flex: 1;
+            padding: 32px;
+            overflow-y: auto;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .dashboard-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .dashboard-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .dashboard-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .dashboard-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .dashboard-card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .dashboard-card-label {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .priority-A .dashboard-card-icon { background: #fee2e2; color: var(--danger); }
+        .priority-B .dashboard-card-icon { background: #fef3c7; color: var(--warning); }
+        .priority-C .dashboard-card-icon { background: #d1fae5; color: var(--success); }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .chart-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        .chart-container {
+            height: 200px;
+            position: relative;
+        }
+
+        /* Stage */
+        .stage {
+            margin-bottom: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .stage-header {
+            padding: 16px 20px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .stage-header:hover {
+            background: #f1f5f9;
+        }
+
+        .stage-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stage-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .stage-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .stage-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stage-deadline {
+            font-size: 12px;
+            color: var(--text-light);
+            padding: 4px 12px;
+            background: var(--bg);
+            border-radius: 12px;
+        }
+
+        .stage-toggle {
+            color: var(--text-light);
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+
+        .stage.collapsed .stage-toggle {
+            transform: rotate(-90deg);
+        }
+
+        .stage-content {
+            padding: 20px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .stage.collapsed .stage-content {
+            display: none;
+        }
+
+        /* Task */
+        .task {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+            transition: all 0.2s;
+        }
+
+        .task:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+
+        .task.priority-A { border-left-color: var(--danger); }
+        .task.priority-B { border-left-color: var(--warning); }
+        .task.priority-C { border-left-color: var(--success); }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .task-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-number {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-right: 8px;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 14px;
+            display: inline;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .badge-priority-A {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .badge-priority-B {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .badge-priority-C {
+            background: #d1fae5;
+            color: var(--success);
+        }
+
+        .badge-responsible {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        .badge-deadline {
+            background: #f3f4f6;
+            color: var(--text);
+        }
+
+        .subtasks {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            display: grid;
+            gap: 8px;
+        }
+
+        .subtask {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 2px solid var(--border);
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 13px;
+        }
+
+        .subtask.priority-A { border-left-color: var(--danger); }
+        .subtask.priority-B { border-left-color: var(--warning); }
+        .subtask.priority-C { border-left-color: var(--success); }
+
+        .subtask-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .subtask-info {
+            flex: 1;
+        }
+
+        .subtask-number {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 12px;
+            margin-right: 6px;
+        }
+
+        .subtask-title {
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .subtask-meta {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        /* Timeline View */
+        .timeline-view {
+            display: none;
+        }
+
+        .timeline-view.active {
+            display: block;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding-left: 32px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 6px;
+            top: 4px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 3px solid var(--primary);
+            z-index: 1;
+        }
+
+        .timeline-content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .timeline-date {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .timeline-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .dashboard-grid,
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">Bridge Kazakhstan</div>
+                <div class="logo-subtitle">План проекта</div>
+            </div>
+
+            <div class="sidebar-stats" id="sidebarStats">
+                <!-- Stats will be populated -->
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <div class="filter-label">Поиск</div>
+                    <input type="text" class="filter-input" id="searchInput" placeholder="Название задачи...">
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Приоритет</div>
+                    <select class="filter-input" id="priorityFilter">
+                        <option value="">Все</option>
+                        <option value="A">A - Высокий</option>
+                        <option value="B">B - Средний</option>
+                        <option value="C">C - Низкий</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-label">Ответственный</div>
+                    <select class="filter-input" id="responsibleFilter">
+                        <option value="">Все</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="topbar">
+                <div class="topbar-title">План реализации проекта</div>
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="list">Список</button>
+                    <button class="view-btn" data-view="timeline">Timeline</button>
+                </div>
+            </div>
+
+            <div class="content">
+                <!-- Dashboard -->
+                <div class="dashboard-grid" id="dashboard">
+                    <!-- Will be populated -->
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-title">Распределение по приоритетам</div>
+                        <div class="chart-container">
+                            <canvas id="priorityChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">Нагрузка по ответственным</div>
+                        <div class="chart-container">
+                            <canvas id="responsibleChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">Задачи по этапам</div>
+                        <div class="chart-container">
+                            <canvas id="stagesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div id="content">
+                    <!-- Will be populated -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const projectData = [
+            {
+                stage: "I",
+                stageTitle: "Подготовительный этап",
+                stageDeadline: "21-25 июл",
+                tasks: [
+                    {
+                        number: "1",
+                        title: "Регистрация компаний",
+                        responsible: "Учередители",
+                        priority: "A",
+                        deadline: "23-27 июн",
+                        subtasks: [
+                            { number: "1.1", title: "Регистрация компании в МФЦА", responsible: "Учередители", priority: "A", deadline: "5-9 май" },
+                            { number: "1.2", title: "Составление учередительной документации", responsible: "Учередители", priority: "B", deadline: "12-16 май" },
+                            { number: "1.3", title: "Открытие расчетного счета", responsible: "Учередители", priority: "A", deadline: "19-23 май" },
+                            { number: "1.4", title: "Регистрация компании в Гуаньжоу", responsible: "Учередители", priority: "A", deadline: "23-27 июн" },
+                            { number: "1.5", title: "Составление учередительной документации", responsible: "Учередители", priority: "B", deadline: "30 июн-4 июл" },
+                            { number: "1.6", title: "Открытие расчетного счета", responsible: "Учередители", priority: "A", deadline: "14-18 июл" }
+                        ]
+                    },
+                    {
+                        number: "2",
+                        title: "Поиск и аренда помещений",
+                        responsible: "CEO",
+                        priority: "B",
+                        deadline: "25-29 авг",
+                        subtasks: [
+                            { number: "2.1", title: "Поиск офисного помещения 150м² в г.Алматы", responsible: "CEO", priority: "B", deadline: "28 апр - 2 май" },
+                            { number: "2.2", title: "Поиск складского помещения 300 м² в г.Алматы", responsible: "Координатор логистики", priority: "C", deadline: "11-15 авг" },
+                            { number: "2.3", title: "Поиск офисного помещения 150м² в г.Гуанчжоу", responsible: "CEO", priority: "B", deadline: "2-6 июн" },
+                            { number: "2.4", title: "Поиск складского помещения 300 м² в г.Гуанчжоу", responsible: "Координатор логистики", priority: "C", deadline: "25-29 авг" }
+                        ]
+                    },
+                    {
+                        number: "3",
+                        title: "Формирование команды",
+                        responsible: "CEO",
+                        priority: "A",
+                        deadline: "27-31 окт",
+                        subtasks: [
+                            { number: "3.1", title: "Создание списка сотрудников для компаний РК и КНР", responsible: "CEO, HR-директор", priority: "A", deadline: "28 апр - 2 май" },
+                            { number: "3.2", title: "Составление вакансий, размещение объявлений", responsible: "CEO, HR-директор", priority: "B", deadline: "23-27 июн" },
+                            { number: "3.3", title: "Проведение собеседований", responsible: "CEO, HR-директор, Руководитель соответствующего отдела", priority: "A", deadline: "22-26 сен" },
+                            { number: "3.4", title: "Заключение трудовых договоров", responsible: "HR-директор, главный юрист", priority: "A", deadline: "27-31 окт" }
+                        ]
+                    }
+                ]
+            },
+            {
+                stage: "II",
+                stageTitle: "Этап проектирования платформы",
+                stageDeadline: "22-26 сен",
+                tasks: [
+                    {
+                        number: "4",
+                        title: "Анализ и проектирование",
+                        responsible: "CEO, Руководитель IT-отдела",
+                        priority: "A",
+                        deadline: "2-6 июн",
+                        subtasks: [
+                            { number: "4.1", title: "Сбор требований (интерфейсы, архитектура)", responsible: "Руководитель IT-отдела, Главный разработчик", priority: "B", deadline: "26-30 май" },
+                            { number: "4.2", title: "Разработка концепции платформы", responsible: "CEO", priority: "A", deadline: "31 мар - 4 апр" },
+                            { number: "4.3", title: "Разработка функционала платформы", responsible: "CEO, Руководитель IT-отдела", priority: "A", deadline: "14-18 апр" },
+                            { number: "4.4", title: "Разработка пользовательских сценариев", responsible: "CEO, Руководитель IT-отдела", priority: "C", deadline: "31 мар - 4 апр" }
+                        ]
+                    },
+                    {
+                        number: "5",
+                        title: "IT-инфраструктура",
+                        responsible: "Руководитель IT-отдела, Главный разработчик",
+                        priority: "B",
+                        deadline: "7-11 июл",
+                        subtasks: [
+                            { number: "5.1", title: "Выбор облачных сервисов", responsible: "Главный разработчик", priority: "B", deadline: "5-9 май" },
+                            { number: "5.2", title: "Резервирование доменов", responsible: "Руководитель IT-отдела, Главный разработчик", priority: "B", deadline: "28 апр - 2 май" },
+                            { number: "5.3", title: "Регистрация прав", responsible: "Руководитель IT-отдела, Главный юрист", priority: "B", deadline: "12-16 май" }
+                        ]
+                    }
+                ]
+            },
+            {
+                stage: "III",
+                stageTitle: "Этап разработки",
+                stageDeadline: "22-26 сен",
+                tasks: [
+                    {
+                        number: "6",
+                        title: "Backend и Frontend разработка",
+                        responsible: "Руководитель IT-отдела",
+                        priority: "A",
+                        deadline: "23-27 июн",
+                        subtasks: [
+                            { number: "6.1", title: "Реализация MVP Казахстанской платформы", responsible: "Главный разработчик", priority: "A", deadline: "31 мар - 4 апр" },
+                            { number: "6.2", title: "Интеграция поиска тендеров, баз данных загрузка документов", responsible: "Главный разработчик", priority: "A", deadline: "31 мар - 4 апр" },
+                            { number: "6.3", title: "Реализация MVP Китайской платформы", responsible: "Главный разработчик", priority: "A", deadline: "26-30 май" },
+                            { number: "6.4", title: "Интеграция поиска тендеров, баз данных загрузка документов", responsible: "Главный разработчик", priority: "B", deadline: "26-30 май" }
+                        ]
+                    },
+                    {
+                        number: "7",
+                        title: "Интеграция и автоматизация",
+                        responsible: "Руководитель IT-отдела",
+                        priority: "B",
+                        deadline: "21-25 июл",
+                        subtasks: [
+                            { number: "7.1", title: "Перевод и синхронизация тендеров", responsible: "Главный разработчик, переводчик", priority: "B", deadline: "23-27 июн" },
+                            { number: "7.2", title: "Интеграция логистических калькуляторов и систем уведомления", responsible: "Главный разработчик, Координатор логистики", priority: "A", deadline: "21-25 июл" },
+                            { number: "7.3", title: "Подключения механизма заключения электронных договоров и платежных систем", responsible: "Руководитель IT-отдела, Главный юрист", priority: "B", deadline: "2-6 июн" }
+                        ]
+                    },
+                    {
+                        number: "8",
+                        title: "Локализация",
+                        responsible: "Директор по маркетингу, Руководитель IT-отдела, Переводчик",
+                        priority: "B",
+                        deadline: "21-25 июл",
+                        subtasks: [
+                            { number: "8.1", title: "Поддержка 3х языков (русский, казахский, английский, китайский)", responsible: "Руководитель IT-отдела, переводчик", priority: "C", deadline: "11-15 авг" },
+                            { number: "8.2", title: "Адаптация интерфейса под китайскую аудиторию", responsible: "Руководитель IT-отдела, Директор по маркетингу, переводчик", priority: "C", deadline: "25-29 авг" }
+                        ]
+                    }
+                ]
+            },
+            {
+                stage: "IV",
+                stageTitle: "Тестирование и подготовка к запуску",
+                stageDeadline: "13-17 окт",
+                tasks: [
+                    {
+                        number: "9",
+                        title: "Тестирование платформы",
+                        responsible: "Тестировщики, Главный разработчик",
+                        priority: "A",
+                        deadline: "13-17 окт",
+                        subtasks: [
+                            { number: "9.1", title: "Функциональное и нагрузочное тестирование", responsible: "Тестировщики, Главный разработчик", priority: "C", deadline: "8-12 сен" },
+                            { number: "9.2", title: "Внутреннее бета тестирование", responsible: "Главный разработчик", priority: "B", deadline: "4-8 авг" },
+                            { number: "9.3", title: "Исправление ошибок и оптимизация", responsible: "Главный разработчик", priority: "B", deadline: "6-10 окт" }
+                        ]
+                    },
+                    {
+                        number: "10",
+                        title: "Обучение персонала",
+                        responsible: "HR-директор",
+                        priority: "A",
+                        deadline: "27-31 окт",
+                        subtasks: [
+                            { number: "10.1", title: "Обучение операторов платформы, логистов, менеджеров", responsible: "HR-директор, Координатор логистики", priority: "A", deadline: "8-12 сен" },
+                            { number: "10.2", title: "Подготовка видео-инструкций и справочного раздела", responsible: "Маркетолог, Директор по продажам", priority: "C", deadline: "7-11 июл" }
+                        ]
+                    },
+                    {
+                        number: "11",
+                        title: "Подготовка маркетинга",
+                        responsible: "Директор по маркетингу, Руководитель IT-отдела, Переводчик",
+                        priority: "A",
+                        deadline: "25-29 авг",
+                        subtasks: [
+                            { number: "11.1", title: "Разработка лендингов", responsible: "Директор по маркетингу, Руководитель IT-отдела, Переводчик", priority: "B", deadline: "21-25 июл" },
+                            { number: "11.2", title: "Подготовка промо-материалов (видео, баннеры)", responsible: "Маркетолог, Директор по продажам", priority: "C", deadline: "28 июл-1 авг" },
+                            { number: "11.3", title: "Запуск аккаунтов в соцсетях (LinkedIn, WeChat, Telegram и др.)", responsible: "Руководитель IT-отдела, Специалист по связям с общественностью, Контент менеджер", priority: "C", deadline: "18-22 авг" }
+                        ]
+                    }
+                ]
+            },
+            {
+                stage: "V",
+                stageTitle: "Запуск и масштабирование",
+                stageDeadline: "10-14 ноя",
+                tasks: [
+                    {
+                        number: "12",
+                        title: "Мягкий запуск",
+                        responsible: "CEO, Руководитель IT-отдела, Тестировщики",
+                        priority: "A",
+                        deadline: "6-10 окт",
+                        subtasks: [
+                            { number: "12.1", title: "Приглашение 10-15 компаний для тестирования", responsible: "Директор по продажам", priority: "A", deadline: "8-12 сен" },
+                            { number: "12.2", title: "Обратная связь, улучшения, исправления", responsible: "Руководитель IT-отдела, менеджер по продажам, служба поддержки", priority: "A", deadline: "6-10 окт" }
+                        ]
+                    },
+                    {
+                        number: "13",
+                        title: "Публичный запуск",
+                        responsible: "CEO, руководитель IT-отдела, Директор по маркетингу, Главный юрист",
+                        priority: "A",
+                        deadline: "3-7 ноя",
+                        subtasks: [
+                            { number: "13.1", title: "Запуск платформы и объявления в СМИ", responsible: "Директор по маркетингу", priority: "A", deadline: "8-12 сен" },
+                            { number: "13.2", title: "E-mail рассылка, вебинары, реклама", responsible: "Директор по маркетингу", priority: "C", deadline: "6-10 окт" },
+                            { number: "13.3", title: "Начало генерации первых сделок", responsible: "CEO", priority: "A", deadline: "27-31 окт" }
+                        ]
+                    }
+                ]
+            },
+            {
+                stage: "Параллельно",
+                stageTitle: "Параллельно в течение реализации",
+                stageDeadline: "29 дек-2 янв",
+                tasks: [
+                    {
+                        number: "14",
+                        title: "Юридическое сопровождение в обеих странах",
+                        responsible: "Главный юрист",
+                        priority: "A",
+                        deadline: "29 дек-2 янв",
+                        subtasks: []
+                    },
+                    {
+                        number: "15",
+                        title: "Формирование базы поставщиков в КНР",
+                        responsible: "Начальник ОМТС",
+                        priority: "A",
+                        deadline: "29 дек-2 янв",
+                        subtasks: []
+                    },
+                    {
+                        number: "16",
+                        title: "Переговоры с логистическими операторами и таможенными органами",
+                        responsible: "Координатор логистики, специалист по таможенному оформлению",
+                        priority: "A",
+                        deadline: "29 дек-2 янв",
+                        subtasks: []
+                    }
+                ]
+            }
+        ];
+
+        // Calculate statistics
+        function calculateStats() {
+            let totalTasks = 0;
+            let totalSubtasks = 0;
+            let priorityA = 0, priorityB = 0, priorityC = 0;
+            const responsibleCount = {};
+            const stageCounts = {};
+
+            projectData.forEach(stage => {
+                stageCounts[stage.stage] = 0;
+                stage.tasks.forEach(task => {
+                    totalTasks++;
+                    stageCounts[stage.stage]++;
+                    if (task.priority === 'A') priorityA++;
+                    else if (task.priority === 'B') priorityB++;
+                    else if (task.priority === 'C') priorityC++;
+
+                    task.responsible.split(',').forEach(r => {
+                        const resp = r.trim();
+                        responsibleCount[resp] = (responsibleCount[resp] || 0) + 1;
+                    });
+
+                    task.subtasks.forEach(subtask => {
+                        totalSubtasks++;
+                        if (subtask.priority === 'A') priorityA++;
+                        else if (subtask.priority === 'B') priorityB++;
+                        else if (subtask.priority === 'C') priorityC++;
+
+                        subtask.responsible.split(',').forEach(r => {
+                            const resp = r.trim();
+                            responsibleCount[resp] = (responsibleCount[resp] || 0) + 1;
+                        });
+                    });
+                });
+            });
+
+            return {
+                totalTasks: totalTasks + totalSubtasks,
+                totalMainTasks: totalTasks,
+                totalSubtasks,
+                priorityA,
+                priorityB,
+                priorityC,
+                responsibleCount,
+                stageCounts
+            };
+        }
+
+        const stats = calculateStats();
+
+        // Render sidebar stats
+        function renderSidebarStats() {
+            const sidebarStats = document.getElementById('sidebarStats');
+            sidebarStats.innerHTML = `
+                <div class="stat-mini">
+                    <span class="stat-mini-label">Всего задач</span>
+                    <span class="stat-mini-value">${stats.totalTasks}</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-label">Приоритет A</span>
+                    <span class="stat-mini-value">${stats.priorityA}</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-label">Приоритет B</span>
+                    <span class="stat-mini-value">${stats.priorityB}</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-mini-label">Приоритет C</span>
+                    <span class="stat-mini-value">${stats.priorityC}</span>
+                </div>
+            `;
+        }
+
+        // Render dashboard
+        function renderDashboard() {
+            const dashboard = document.getElementById('dashboard');
+            dashboard.innerHTML = `
+                <div class="dashboard-card priority-A" onclick="filterByPriority('A')">
+                    <div class="dashboard-card-header">
+                        <div class="dashboard-card-icon">🔥</div>
+                    </div>
+                    <div class="dashboard-card-value">${stats.priorityA}</div>
+                    <div class="dashboard-card-label">Высокий приоритет</div>
+                </div>
+                <div class="dashboard-card priority-B" onclick="filterByPriority('B')">
+                    <div class="dashboard-card-header">
+                        <div class="dashboard-card-icon">⚡</div>
+                    </div>
+                    <div class="dashboard-card-value">${stats.priorityB}</div>
+                    <div class="dashboard-card-label">Средний приоритет</div>
+                </div>
+                <div class="dashboard-card priority-C" onclick="filterByPriority('C')">
+                    <div class="dashboard-card-header">
+                        <div class="dashboard-card-icon">✅</div>
+                    </div>
+                    <div class="dashboard-card-value">${stats.priorityC}</div>
+                    <div class="dashboard-card-label">Низкий приоритет</div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="dashboard-card-header">
+                        <div class="dashboard-card-icon" style="background: #dbeafe; color: var(--primary);">📋</div>
+                    </div>
+                    <div class="dashboard-card-value">${stats.totalTasks}</div>
+                    <div class="dashboard-card-label">Всего задач</div>
+                </div>
+            `;
+        }
+
+        function filterByPriority(priority) {
+            document.getElementById('priorityFilter').value = priority;
+            filterContent();
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Priority chart
+            const priorityCtx = document.getElementById('priorityChart').getContext('2d');
+            new Chart(priorityCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['A', 'B', 'C'],
+                    datasets: [{
+                        data: [stats.priorityA, stats.priorityB, stats.priorityC],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 12,
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Responsible chart
+            const responsibleData = Object.entries(stats.responsibleCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8);
+            
+            const responsibleCtx = document.getElementById('responsibleChart').getContext('2d');
+            new Chart(responsibleCtx, {
+                type: 'bar',
+                data: {
+                    labels: responsibleData.map(d => d[0].length > 15 ? d[0].substring(0, 15) + '...' : d[0]),
+                    datasets: [{
+                        data: responsibleData.map(d => d[1]),
+                        backgroundColor: '#2563eb',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                font: { size: 10 }
+                            },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            ticks: {
+                                font: { size: 10 }
+                            },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Stages chart
+            const stagesCtx = document.getElementById('stagesChart').getContext('2d');
+            new Chart(stagesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(stats.stageCounts),
+                    datasets: [{
+                        data: Object.values(stats.stageCounts),
+                        backgroundColor: ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#dbeafe', '#f3f4f6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 12,
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Collect all responsibles
+        const allResponsibles = new Set();
+        projectData.forEach(stage => {
+            stage.tasks.forEach(task => {
+                if (task.responsible) {
+                    task.responsible.split(',').forEach(r => allResponsibles.add(r.trim()));
+                }
+                task.subtasks.forEach(subtask => {
+                    if (subtask.responsible) {
+                        subtask.responsible.split(',').forEach(r => allResponsibles.add(r.trim()));
+                    }
+                });
+            });
+        });
+
+        // Populate responsible filter
+        const responsibleSelect = document.getElementById('responsibleFilter');
+        Array.from(allResponsibles).sort().forEach(resp => {
+            const option = document.createElement('option');
+            option.value = resp;
+            option.textContent = resp;
+            responsibleSelect.appendChild(option);
+        });
+
+        // Render content
+        function renderContent(data, view = 'list') {
+            const content = document.getElementById('content');
+            
+            if (view === 'list') {
+                content.innerHTML = data.map((stage, index) => `
+                    <div class="stage" data-stage-index="${index}">
+                        <div class="stage-header" onclick="toggleStage(${index})">
+                            <div class="stage-title">
+                                <div class="stage-number">${stage.stage}</div>
+                                <div class="stage-name">${stage.stageTitle}</div>
+                            </div>
+                            <div class="stage-meta">
+                                <div class="stage-deadline">${stage.stageDeadline}</div>
+                                <div class="stage-toggle">▼</div>
+                            </div>
+                        </div>
+                        <div class="stage-content">
+                            ${stage.tasks.map(task => renderTask(task)).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                content.innerHTML = `
+                    <div class="timeline-view active">
+                        <div class="timeline">
+                            ${data.flatMap((stage, stageIndex) => 
+                                stage.tasks.map((task, taskIndex) => `
+                                    <div class="timeline-item">
+                                        <div class="timeline-dot"></div>
+                                        <div class="timeline-content">
+                                            <div class="timeline-date">${task.deadline}</div>
+                                            <div class="timeline-title">${task.number}. ${task.title}</div>
+                                            <div style="margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap;">
+                                                <span class="badge badge-priority-${task.priority}">${task.priority}</span>
+                                                <span class="badge badge-responsible">${task.responsible.split(',')[0].trim()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `)
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderTask(task) {
+            return `
+                <div class="task priority-${task.priority}" 
+                     data-task-number="${task.number}"
+                     data-priority="${task.priority}"
+                     data-responsible="${task.responsible}"
+                     data-title="${task.title.toLowerCase()}">
+                    <div class="task-header">
+                        <div class="task-info">
+                            <span class="task-number">${task.number}.</span>
+                            <span class="task-title">${task.title}</span>
+                        </div>
+                        <div class="task-meta">
+                            <span class="badge badge-priority-${task.priority}">${task.priority}</span>
+                            <span class="badge badge-responsible">${task.responsible.split(',')[0].trim()}</span>
+                            <span class="badge badge-deadline">${task.deadline}</span>
+                        </div>
+                    </div>
+                    ${task.subtasks && task.subtasks.length > 0 ? `
+                        <div class="subtasks">
+                            ${task.subtasks.map(subtask => `
+                                <div class="subtask priority-${subtask.priority}"
+                                     data-task-number="${subtask.number}"
+                                     data-priority="${subtask.priority}"
+                                     data-responsible="${subtask.responsible}"
+                                     data-title="${subtask.title.toLowerCase()}">
+                                    <div class="subtask-header">
+                                        <div class="subtask-info">
+                                            <span class="subtask-number">${subtask.number}</span>
+                                            <span class="subtask-title">${subtask.title}</span>
+                                        </div>
+                                        <div class="subtask-meta">
+                                            <span class="badge badge-priority-${subtask.priority}">${subtask.priority}</span>
+                                            <span class="badge badge-deadline">${subtask.deadline}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function toggleStage(index) {
+            const stage = document.querySelector(`[data-stage-index="${index}"]`);
+            if (stage) {
+                stage.classList.toggle('collapsed');
+            }
+        }
+
+        function filterContent() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const responsibleFilter = document.getElementById('responsibleFilter').value;
+
+            const allTasks = document.querySelectorAll('.task, .subtask');
+            let visibleCount = 0;
+
+            allTasks.forEach(task => {
+                const title = task.dataset.title || '';
+                const priority = task.dataset.priority || '';
+                const responsible = task.dataset.responsible || '';
+
+                const matchesSearch = !searchTerm || title.includes(searchTerm);
+                const matchesPriority = !priorityFilter || priority === priorityFilter;
+                const matchesResponsible = !responsibleFilter || 
+                    (responsible && responsible.split(',').some(r => r.trim() === responsibleFilter));
+
+                if (matchesSearch && matchesPriority && matchesResponsible) {
+                    task.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    task.classList.add('hidden');
+                }
+            });
+
+            // Hide stages if all tasks are hidden
+            document.querySelectorAll('.stage').forEach(stage => {
+                const visibleTasksInStage = stage.querySelectorAll('.task:not(.hidden), .subtask:not(.hidden)').length;
+                if (visibleTasksInStage === 0) {
+                    stage.style.display = 'none';
+                } else {
+                    stage.style.display = 'block';
+                }
+            });
+
+            // Show empty state
+            const content = document.getElementById('content');
+            const hasVisibleContent = content.querySelectorAll('.stage[style*="block"], .timeline-item:not(.hidden)').length > 0;
+            let emptyState = content.querySelector('.empty-state');
+            
+            if (!hasVisibleContent) {
+                if (!emptyState) {
+                    emptyState = document.createElement('div');
+                    emptyState.className = 'empty-state';
+                    emptyState.innerHTML = `
+                        <div class="empty-state-icon">🔍</div>
+                        <h3>Ничего не найдено</h3>
+                        <p>Попробуйте изменить параметры фильтрации</p>
+                    `;
+                    content.appendChild(emptyState);
+                }
+            } else {
+                if (emptyState) {
+                    emptyState.remove();
+                }
+            }
+        }
+
+        // View toggle
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const view = this.dataset.view;
+                renderContent(projectData, view);
+                setTimeout(filterContent, 100);
+            });
+        });
+
+        // Initialize
+        renderSidebarStats();
+        renderDashboard();
+        initCharts();
+        renderContent(projectData, 'list');
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', filterContent);
+        document.getElementById('priorityFilter').addEventListener('change', filterContent);
+        document.getElementById('responsibleFilter').addEventListener('change', filterContent);
+    </script>
+</body>
+</html>

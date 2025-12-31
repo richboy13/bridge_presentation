@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bridge CRM - Архитектура системы</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            border: 0;
+            box-sizing: border-box;
+        }
+
+        *:before,
+        *:after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            font-family: "Play", sans-serif;
+            background: #fff;
+            color: #000;
+            overflow: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .presentation-wrapper {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .slide {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: clamp(40px, calc(40px + 40 * ((100vw - 375px) / (1230 - 375))), 80px);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .container {
+            max-width: 1260px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 15px clamp(90px, calc(90px + 30 * ((100vw - 375px) / (1230 - 375))), 120px) 15px;
+        }
+
+        h1 {
+            font-size: clamp(30px, calc(30px + 20 * ((100vw - 375px) / (1230 - 375))), 50px);
+            line-height: clamp(34px, calc(34px + 24 * ((100vw - 375px) / (1230 - 375))), 58px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+        }
+
+        h2 {
+            font-size: clamp(28px, calc(28px + 18 * ((100vw - 375px) / (1230 - 375))), 46px);
+            line-height: clamp(32px, calc(32px + 22 * ((100vw - 375px) / (1230 - 375))), 54px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(15px, calc(15px + 8 * ((100vw - 375px) / (1230 - 375))), 23px);
+        }
+
+        h3 {
+            font-size: clamp(22px, calc(22px + 12 * ((100vw - 375px) / (1230 - 375))), 34px);
+            line-height: clamp(26px, calc(26px + 14 * ((100vw - 375px) / (1230 - 375))), 40px);
+            font-weight: 700;
+            color: #000;
+            margin-bottom: clamp(12px, calc(12px + 6 * ((100vw - 375px) / (1230 - 375))), 18px);
+        }
+
+        p {
+            font-size: clamp(14px, calc(14px + 4 * ((100vw - 375px) / (1230 - 375))), 18px);
+            line-height: clamp(20px, calc(20px + 6 * ((100vw - 375px) / (1230 - 375))), 26px);
+            color: #333;
+            margin-bottom: clamp(10px, calc(10px + 4 * ((100vw - 375px) / (1230 - 375))), 14px);
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul li {
+            font-size: clamp(14px, calc(14px + 4 * ((100vw - 375px) / (1230 - 375))), 18px);
+            line-height: clamp(20px, calc(20px + 6 * ((100vw - 375px) / (1230 - 375))), 26px);
+            color: #333;
+            margin-bottom: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px);
+            padding-left: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            position: relative;
+        }
+
+        ul li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #0095ff;
+            font-weight: 700;
+        }
+
+        .section-title {
+            color: #000;
+            font-weight: 700;
+            margin-bottom: clamp(15px, calc(15px + 8 * ((100vw - 375px) / (1230 - 375))), 23px);
+            position: relative;
+            padding-bottom: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px);
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: #0095ff;
+            border-radius: 2px;
+        }
+
+        .content-box {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: clamp(15px, calc(15px + 3 * ((100vw - 375px) / (1230 - 375))), 18px) clamp(12px, calc(12px + 10 * ((100vw - 375px) / (1230 - 375))), 22px);
+            margin-bottom: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px);
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .highlight-box {
+            background: #0095ff;
+            color: #fff;
+            border-radius: 10px;
+            padding: clamp(15px, calc(15px + 3 * ((100vw - 375px) / (1230 - 375))), 18px) clamp(12px, calc(12px + 10 * ((100vw - 375px) / (1230 - 375))), 22px);
+            margin: clamp(8px, calc(8px + 3 * ((100vw - 375px) / (1230 - 375))), 11px) 0;
+        }
+
+        .highlight-box h3,
+        .highlight-box h4,
+        .highlight-box p,
+        .highlight-box li {
+            color: #fff;
+        }
+
+        .highlight-box ul li::before {
+            color: #fff;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(15px, calc(15px + 10 * ((100vw - 375px) / (1230 - 375))), 25px);
+            margin: clamp(15px, calc(15px + 10 * ((100vw - 375px) / (1230 - 375))), 25px) 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(15px, calc(15px + 10 * ((100vw - 375px) / (1230 - 375))), 25px);
+            margin: clamp(15px, calc(15px + 10 * ((100vw - 375px) / (1230 - 375))), 25px) 0;
+        }
+
+        .card {
+            background: #fafafa;
+            border-radius: 10px;
+            padding: clamp(20px, calc(20px + 10 * ((100vw - 375px) / (1230 - 375))), 30px);
+            border-left: 4px solid #0095ff;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 149, 255, 0.2);
+        }
+
+        .card h4 {
+            color: #0095ff;
+            margin-bottom: 10px;
+        }
+
+        .architecture-diagram {
+            background: #f5f5f5;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            overflow-x: auto;
+        }
+
+        .layer {
+            background: #fff;
+            border: 2px solid #0095ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .layer-title {
+            font-weight: 700;
+            color: #0095ff;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .flow-box {
+            background: linear-gradient(135deg, #0095ff 0%, #0077cc 100%);
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 150px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .flow-arrow {
+            font-size: 30px;
+            color: #0095ff;
+            font-weight: 700;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .tech-badge {
+            background: #0095ff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-btn {
+            background: #0095ff;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: "Play", sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #0077cc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 149, 255, 0.3);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 149, 255, 0.9);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            z-index: 1000;
+        }
+
+        .ecp-flow {
+            background: #f0f8ff;
+            border: 2px solid #0095ff;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .ecp-step {
+            background: #fff;
+            border-left: 4px solid #0095ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .ecp-step-number {
+            display: inline-block;
+            background: #0095ff;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-diagram {
+                flex-direction: column;
+            }
+
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="presentation-wrapper">
+        <div class="slide-counter">
+            <span id="current-slide">1</span> / <span id="total-slides">10</span>
+        </div>
+
+        <!-- Слайд 1: Титульный -->
+        <div class="slide active">
+            <div class="container">
+                <h1 style="text-align: center; color: #0095ff;">Bridge CRM</h1>
+                <h2 style="text-align: center; margin-top: 20px;">Архитектура системы</h2>
+                <div style="text-align: center; margin-top: 40px;">
+                    <p style="font-size: 18px; color: #666;">Модульная архитектура Django с интеграцией ЭЦП</p>
+                    <p style="font-size: 16px; color: #999; margin-top: 20px;">2025</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 2: Общая архитектура -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">Общая архитектура системы</h2>
+                <div class="architecture-diagram">
+                    <div class="layer">
+                        <div class="layer-title">Frontend Layer (Клиент)</div>
+                        <div>• HTML/CSS/JavaScript</div>
+                        <div>• Django Templates</div>
+                        <div>• REST API клиенты</div>
+                        <div>• ЭЦП интеграция (NCALayer)</div>
+                    </div>
+                    <div class="layer">
+                        <div class="layer-title">Application Layer (Django)</div>
+                        <div>• Accounts (Пользователи + ЭЦП)</div>
+                        <div>• Announces (Объявления)</div>
+                        <div>• Deals (Сделки)</div>
+                        <div>• Customers, Suppliers, Operators</div>
+                        <div>• Integrations (Внешние API)</div>
+                    </div>
+                    <div class="layer">
+                        <div class="layer-title">Data Layer</div>
+                        <div>• SQLite / PostgreSQL</div>
+                        <div>• Redis (Кэш, Сессии)</div>
+                        <div>• Celery (Фоновые задачи)</div>
+                    </div>
+                    <div class="layer">
+                        <div class="layer-title">External Services</div>
+                        <div>• NCANode API (Проверка ЭЦП)</div>
+                        <div>• ГосЗакуп API</div>
+                        <div>• Самрук API</div>
+                        <div>• Национальный Банк РК</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 3: Модули системы -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">Модули системы</h2>
+                <div class="grid-3">
+                    <div class="card">
+                        <h4>Core</h4>
+                        <p>Базовые классы моделей, утилиты, константы</p>
+                    </div>
+                    <div class="card">
+                        <h4>Accounts</h4>
+                        <p>Управление пользователями, профили, ЭЦП авторизация</p>
+                    </div>
+                    <div class="card">
+                        <h4>Common</h4>
+                        <p>Справочники (валюты, КАТО, переводы)</p>
+                    </div>
+                    <div class="card">
+                        <h4>Announces</h4>
+                        <p>Объявления о тендерах и лоты</p>
+                    </div>
+                    <div class="card">
+                        <h4>Deals</h4>
+                        <p>Центральная модель - сделки между заказчиком и поставщиком</p>
+                    </div>
+                    <div class="card">
+                        <h4>Customers</h4>
+                        <p>Заказчики, интересы, заказы</p>
+                    </div>
+                    <div class="card">
+                        <h4>Suppliers</h4>
+                        <p>Поставщики, продукты, предложения</p>
+                    </div>
+                    <div class="card">
+                        <h4>Operators</h4>
+                        <p>Операторы КЗ и КНР, перевозчики, таможня</p>
+                    </div>
+                    <div class="card">
+                        <h4>Integrations</h4>
+                        <p>Интеграции с внешними системами</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 4: Архитектура ЭЦП -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">Интеграция ЭЦП (Электронная Цифровая Подпись)</h2>
+                <div class="ecp-flow">
+                    <div class="ecp-step">
+                        <span class="ecp-step-number">1</span>
+                        <strong>Клиент (Браузер)</strong>
+                        <p>JavaScript клиент подключается к NCALayer через WebSocket (ws://127.0.0.1:13579)</p>
+                    </div>
+                    <div class="ecp-step">
+                        <span class="ecp-step-number">2</span>
+                        <strong>NCALayer (Локально)</strong>
+                        <p>Приложение NCALayer на компьютере пользователя обрабатывает запросы на подпись</p>
+                    </div>
+                    <div class="ecp-step">
+                        <span class="ecp-step-number">3</span>
+                        <strong>Django Backend</strong>
+                        <p>Генерирует challenge, проверяет подпись через NCANode API, авторизует пользователя</p>
+                    </div>
+                    <div class="ecp-step">
+                        <span class="ecp-step-number">4</span>
+                        <strong>NCANode API</strong>
+                        <p>Внешний сервис для проверки подписи и валидации сертификата</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 5: Поток авторизации через ЭЦП -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">Поток авторизации через ЭЦП</h2>
+                <div class="flow-diagram">
+                    <div class="flow-box">Браузер<br/>Запрос challenge</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Django API<br/>Генерация challenge</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">NCALayer<br/>Подпись challenge</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Django API<br/>Проверка подписи</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">NCANode<br/>Валидация</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-box">Авторизация<br/>Успех</div>
+                </div>
+                <div class="content-box" style="margin-top: 30px;">
+                    <h4>Ключевые компоненты:</h4>
+                    <ul>
+                        <li><strong>ecp_challenge</strong> - генерация уникального challenge (nonce)</li>
+                        <li><strong>ecp_verify</strong> - проверка подписи и авторизация</li>
+                        <li><strong>Извлечение ИИН/БИН</strong> - из SubjectDN сертификата</li>
+                        <li><strong>Автоматическое создание пользователя</strong> - при первом входе</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 6: Модель данных ЭЦП -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">Модель данных для ЭЦП</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>UserProfile (Расширена)</h4>
+                        <ul>
+                            <li><strong>iin</strong> - ИИН (для физических лиц)</li>
+                            <li><strong>bin</strong> - БИН (для юридических лиц)</li>
+                            <li><strong>certificate_serial</strong> - Серийный номер сертификата</li>
+                            <li><strong>ecp_enabled</strong> - Флаг использования ЭЦП</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Безопасность</h4>
+                        <ul>
+                            <li>Challenge с ограниченным сроком (5 минут)</li>
+                            <li>Криптографически стойкая генерация</li>
+                            <li>Проверка OCSP и CRL</li>
+                            <li>Логирование всех операций</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <h4>Процесс авторизации:</h4>
+                    <p>1. Пользователь выбирает сертификат ЭЦП → 2. Подписывает challenge → 3. Сервер проверяет подпись → 4. Извлекает ИИН/БИН → 5. Находит или создает пользователя → 6. Авторизует в системе</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 7: Технологический стек -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">Технологический стек</h2>
+                <div class="content-box">
+                    <h4>Backend:</h4>
+                    <div class="tech-stack">
+                        <span class="tech-badge">Django 5.2.8</span>
+                        <span class="tech-badge">Django REST Framework</span>
+                        <span class="tech-badge">PostgreSQL / SQLite</span>
+                        <span class="tech-badge">Redis</span>
+                        <span class="tech-badge">Celery</span>
+                        <span class="tech-badge">Python 3.13</span>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h4>Frontend:</h4>
+                    <div class="tech-stack">
+                        <span class="tech-badge">HTML5 / CSS3</span>
+                        <span class="tech-badge">JavaScript (ES6+)</span>
+                        <span class="tech-badge">Django Templates</span>
+                        <span class="tech-badge">WebSocket API</span>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h4>ЭЦП:</h4>
+                    <div class="tech-stack">
+                        <span class="tech-badge">NCALayer</span>
+                        <span class="tech-badge">NCANode API</span>
+                        <span class="tech-badge">WebSocket</span>
+                        <span class="tech-badge">RSA / ГОСТ</span>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h4>Интеграции:</h4>
+                    <div class="tech-stack">
+                        <span class="tech-badge">ГосЗакуп API</span>
+                        <span class="tech-badge">Самрук API</span>
+                        <span class="tech-badge">НБ РК API</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 8: API Endpoints -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">API Endpoints</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>ЭЦП Авторизация</h4>
+                        <ul>
+                            <li><code>GET /api/v1/accounts/ecp/challenge/</code></li>
+                            <li><code>POST /api/v1/accounts/ecp/verify/</code></li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Объявления</h4>
+                        <ul>
+                            <li><code>GET /api/v1/announces/</code></li>
+                            <li><code>POST /api/v1/announces/</code></li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Сделки</h4>
+                        <ul>
+                            <li><code>GET /api/v1/deals/</code></li>
+                            <li><code>POST /api/v1/deals/</code></li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Интеграции</h4>
+                        <ul>
+                            <li><code>GET /api/v1/integrations/</code></li>
+                            <li>Синхронизация с внешними системами</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 9: Безопасность -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">Безопасность и валидация</h2>
+                <div class="grid-2">
+                    <div class="highlight-box">
+                        <h4>ЭЦП Безопасность</h4>
+                        <ul>
+                            <li>Криптографически стойкий challenge (secrets.token_urlsafe)</li>
+                            <li>Ограниченный срок действия (5 минут)</li>
+                            <li>Проверка OCSP и CRL</li>
+                            <li>Валидация через NCANode API</li>
+                            <li>Логирование всех операций</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h4>Общая безопасность</h4>
+                        <ul>
+                            <li>CSRF защита</li>
+                            <li>Session-based аутентификация</li>
+                            <li>HTTPS в production</li>
+                            <li>Валидация входных данных</li>
+                            <li>Rate limiting (планируется)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h4>Обработка ошибок:</h4>
+                    <ul>
+                        <li>NCALayer не установлен / не запущен</li>
+                        <li>Сертификат не найден или истек</li>
+                        <li>Недействительная подпись</li>
+                        <li>Истекший challenge</li>
+                        <li>Ошибки NCANode API</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Слайд 10: Преимущества архитектуры -->
+        <div class="slide">
+            <div class="container">
+                <h2 class="section-title">Преимущества архитектуры</h2>
+                <div class="grid-2">
+                    <div class="card">
+                        <h4>Модульность</h4>
+                        <p>Четкое разделение ответственности между приложениями Django. Каждый модуль решает свою задачу.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Масштабируемость</h4>
+                        <p>Легко добавлять новые модули и функциональность. Поддержка горизонтального масштабирования.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Безопасность</h4>
+                        <p>Интеграция ЭЦП для безопасной авторизации. Соответствие требованиям законодательства РК.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Интеграции</h4>
+                        <p>Гибкая система интеграций с внешними API. Поддержка различных источников данных.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <h4>Следующие шаги:</h4>
+                    <ul>
+                        <li>Тестирование на Windows с реальными сертификатами ЭЦП</li>
+                        <li>Оптимизация производительности</li>
+                        <li>Расширение функциональности ЭЦП (подпись документов)</li>
+                        <li>Поддержка мобильной ЭЦП (eGov mobile)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Навигация -->
+        <div class="navigation">
+            <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)">← Назад</button>
+            <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Вперёд →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            if (n >= totalSlides) {
+                currentSlide = 0;
+            } else if (n < 0) {
+                currentSlide = totalSlides - 1;
+            } else {
+                currentSlide = n;
+            }
+
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            document.getElementById('prev-btn').disabled = currentSlide === 0;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        // Клавиатурная навигация
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        // Инициализация
+        showSlide(0);
+    </script>
+</body>
+
+</html>
+

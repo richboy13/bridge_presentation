@@ -1,0 +1,2148 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bridge CRM - Глубокий анализ проекта</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            border: 0;
+            box-sizing: border-box;
+        }
+
+        *:before,
+        *:after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            font-family: "Play", sans-serif;
+            background: #fff;
+            color: #000;
+            scroll-behavior: smooth;
+        }
+
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Боковая навигация */
+        .sidebar {
+            width: 300px;
+            background: #fafafa;
+            border-right: 1px solid #e0e0e0;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #0095ff;
+        }
+
+        .sidebar-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0095ff;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header .subtitle {
+            font-size: 12px;
+            color: #97999c;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 5px;
+        }
+
+        .nav-menu a {
+            display: block;
+            padding: 10px 15px;
+            color: #000;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .nav-menu a:hover {
+            background: #e8f4fd;
+            color: #0095ff;
+        }
+
+        .nav-menu a.active {
+            background: #0095ff;
+            color: #fff;
+        }
+
+        .nav-menu .nav-section {
+            font-weight: 700;
+            color: #0095ff;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            padding: 0 15px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        /* Основной контент */
+        .content {
+            flex: 1;
+            margin-left: 300px;
+            padding: 40px 60px;
+            max-width: 1200px;
+        }
+
+        .header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #0095ff;
+        }
+
+        .header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0095ff 0%, #000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .header .meta {
+            font-size: 14px;
+            color: #97999c;
+            margin-top: 10px;
+        }
+
+        /* Типографика */
+        h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #000;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0095ff;
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #000;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #000;
+            margin-bottom: 15px;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 20px;
+            padding-left: 30px;
+        }
+
+        li {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        ul li {
+            list-style: none;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #0095ff;
+            font-weight: 700;
+            font-size: 1.5em;
+        }
+
+        ol li {
+            list-style: decimal;
+        }
+
+        /* Блоки кода */
+        pre {
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-left: 4px solid #0095ff;
+            border-radius: 5px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+        }
+
+        pre code {
+            color: #000;
+        }
+
+        /* Выделенные блоки */
+        .highlight-box {
+            background: linear-gradient(135deg, #0095ff 0%, #0077cc 100%);
+            color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h3,
+        .highlight-box h4,
+        .highlight-box p,
+        .highlight-box li {
+            color: #fff;
+        }
+
+        .highlight-box ul li::before {
+            color: #fff;
+        }
+
+        .info-box {
+            background: #e8f4fd;
+            border-left: 4px solid #0095ff;
+            border-radius: 5px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+
+        /* Таблицы */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        table th {
+            background: #f5f5f5;
+            font-weight: 700;
+            color: #0095ff;
+        }
+
+        table tr:hover {
+            background: #f9f9f9;
+        }
+
+        /* Mermaid диаграммы */
+        .mermaid {
+            margin: 30px 0;
+            text-align: center;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: auto;
+            min-height: 500px;
+            width: 100%;
+            display: block;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            height: auto !important;
+            overflow: visible;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Убеждаемся, что SVG виден полностью */
+        .mermaid[data-processed="true"] {
+            min-height: auto;
+        }
+
+        /* Улучшаем отображение для маленьких экранов */
+        @media (max-width: 768px) {
+            .mermaid {
+                min-height: 300px;
+                padding: 15px;
+                overflow-x: auto;
+                overflow-y: visible;
+            }
+        }
+
+        .mermaid:hover {
+            border-color: #0095ff;
+            box-shadow: 0 5px 15px rgba(0, 149, 255, 0.2);
+        }
+
+        .mermaid-container {
+            position: relative;
+            width: 100%;
+            overflow: auto;
+            margin-bottom: 30px;
+            background: #fafafa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .mermaid-container .mermaid {
+            margin: 0;
+            background: transparent;
+            border: none;
+            padding: 0;
+        }
+
+        .mermaid-zoom-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #0095ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .mermaid-zoom-btn:hover {
+            background: #0077cc;
+            transform: scale(1.05);
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 95vw;
+            max-height: 95vh;
+            overflow: auto;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #0095ff;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10001;
+        }
+
+        .modal-close:hover {
+            background: #0077cc;
+            transform: rotate(90deg);
+        }
+
+        .modal .mermaid {
+            min-width: 1100px;
+            min-height: 900px;
+            cursor: default;
+            width: 100%;
+            overflow: auto;
+            display: block;
+            position: relative;
+            padding: 40px;
+        }
+
+        .modal .mermaid svg {
+            width: 100% !important;
+            height: auto !important;
+            max-width: none;
+            overflow: visible;
+            display: block;
+            min-width: 1000px;
+        }
+
+        /* Индикатор загрузки */
+        .mermaid-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            color: #0095ff;
+            font-size: 18px;
+        }
+
+        .mermaid-loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .mermaid-error {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            color: #856404;
+            text-align: center;
+        }
+
+        /* Контролы масштабирования */
+        .diagram-controls {
+            position: absolute;
+            top: 15px;
+            right: 60px;
+            display: flex;
+            gap: 10px;
+            z-index: 10001;
+        }
+
+        .diagram-controls button {
+            background: #0095ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .diagram-controls button:hover {
+            background: #0077cc;
+        }
+
+        @media (max-width: 1400px) {
+            .modal .mermaid {
+                min-width: 100%;
+                min-height: 700px;
+            }
+            
+            .modal-content {
+                min-width: 95vw;
+            }
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 98vw;
+            max-height: 98vh;
+            overflow: auto;
+            position: relative;
+            animation: slideIn 0.3s ease;
+            width: auto;
+            min-width: 1200px;
+        }
+
+        @media (max-width: 1400px) {
+            .modal-content {
+                min-width: 95vw;
+            }
+        }
+
+        /* Интерактивные элементы диаграммы */
+        .mermaid svg .node rect,
+        .mermaid svg .node circle,
+        .mermaid svg .node ellipse,
+        .mermaid svg .node polygon {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mermaid svg .node rect:hover,
+        .mermaid svg .node circle:hover,
+        .mermaid svg .node ellipse:hover,
+        .mermaid svg .node polygon:hover {
+            fill: #e8f4fd !important;
+            stroke: #0095ff !important;
+            stroke-width: 3px !important;
+            filter: drop-shadow(0 0 8px rgba(0, 149, 255, 0.5));
+        }
+
+        .mermaid svg .node.expanded rect,
+        .mermaid svg .node.expanded circle,
+        .mermaid svg .node.expanded ellipse,
+        .mermaid svg .node.expanded polygon {
+            fill: #0095ff !important;
+            stroke: #0077cc !important;
+            stroke-width: 3px !important;
+        }
+
+        .mermaid svg .node.expanded .nodeLabel {
+            fill: #fff !important;
+            font-weight: 700;
+        }
+
+        .mermaid svg .edgePath path {
+            transition: all 0.3s ease;
+        }
+
+        .mermaid svg .edgePath.highlighted path {
+            stroke: #0095ff !important;
+            stroke-width: 3px !important;
+        }
+
+        .mermaid svg .edgePath.highlighted .arrowheadPath {
+            fill: #0095ff !important;
+        }
+
+        /* Информационная панель */
+        .node-info {
+            position: fixed;
+            background: #fff;
+            border: 2px solid #0095ff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            max-width: 350px;
+            z-index: 10002;
+            display: none;
+            pointer-events: none;
+        }
+
+        .node-info.active {
+            display: block;
+            animation: slideIn 0.2s ease;
+            pointer-events: auto;
+        }
+
+        .node-info h4 {
+            color: #0095ff;
+            margin-bottom: 10px;
+            font-size: 18px;
+            border-bottom: 2px solid #e8f4fd;
+            padding-bottom: 8px;
+        }
+
+        .node-info p {
+            font-size: 14px;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .node-info ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .node-info li {
+            font-size: 13px;
+            margin-bottom: 5px;
+            line-height: 1.4;
+        }
+
+        .node-info .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: transparent;
+            border: none;
+            color: #0095ff;
+            font-size: 20px;
+            cursor: pointer;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .node-info .close-btn:hover {
+            background: #e8f4fd;
+        }
+
+        /* Секции */
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 4px;
+            height: 30px;
+            background: #0095ff;
+            border-radius: 2px;
+        }
+
+        /* Кнопка "Наверх" */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: #0095ff;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+        }
+
+        .scroll-top:hover {
+            background: #0077cc;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 250px;
+            }
+
+            .content {
+                margin-left: 250px;
+                padding: 30px 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .wrapper {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            h3 {
+                font-size: 20px;
+            }
+        }
+
+        /* Эмодзи в заголовках */
+        h2::before {
+            margin-right: 10px;
+        }
+
+        /* Разделители */
+        hr {
+            border: none;
+            border-top: 2px solid #e0e0e0;
+            margin: 40px 0;
+        }
+
+        /* Ссылки */
+        a {
+            color: #0095ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Блоки с кодом Python/JSON */
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            border-radius: 5px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .code-block code {
+            color: #f8f8f2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- Боковая навигация -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Bridge CRM</h1>
+                <div class="subtitle">Глубокий анализ</div>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-section">Содержание</li>
+                    <li><a href="#intro">Введение</a></li>
+                    <li><a href="#architecture">Архитектура проекта</a></li>
+                    <li><a href="#business-processes">Бизнес-процессы</a></li>
+                    <li><a href="#platform-workflow">Как работает платформа</a></li>
+                    <li><a href="#roles">Взаимодействие ролей</a></li>
+                    <li><a href="#technical">Техническая архитектура</a></li>
+                    <li><a href="#integrations">Интеграции</a></li>
+                    <li><a href="#security">Безопасность</a></li>
+                    <li><a href="#diagrams">Диаграммы</a></li>
+                    <li><a href="#conclusions">Выводы</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Основной контент -->
+        <main class="content">
+            <div class="header" id="intro">
+                <h1>Глубокий анализ проекта Bridge CRM</h1>
+                <div class="meta">
+                    <strong>Версия проекта:</strong> 2.0 (Django)<br>
+                    <strong>Статус:</strong> В разработке<br>
+                    <strong>Дата анализа:</strong> 2025-01-XX
+                </div>
+            </div>
+
+            <section class="section" id="architecture">
+                <h2>🏗️ Общая архитектура проекта</h2>
+                
+                <h3>Принцип построения</h3>
+                <p>Проект использует <strong>модульную архитектуру Django</strong> с четким разделением ответственности:</p>
+                
+                <pre><code>bridge_crm_django/
+├── core/              # Базовые классы (BaseModel, BaseTimestampedModel)
+├── common/            # Справочники (Currency, Kato, SubjectType)
+├── accounts/         # Пользователи и профили (UserProfile, роли)
+├── announces/        # Объявления о тендерах (Announce, AnnounceLot)
+├── deals/            # 🎯 ЦЕНТРАЛЬНАЯ СУЩНОСТЬ - Сделки
+├── customers/         # Заказчики (Interest, Order)
+├── suppliers/         # Поставщики (Product, Offer)
+├── operators_kz/      # Оператор Казахстан
+├── operators_cn/      # Оператор Китай
+├── carriers/          # Перевозчики
+├── customs/           # Таможня
+├── integrations/      # Внешние API (read-only)
+└── tenders/           # Панель управления (legacy)</code></pre>
+
+                <h3>Ключевые принципы</h3>
+                <ul>
+                    <li><strong>Deal-центричная архитектура</strong> - все бизнес-процессы вращаются вокруг модели <code>Deal</code></li>
+                    <li><strong>Один лот = одна сделка</strong> - строгое правило системы</li>
+                    <li><strong>State Machine</strong> - управление жизненным циклом через конечный автомат</li>
+                    <li><strong>Разделение ответственности</strong> - каждая роль имеет свой модуль</li>
+                </ul>
+            </section>
+
+            <section class="section" id="business-processes">
+                <h2>🔄 Архитектура бизнес-процессов</h2>
+                
+                <h3>Жизненный цикл сделки (Deal)</h3>
+                <p>Сделка проходит через <strong>7 уровней</strong> с тремя параллельными статусами:</p>
+                
+                <h4>Уровень 1: Интерес (Interest)</h4>
+                <ul>
+                    <li>Заказчик проявляет интерес к лоту</li>
+                    <li>Ещё не обязательство, только намерение</li>
+                    <li>Модель: <code>customers.Interest</code></li>
+                </ul>
+
+                <h4>Уровень 2: Коммерческое предложение (Offer)</h4>
+                <ul>
+                    <li>Поставщик создаёт коммерческое предложение</li>
+                    <li>Юридически значимый документ</li>
+                    <li>Модель: <code>suppliers.Offer</code></li>
+                </ul>
+
+                <h4>Уровень 3: Заказ (Order)</h4>
+                <ul>
+                    <li>Заказчик создаёт заказ на основе лота</li>
+                    <li>При создании автоматически создаётся <code>Deal</code></li>
+                    <li>Модель: <code>customers.Order</code></li>
+                </ul>
+
+                <h4>Уровень 4: Финансовый статус (Financial Status)</h4>
+                <ul>
+                    <li><strong>PENDING</strong> → Ожидает оплаты</li>
+                    <li><strong>PAYMENT_INITIATED</strong> → Оплата инициирована заказчиком</li>
+                    <li><strong>PAYMENT_RECEIVED</strong> → Оплата получена платформой (блокировка средств)</li>
+                    <li><strong>FUNDS_TRANSFERRED</strong> → Средства переданы оператору КЗ</li>
+                    <li><strong>OPERATOR_CN_FUNDS_RECEIVED</strong> → Оператор CN получил средства</li>
+                    <li><strong>SUPPLIER_PAID</strong> → Поставщик оплачен</li>
+                    <li><strong>COMPLETED</strong> → Финансы закрыты</li>
+                </ul>
+
+                <h4>Уровень 5-6: Статус груза (Cargo Status)</h4>
+                <ul>
+                    <li><strong>NOT_STARTED</strong> → Груз не начат</li>
+                    <li><strong>CARGO_TRANSFERRED</strong> → Груз передан перевозчику</li>
+                    <li><strong>IN_TRANSIT</strong> → В пути</li>
+                    <li><strong>AT_CUSTOMS</strong> → На таможне</li>
+                    <li><strong>CUSTOMS_CLEARED</strong> → Таможня пройдена</li>
+                    <li><strong>DELIVERED</strong> → Доставлен заказчику</li>
+                </ul>
+
+                <h4>Уровень 7: Статус документов (Document Status)</h4>
+                <ul>
+                    <li><strong>PENDING</strong> → Документы ожидают</li>
+                    <li><strong>SUBMITTED</strong> → Документы поданы</li>
+                    <li><strong>UNDER_REVIEW</strong> → На рассмотрении</li>
+                    <li><strong>CORRIDOR_ASSIGNED</strong> → Коридор назначен</li>
+                    <li><strong>CLEARED</strong> → Выпущен</li>
+                    <li><strong>REJECTED</strong> → Отклонен</li>
+                </ul>
+
+                <h3>State Machine (Конечный автомат)</h3>
+                <p>Система использует <strong>State Machine</strong> для управления переходами между состояниями:</p>
+                
+                <pre><code>DealState.CREATED
+  → DealState.OFFER_SUBMITTED
+  → DealState.SUPPLIER_SELECTED
+  → DealState.PAYMENT_INITIATED
+  → DealState.PAYMENT_RECEIVED
+  → DealState.FUNDS_TRANSFERRED
+  → DealState.OPERATOR_CN_FUNDS_RECEIVED
+  → DealState.SUPPLIER_PAID
+  → DealState.CARGO_TRANSFERRED
+  → DealState.IN_TRANSIT
+  → DealState.AT_CUSTOMS
+  → DealState.CUSTOMS_CLEARED
+  → DealState.DELIVERED
+  → DealState.COMPLETED</code></pre>
+
+                <div class="info-box">
+                    <strong>Правила синхронизации:</strong>
+                    <ul>
+                        <li>Груз не может двигаться без подтверждения оплаты</li>
+                        <li>Поставщик не оплачивается без подтверждения оплаты заказчика</li>
+                        <li>Груз не передаётся перевозчику без подтверждения оплаты поставщиком</li>
+                        <li>Транспортировка не начинается без подтверждения получения груза перевозчиком</li>
+                        <li>Таможня не обрабатывает без подтверждения получения груза</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="section" id="platform-workflow">
+                <h2>🚀 Как работает платформа</h2>
+                
+                <h3>Основной поток работы</h3>
+                
+                <h4>1. Создание объявления (Announce)</h4>
+                <p><strong>Источники:</strong></p>
+                <ul>
+                    <li><strong>Ручное создание</strong> - заказчик создаёт объявление вручную</li>
+                    <li><strong>ГосЗакуп</strong> - автоматическая синхронизация через GraphQL API</li>
+                    <li><strong>Самрук</strong> - автоматическая синхронизация через REST API</li>
+                </ul>
+
+                <h4>2. Проявление интереса (Interest)</h4>
+                <p><strong>Заказчик:</strong></p>
+                <ul>
+                    <li>Просматривает объявления и лоты</li>
+                    <li>Может создать <code>Interest</code> (типы: Слежение, Расчёт, Участие)</li>
+                    <li>Ещё не обязательство</li>
+                </ul>
+
+                <h4>3. Создание коммерческого предложения (Offer)</h4>
+                <p><strong>Поставщик:</strong></p>
+                <ul>
+                    <li>Просматривает доступные лоты</li>
+                    <li>Создаёт <code>Offer</code> на основе лота</li>
+                    <li>Указывает цены, условия доставки и оплаты</li>
+                    <li>Связывает продукты из каталога (<code>Product</code>)</li>
+                </ul>
+
+                <h4>4. Создание заказа и сделки (Order → Deal)</h4>
+                <p><strong>Заказчик:</strong></p>
+                <ul>
+                    <li>Создаёт <code>Order</code> на основе лота</li>
+                    <li>Выбирает поставщика (из предложений)</li>
+                    <li>При сохранении автоматически создаётся <code>Deal</code></li>
+                </ul>
+                <div class="warning-box">
+                    <strong>Правило:</strong> Один лот = одна сделка (уникальное ограничение в БД)
+                </div>
+
+                <h4>5. Финансовый поток</h4>
+                <ol>
+                    <li><strong>Инициирование оплаты</strong> (Заказчик) - Статус: <code>PAYMENT_INITIATED</code></li>
+                    <li><strong>Получение оплаты платформой</strong> - Средства блокируются, статус: <code>PAYMENT_RECEIVED</code></li>
+                    <li><strong>Передача средств оператору КЗ</strong> - Статус: <code>FUNDS_TRANSFERRED</code></li>
+                    <li><strong>Получение средств оператором CN</strong> - Статус: <code>OPERATOR_CN_FUNDS_RECEIVED</code></li>
+                    <li><strong>Оплата поставщика</strong> (Оператор КЗ) - Статус: <code>SUPPLIER_PAID</code></li>
+                    <li><strong>Подтверждение оплаты поставщиком</strong> - Флаг: <code>supplier_payment_confirmed = True</code></li>
+                </ol>
+
+                <h4>6. Логистический поток</h4>
+                <ol>
+                    <li><strong>Передача груза перевозчику</strong> (Поставщик) - Статус: <code>CARGO_TRANSFERRED</code></li>
+                    <li><strong>Принятие груза перевозчиком</strong> - Флаг: <code>carrier_cargo_confirmed = True</code>, Статус: <code>IN_TRANSIT</code></li>
+                    <li><strong>Доставка на таможню</strong> - Статус: <code>AT_CUSTOMS</code></li>
+                    <li><strong>Подтверждение получения таможней</strong> - Флаг: <code>customs_cargo_confirmed = True</code></li>
+                    <li><strong>Таможенное оформление</strong> - Статус документов: <code>CLEARED</code>, Статус груза: <code>CUSTOMS_CLEARED</code></li>
+                    <li><strong>Доставка заказчику</strong> - Статус: <code>DELIVERED</code></li>
+                </ol>
+            </section>
+
+            <section class="section" id="roles">
+                <h2>👥 Взаимодействие ролей</h2>
+                
+                <h3>Роли в системе</h3>
+                
+                <div class="highlight-box">
+                    <h4>1. Заказчик (Customer)</h4>
+                    <p><strong>Профиль:</strong> <code>UserProfile</code> с <code>profile_type = CUSTOMER</code></p>
+                    <p><strong>Возможности:</strong></p>
+                    <ul>
+                        <li>Просмотр объявлений и лотов</li>
+                        <li>Создание интересов (<code>Interest</code>)</li>
+                        <li>Создание заказов (<code>Order</code>) → автоматически создаёт <code>Deal</code></li>
+                        <li>Выбор поставщика из предложений</li>
+                        <li>Инициирование оплаты</li>
+                        <li>Завершение сделки</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>2. Поставщик (Supplier)</h4>
+                    <p><strong>Профиль:</strong> <code>UserProfile</code> с <code>profile_type = SUPPLIER</code></p>
+                    <p><strong>Возможности:</strong></p>
+                    <ul>
+                        <li>Управление каталогом продуктов (<code>Product</code>)</li>
+                        <li>Создание коммерческих предложений (<code>Offer</code>)</li>
+                        <li>Просмотр доступных лотов</li>
+                        <li>Подтверждение получения оплаты</li>
+                        <li>Передача груза перевозчику</li>
+                    </ul>
+                </div>
+
+                <h4>3. Оператор КЗ (Operator KZ)</h4>
+                <ul>
+                    <li>Получение средств от платформы</li>
+                    <li>Передача средств оператору CN</li>
+                    <li>Оплата поставщика</li>
+                    <li>Управление платёжными схемами</li>
+                </ul>
+
+                <h4>4. Оператор CN (Operator CN)</h4>
+                <ul>
+                    <li>Получение средств от оператора КЗ</li>
+                    <li>Оплата поставщика в Китае</li>
+                    <li>Подтверждение получения средств</li>
+                </ul>
+
+                <h4>5. Перевозчик (Carrier)</h4>
+                <ul>
+                    <li>Принятие груза от поставщика</li>
+                    <li>Подтверждение получения груза</li>
+                    <li>Транспортировка груза</li>
+                    <li>Доставка на таможню и заказчику</li>
+                </ul>
+
+                <h4>6. Таможня (Customs)</h4>
+                <ul>
+                    <li>Подтверждение получения груза</li>
+                    <li>Обработка таможенного оформления</li>
+                    <li>Назначение коридора (зелёный/жёлтый/красный)</li>
+                    <li>Выпуск с таможни</li>
+                </ul>
+
+                <h4>7. Платформа (Platform)</h4>
+                <ul>
+                    <li>Получение оплаты от заказчиков</li>
+                    <li>Блокировка средств под сделки</li>
+                    <li>Передача средств операторам</li>
+                    <li>Подтверждение оплат</li>
+                    <li>Просмотр всех сделок</li>
+                    <li>Управление системой</li>
+                </ul>
+
+                <h3>Матрица взаимодействия</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Роль</th>
+                            <th>Может видеть</th>
+                            <th>Может создавать</th>
+                            <th>Может изменять</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Заказчик</strong></td>
+                            <td>Свои сделки, объявления</td>
+                            <td>Interest, Order, Deal</td>
+                            <td>Финансовый статус (инициирование)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Поставщик</strong></td>
+                            <td>Свои предложения, доступные лоты</td>
+                            <td>Product, Offer</td>
+                            <td>Статус груза (передача), подтверждение оплаты</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Оператор КЗ</strong></td>
+                            <td>Связанные сделки</td>
+                            <td>-</td>
+                            <td>Финансовый статус (оплата поставщика)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Оператор CN</strong></td>
+                            <td>Связанные сделки</td>
+                            <td>-</td>
+                            <td>Финансовый статус (подтверждение получения)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Перевозчик</strong></td>
+                            <td>Связанные сделки</td>
+                            <td>-</td>
+                            <td>Статус груза (принятие, транспортировка, доставка)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Таможня</strong></td>
+                            <td>Связанные сделки</td>
+                            <td>-</td>
+                            <td>Статус документов, статус груза (таможня)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Платформа</strong></td>
+                            <td>Все сделки</td>
+                            <td>-</td>
+                            <td>Все статусы (через бизнес-логику)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section" id="technical">
+                <h2>🛠️ Техническая архитектура</h2>
+                
+                <h3>Технологический стек</h3>
+                <p><strong>Backend:</strong></p>
+                <ul>
+                    <li>Django 5.2.8</li>
+                    <li>Django REST Framework</li>
+                    <li>PostgreSQL (production) / SQLite (development)</li>
+                    <li>Redis (кэширование, Celery брокер)</li>
+                    <li>Celery (фоновые задачи)</li>
+                    <li>Gunicorn (WSGI сервер)</li>
+                </ul>
+
+                <p><strong>Frontend:</strong></p>
+                <ul>
+                    <li>HTML5, CSS3, JavaScript</li>
+                    <li>jQuery</li>
+                    <li>AOS (анимации)</li>
+                    <li>Swiper (слайдеры)</li>
+                    <li>Flatpickr (даты)</li>
+                </ul>
+
+                <h3>API архитектура</h3>
+                <p><strong>Основной endpoint:</strong> <code>/api/v1/deals/</code></p>
+                <p><strong>Действия:</strong></p>
+                <ul>
+                    <li><code>POST /api/v1/deals/</code> - Создание сделки (заказчик)</li>
+                    <li><code>GET /api/v1/deals/</code> - Список сделок (с фильтрацией по роли)</li>
+                    <li><code>GET /api/v1/deals/{id}/</code> - Детали сделки</li>
+                    <li><code>POST /api/v1/deals/{id}/submit-offer/</code> - Подача предложения (поставщик)</li>
+                    <li><code>POST /api/v1/deals/{id}/select-supplier/</code> - Выбор поставщика (заказчик)</li>
+                    <li><code>POST /api/v1/deals/{id}/initiate-payment/</code> - Инициирование оплаты (заказчик)</li>
+                    <li><code>POST /api/v1/deals/{id}/confirm-payment/</code> - Подтверждение оплаты (платформа)</li>
+                    <li><code>POST /api/v1/deals/{id}/transfer-funds/</code> - Передача средств (платформа)</li>
+                    <li><code>POST /api/v1/deals/{id}/pay-supplier/</code> - Оплата поставщика (оператор КЗ)</li>
+                    <li><code>POST /api/v1/deals/{id}/accept-cargo/</code> - Принятие груза (перевозчик)</li>
+                    <li><code>POST /api/v1/deals/{id}/deliver-to-customs/</code> - Доставка на таможню (перевозчик)</li>
+                    <li><code>POST /api/v1/deals/{id}/process-customs/</code> - Обработка таможни (таможня)</li>
+                    <li><code>POST /api/v1/deals/{id}/complete/</code> - Завершение сделки</li>
+                </ul>
+            </section>
+
+            <section class="section" id="integrations">
+                <h2>🔌 Интеграции</h2>
+                
+                <h3>ГосЗакуп (goszakup.gov.kz)</h3>
+                <ul>
+                    <li><strong>Тип:</strong> GraphQL API</li>
+                    <li><strong>URL:</strong> <code>https://ows.goszakup.gov.kz/v3/graphql</code></li>
+                    <li><strong>Аутентификация:</strong> Bearer Token</li>
+                    <li><strong>Функциональность:</strong> Получение тендеров, автоматическая синхронизация</li>
+                </ul>
+
+                <h3>Самрук (zakup.sk.kz)</h3>
+                <ul>
+                    <li><strong>Тип:</strong> REST API</li>
+                    <li><strong>URL:</strong> <code>https://zakup.sk.kz/eprocsearch/api/external/4dv3rts</code></li>
+                    <li><strong>Метод:</strong> POST</li>
+                    <li><strong>Функциональность:</strong> Получение тендеров по фильтрам</li>
+                </ul>
+
+                <h3>Национальный Банк РК</h3>
+                <ul>
+                    <li><strong>Тип:</strong> RSS XML</li>
+                    <li><strong>URL:</strong> <code>https://nationalbank.kz/rss/get_rates.cfm</code></li>
+                    <li><strong>Функциональность:</strong> Получение курсов валют, автоматическое обновление</li>
+                </ul>
+
+                <h3>NCANode (ЭЦП)</h3>
+                <ul>
+                    <li><strong>Тип:</strong> REST API</li>
+                    <li><strong>URL:</strong> <code>https://v3.ncanode.kz/api/v1</code></li>
+                    <li><strong>Функциональность:</strong> Проверка электронной цифровой подписи, верификация сертификатов</li>
+                </ul>
+            </section>
+
+            <section class="section" id="security">
+                <h2>🔒 Безопасность и права доступа</h2>
+                
+                <h3>Система permissions</h3>
+                <p><strong>View-level permissions (DRF):</strong></p>
+                <ul>
+                    <li><code>IsPlatform</code> - Платформа (is_staff)</li>
+                    <li><code>IsCustomer</code> - Заказчик</li>
+                    <li><code>IsSupplier</code> - Поставщик</li>
+                    <li><code>IsOperatorKZ</code> - Оператор КЗ</li>
+                    <li><code>IsOperatorCN</code> - Оператор CN</li>
+                    <li><code>IsCarrier</code> - Перевозчик</li>
+                    <li><code>IsCustoms</code> - Таможня</li>
+                </ul>
+
+                <p><strong>Object-level permissions (DealPolicy):</strong></p>
+                <ul>
+                    <li><code>DealPolicy.can_view()</code> - Просмотр сделки</li>
+                    <li><code>DealPolicy.can_submit_offer()</code> - Подача предложения</li>
+                    <li><code>DealPolicy.can_select_supplier()</code> - Выбор поставщика</li>
+                    <li><code>DealPolicy.can_pay()</code> - Оплата</li>
+                    <li><code>DealPolicy.can_confirm_payment()</code> - Подтверждение оплаты</li>
+                    <li><code>DealPolicy.can_transfer_funds()</code> - Передача средств</li>
+                    <li>И другие методы...</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>Принцип:</strong> Все проверки прав централизованы в <code>DealPolicy</code>
+                </div>
+            </section>
+
+            <section class="section" id="diagrams">
+                <h2>🗺️ Полная архитектурная диаграмма (Ментальная карта)</h2>
+                
+                <h3>1. Общая структура проекта</h3>
+                <div class="info-box" style="margin-bottom: 20px;">
+                    <strong>💡 Интерактивная диаграмма:</strong>
+                    <ul style="margin-top: 10px; margin-bottom: 0;">
+                        <li>Нажмите <strong>"🔍 Увеличить"</strong> для детального просмотра в полноэкранном режиме</li>
+                        <li><strong>Кликайте на элементы</strong> диаграммы для получения подробной информации</li>
+                        <li><strong>Наведите курсор</strong> на элемент для быстрого просмотра информации</li>
+                        <li>Нажмите <strong>Escape</strong> или кликните вне диаграммы для закрытия</li>
+                    </ul>
+                </div>
+                <div class="mermaid-container" id="structure-diagram-container">
+                    <button class="mermaid-zoom-btn" onclick="openStructureModal()">🔍 Увеличить</button>
+                    <div class="mermaid" id="structure-diagram" style="min-height: 500px; overflow: visible;">
+graph TB
+    subgraph "Core Layer"
+        A[core/] --> A1[BaseModel]
+        A --> A2[BaseTimestampedModel]
+        A --> A3[TimestampedModel]
+    end
+    
+    subgraph "Common Layer"
+        B[common/] --> B1[Currency]
+        B --> B2[Kato]
+        B --> B3[SubjectType]
+        B --> B4[TenderInfo]
+    end
+    
+    subgraph "User Management"
+        C[accounts/] --> C1[UserProfile]
+        C --> C2[CustomerProfile]
+        C --> C3[SupplierProfile]
+        C --> C4[OperatorKZProfile]
+        C --> C5[OperatorCNProfile]
+        C --> C6[CarrierProfile]
+        C --> C7[CustomsProfile]
+    end
+    
+    subgraph "Deal-Centric Architecture"
+        D[deals/] --> D1[Deal]
+        D --> D2[DealStatusHistory]
+        D --> D3[PaymentScheme]
+        D --> D4[PlatformPaymentReceived]
+        D --> D5[State Machine]
+        D --> D6[DealPolicy]
+    end
+    
+    subgraph "Business Entities"
+        E[announces/] --> E1[Announce]
+        E --> E2[AnnounceLot]
+        E --> E3[LotFile]
+        
+        F[customers/] --> F1[Interest]
+        F --> F2[Order]
+        F --> F3[OrderItem]
+        
+        G[suppliers/] --> G1[Product]
+        G --> G2[Offer]
+        G --> G3[OfferAnnounceLot]
+    end
+    
+    subgraph "Role Modules"
+        H[operators_kz/]
+        I[operators_cn/]
+        J[carriers/]
+        K[customs/]
+    end
+    
+    subgraph "Integrations"
+        L[integrations/] --> L1[GoszakupService]
+        L --> L2[SamrukService]
+        L --> L3[NationalBankService]
+    end
+    
+    C1 --> D1
+    E2 --> D1
+    F2 --> D1
+    G2 --> D1
+    D1 --> D2
+    D1 --> D3
+    D1 --> D4
+                    </div>
+                </div>
+
+                <!-- Модальное окно для увеличенной диаграммы -->
+                <div class="modal" id="structureModal">
+                    <div class="modal-content">
+                        <button class="modal-close" onclick="closeStructureModal()">×</button>
+                        <h3 style="margin-bottom: 20px; color: #0095ff;">Общая структура проекта Bridge CRM</h3>
+                        <div class="diagram-controls">
+                            <button onclick="zoomDiagram('in')" title="Увеличить">+</button>
+                            <button onclick="zoomDiagram('out')" title="Уменьшить">−</button>
+                            <button onclick="zoomDiagram('reset')" title="Сбросить">⌂</button>
+                        </div>
+                        <div id="structure-diagram-loading" class="mermaid-loading" style="display: none;">
+                            Загрузка диаграммы
+                        </div>
+                        <div class="mermaid" id="structure-diagram-modal" style="transform-origin: top left;">
+graph TB
+    subgraph "Core Layer"
+        A[core/] --> A1[BaseModel]
+        A --> A2[BaseTimestampedModel]
+        A --> A3[TimestampedModel]
+    end
+    
+    subgraph "Common Layer"
+        B[common/] --> B1[Currency]
+        B --> B2[Kato]
+        B --> B3[SubjectType]
+        B --> B4[TenderInfo]
+    end
+    
+    subgraph "User Management"
+        C[accounts/] --> C1[UserProfile]
+        C --> C2[CustomerProfile]
+        C --> C3[SupplierProfile]
+        C --> C4[OperatorKZProfile]
+        C --> C5[OperatorCNProfile]
+        C --> C6[CarrierProfile]
+        C --> C7[CustomsProfile]
+    end
+    
+    subgraph "Deal-Centric Architecture"
+        D[deals/] --> D1[Deal]
+        D --> D2[DealStatusHistory]
+        D --> D3[PaymentScheme]
+        D --> D4[PlatformPaymentReceived]
+        D --> D5[State Machine]
+        D --> D6[DealPolicy]
+    end
+    
+    subgraph "Business Entities"
+        E[announces/] --> E1[Announce]
+        E --> E2[AnnounceLot]
+        E --> E3[LotFile]
+        
+        F[customers/] --> F1[Interest]
+        F --> F2[Order]
+        F --> F3[OrderItem]
+        
+        G[suppliers/] --> G1[Product]
+        G --> G2[Offer]
+        G --> G3[OfferAnnounceLot]
+    end
+    
+    subgraph "Role Modules"
+        H[operators_kz/]
+        I[operators_cn/]
+        J[carriers/]
+        K[customs/]
+    end
+    
+    subgraph "Integrations"
+        L[integrations/] --> L1[GoszakupService]
+        L --> L2[SamrukService]
+        L --> L3[NationalBankService]
+    end
+    
+    C1 --> D1
+    E2 --> D1
+    F2 --> D1
+    G2 --> D1
+    D1 --> D2
+    D1 --> D3
+    D1 --> D4
+                        </div>
+                        <div class="node-info" id="nodeInfo"></div>
+                    </div>
+                </div>
+
+                <h3>2. Жизненный цикл сделки (Deal Flow)</h3>
+                <div class="mermaid">
+stateDiagram-v2
+    [*] --> Created: Создание Deal
+    
+    Created --> OfferSubmitted: Поставщик подаёт Offer
+    OfferSubmitted --> SupplierSelected: Заказчик выбирает поставщика
+    SupplierSelected --> PaymentInitiated: Заказчик инициирует оплату
+    
+    PaymentInitiated --> PaymentReceived: Платформа получает оплату
+    PaymentReceived --> FundsTransferred: Платформа передаёт средства оператору КЗ
+    FundsTransferred --> OperatorCNFundsReceived: Оператор CN получает средства
+    OperatorCNFundsReceived --> SupplierPaid: Оператор КЗ оплачивает поставщика
+    
+    SupplierPaid --> CargoTransferred: Поставщик передаёт груз перевозчику
+    CargoTransferred --> InTransit: Перевозчик принимает груз
+    InTransit --> AtCustoms: Груз доставлен на таможню
+    AtCustoms --> CustomsCleared: Таможня обработала
+    CustomsCleared --> Delivered: Груз доставлен заказчику
+    
+    Delivered --> Completed: Все статусы завершены
+    Completed --> [*]
+                </div>
+
+                <h3>3. Взаимодействие ролей в сделке</h3>
+                <div class="mermaid">
+graph LR
+    subgraph "Заказчик (Customer)"
+        C1[Создаёт Order] --> C2[Выбирает поставщика]
+        C2 --> C3[Инициирует оплату]
+        C3 --> C4[Завершает сделку]
+    end
+    
+    subgraph "Поставщик (Supplier)"
+        S1[Создаёт Offer] --> S2[Подтверждает оплату]
+        S2 --> S3[Передаёт груз]
+    end
+    
+    subgraph "Платформа (Platform)"
+        P1[Получает оплату] --> P2[Блокирует средства]
+        P2 --> P3[Передаёт оператору КЗ]
+    end
+    
+    subgraph "Оператор КЗ"
+        O1[Получает средства] --> O2[Передаёт оператору CN]
+        O2 --> O3[Оплачивает поставщика]
+    end
+    
+    subgraph "Перевозчик (Carrier)"
+        CR1[Принимает груз] --> CR2[Транспортирует]
+        CR2 --> CR3[Доставляет на таможню]
+        CR3 --> CR4[Доставляет заказчику]
+    end
+    
+    subgraph "Таможня (Customs)"
+        CS1[Подтверждает получение] --> CS2[Обрабатывает документы]
+        CS2 --> CS3[Выпускает груз]
+    end
+    
+    C1 --> D[Deal]
+    S1 --> D
+    C2 --> D
+    C3 --> P1
+    P3 --> O1
+    O3 --> S2
+    S3 --> CR1
+    CR3 --> CS1
+    CS3 --> CR4
+    CR4 --> C4
+                </div>
+
+                <h3>4. Финансовый поток</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant C as Заказчик
+    participant P as Платформа
+    participant OKZ as Оператор КЗ
+    participant OCN as Оператор CN
+    participant S as Поставщик
+    
+    C->>P: 1. Инициирует оплату
+    Note over C,P: financial_status = PAYMENT_INITIATED
+    
+    C->>P: 2. Переводит деньги
+    P->>P: 3. Блокирует средства
+    Note over P: funds_locked = True
+    P->>P: 4. Создаёт PlatformPaymentReceived
+    Note over P: financial_status = PAYMENT_RECEIVED
+    
+    P->>OKZ: 5. Передаёт средства
+    Note over P,OKZ: financial_status = FUNDS_TRANSFERRED
+    
+    OKZ->>OCN: 6. Передаёт средства
+    Note over OKZ,OCN: financial_status = OPERATOR_CN_FUNDS_RECEIVED
+    
+    OCN->>S: 7. Оплачивает поставщика
+    Note over OCN,S: financial_status = SUPPLIER_PAID
+    
+    S->>S: 8. Подтверждает получение
+    Note over S: supplier_payment_confirmed = True
+                </div>
+
+                <h3>5. Логистический поток</h3>
+                <div class="mermaid">
+sequenceDiagram
+    participant S as Поставщик
+    participant CR as Перевозчик
+    participant CS as Таможня
+    participant C as Заказчик
+    
+    Note over S: supplier_payment_confirmed = True
+    
+    S->>CR: 1. Передаёт груз
+    Note over S,CR: cargo_status = CARGO_TRANSFERRED
+    
+    CR->>CR: 2. Подтверждает получение
+    Note over CR: carrier_cargo_confirmed = True
+    CR->>CR: 3. Начинает транспортировку
+    Note over CR: cargo_status = IN_TRANSIT
+    
+    CR->>CS: 4. Доставляет на таможню
+    Note over CR,CS: cargo_status = AT_CUSTOMS
+    
+    CS->>CS: 5. Подтверждает получение
+    Note over CS: customs_cargo_confirmed = True
+    
+    CS->>CS: 6. Обрабатывает документы
+    Note over CS: document_status = CLEARED
+    Note over CS: cargo_status = CUSTOMS_CLEARED
+    
+    CS->>CR: 7. Выпускает груз
+    CR->>C: 8. Доставляет заказчику
+    Note over CR,C: cargo_status = DELIVERED
+                </div>
+            </section>
+
+            <section class="section" id="conclusions">
+                <h2>🎯 Выводы</h2>
+                
+                <h3>Сильные стороны</h3>
+                <ol>
+                    <li><strong>Чёткая архитектура</strong> - модульная структура, разделение ответственности</li>
+                    <li><strong>Deal-центричность</strong> - все процессы вращаются вокруг одной сущности</li>
+                    <li><strong>State Machine</strong> - гарантированная валидация переходов</li>
+                    <li><strong>Безопасность</strong> - защищённые поля, централизованные проверки прав</li>
+                    <li><strong>История изменений</strong> - полный аудит всех действий</li>
+                    <li><strong>Интеграции</strong> - автоматическая синхронизация с внешними системами</li>
+                </ol>
+
+                <h3>Области для улучшения</h3>
+                <ol>
+                    <li><strong>Операторы, перевозчики, таможня</strong> - пока не имеют полной реализации в сделках</li>
+                    <li><strong>Платёжная схема</strong> - можно автоматизировать выполнение платежей</li>
+                    <li><strong>Уведомления</strong> - можно добавить систему уведомлений для участников</li>
+                    <li><strong>Отчёты</strong> - можно добавить аналитику и отчёты по сделкам</li>
+                    <li><strong>Тестирование</strong> - увеличить покрытие тестами</li>
+                </ol>
+            </section>
+
+            <hr>
+
+            <footer style="text-align: center; color: #97999c; margin-top: 50px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <p><strong>Bridge CRM</strong> - Система управления тендерами</p>
+                <p>Последнее обновление: 2025-01-XX</p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Кнопка "Наверх" -->
+    <a href="#intro" class="scroll-top" id="scrollTop">↑</a>
+
+    <script>
+        // Данные для интерактивности
+        const nodeData = {
+            'A': {
+                title: 'core/ - Базовые классы',
+                description: 'Базовые классы для всех моделей проекта',
+                details: [
+                    'BaseModel - UUID primary key',
+                    'TimestampedModel - поля дат создания/обновления',
+                    'BaseTimestampedModel - комбинация UUID + timestamps'
+                ]
+            },
+            'A1': { title: 'BaseModel', description: 'Базовая модель с UUID primary key' },
+            'A2': { title: 'BaseTimestampedModel', description: 'Модель с UUID и полями дат' },
+            'A3': { title: 'TimestampedModel', description: 'Модель с полями дат создания/обновления' },
+            'B': {
+                title: 'common/ - Справочники',
+                description: 'Справочники и метаданные системы',
+                details: [
+                    'Currency - валюты',
+                    'Kato - коды КАТО',
+                    'SubjectType - типы предметов закупки',
+                    'TenderInfo - метаданные тендеров'
+                ]
+            },
+            'B1': { title: 'Currency', description: 'Справочник валют' },
+            'B2': { title: 'Kato', description: 'Коды КАТО (иерархическая структура)' },
+            'B3': { title: 'SubjectType', description: 'Типы предметов закупки' },
+            'B4': { title: 'TenderInfo', description: 'Метаданные тендеров' },
+            'C': {
+                title: 'accounts/ - Управление пользователями',
+                description: 'Пользователи и профили всех ролей',
+                details: [
+                    'UserProfile - базовый профиль',
+                    'CustomerProfile - профиль заказчика',
+                    'SupplierProfile - профиль поставщика',
+                    'OperatorKZProfile - профиль оператора КЗ',
+                    'OperatorCNProfile - профиль оператора CN',
+                    'CarrierProfile - профиль перевозчика',
+                    'CustomsProfile - профиль таможни'
+                ]
+            },
+            'C1': { title: 'UserProfile', description: 'Базовый профиль пользователя (общие данные для всех ролей)' },
+            'C2': { title: 'CustomerProfile', description: 'Профиль заказчика - специфичные данные' },
+            'C3': { title: 'SupplierProfile', description: 'Профиль поставщика - специфичные данные' },
+            'C4': { title: 'OperatorKZProfile', description: 'Профиль оператора Казахстан' },
+            'C5': { title: 'OperatorCNProfile', description: 'Профиль оператора Китай' },
+            'C6': { title: 'CarrierProfile', description: 'Профиль перевозчика' },
+            'C7': { title: 'CustomsProfile', description: 'Профиль таможни' },
+            'D': {
+                title: 'deals/ - 🎯 ЦЕНТРАЛЬНАЯ СУЩНОСТЬ',
+                description: 'Сделки - главная сущность системы',
+                details: [
+                    'Deal - сделка по лоту',
+                    'DealStatusHistory - история изменений статусов',
+                    'PaymentScheme - платёжная схема',
+                    'PlatformPaymentReceived - получение оплаты платформой',
+                    'State Machine - управление переходами статусов',
+                    'DealPolicy - проверки прав доступа'
+                ]
+            },
+            'D1': {
+                title: 'Deal - Сделка',
+                description: 'Главная сущность системы. Один лот = одна сделка',
+                details: [
+                    'Связь с лотом (announce_lot)',
+                    'Заказчик (customer)',
+                    'Поставщик (supplier)',
+                    'Три статуса: финансовый, груз, документы',
+                    'Защищённые поля статусов',
+                    'State Machine для валидации переходов'
+                ]
+            },
+            'D2': { title: 'DealStatusHistory', description: 'История изменения статусов (Event Sourcing подход)' },
+            'D3': { title: 'PaymentScheme', description: 'Платёжная схема - кто платит, кому, за что, в каком порядке' },
+            'D4': { title: 'PlatformPaymentReceived', description: 'Получение оплаты платформой от заказчика' },
+            'D5': { title: 'State Machine', description: 'Конечный автомат для управления переходами статусов' },
+            'D6': { title: 'DealPolicy', description: 'Централизованная бизнес-логика проверок прав доступа' },
+            'E': {
+                title: 'announces/ - Объявления',
+                description: 'Объявления о тендерах',
+                details: [
+                    'Announce - объявление о тендере',
+                    'AnnounceLot - лот в объявлении',
+                    'LotFile - файл лота'
+                ]
+            },
+            'E1': { title: 'Announce', description: 'Объявление о тендере (может содержать несколько лотов)' },
+            'E2': { title: 'AnnounceLot', description: 'Лот объявления (один лот = одна сделка)' },
+            'E3': { title: 'LotFile', description: 'Файл, прикреплённый к лоту' },
+            'F': {
+                title: 'customers/ - Заказчики',
+                description: 'Модуль заказчиков',
+                details: [
+                    'Interest - интерес заказчика к лоту',
+                    'Order - заказ (при создании автоматически создаётся Deal)',
+                    'OrderItem - позиция заказа'
+                ]
+            },
+            'F1': { title: 'Interest', description: 'Интерес заказчика к лоту (ещё не обязательство)' },
+            'F2': { title: 'Order', description: 'Заказ заказчика (при сохранении создаётся Deal)' },
+            'F3': { title: 'OrderItem', description: 'Позиция заказа' },
+            'G': {
+                title: 'suppliers/ - Поставщики',
+                description: 'Модуль поставщиков',
+                details: [
+                    'Product - продукт поставщика',
+                    'Offer - коммерческое предложение',
+                    'OfferAnnounceLot - связь предложения с лотом'
+                ]
+            },
+            'G1': { title: 'Product', description: 'Продукт поставщика (каталог товаров)' },
+            'G2': { title: 'Offer', description: 'Коммерческое предложение (юридически значимый документ)' },
+            'G3': { title: 'OfferAnnounceLot', description: 'Связь предложения с лотом и продуктом' },
+            'H': { title: 'operators_kz/', description: 'Модуль оператора Казахстан' },
+            'I': { title: 'operators_cn/', description: 'Модуль оператора Китай' },
+            'J': { title: 'carriers/', description: 'Модуль перевозчиков' },
+            'K': { title: 'customs/', description: 'Модуль таможни' },
+            'L': {
+                title: 'integrations/ - Интеграции',
+                description: 'Внешние API (read-only)',
+                details: [
+                    'GoszakupService - интеграция с ГосЗакуп (GraphQL)',
+                    'SamrukService - интеграция с Самрук (REST API)',
+                    'NationalBankService - курсы валют (RSS XML)'
+                ]
+            },
+            'L1': { title: 'GoszakupService', description: 'Сервис для работы с API ГосЗакуп через GraphQL' },
+            'L2': { title: 'SamrukService', description: 'Сервис для работы с API Самрук через REST' },
+            'L3': { title: 'NationalBankService', description: 'Сервис для получения курсов валют из НБ РК' }
+        };
+
+        // Инициализация Mermaid
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#0095ff',
+                primaryTextColor: '#000',
+                primaryBorderColor: '#0077cc',
+                lineColor: '#0095ff',
+                secondaryColor: '#e8f4fd',
+                tertiaryColor: '#fafafa'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+
+        // Функции для модального окна
+        function openStructureModal() {
+            const modal = document.getElementById('structureModal');
+            const loadingIndicator = document.getElementById('structure-diagram-loading');
+            const modalDiagram = document.getElementById('structure-diagram-modal');
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Сбрасываем масштаб
+            diagramScale = 1;
+            
+            // Показываем индикатор загрузки
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'flex';
+            }
+            if (modalDiagram) {
+                modalDiagram.style.display = 'none';
+            }
+            
+            // Перерисовываем диаграмму в модальном окне после небольшой задержки
+            setTimeout(() => {
+                if (modalDiagram) {
+                    // Очищаем предыдущий рендер если был
+                    if (modalDiagram.dataset.rendered) {
+                        const svg = modalDiagram.querySelector('svg');
+                        if (svg) svg.remove();
+                        modalDiagram.removeAttribute('data-processed');
+                        modalDiagram.innerHTML = modalDiagram.getAttribute('data-original-content') || modalDiagram.innerHTML;
+                    } else {
+                        // Сохраняем оригинальное содержимое
+                        modalDiagram.setAttribute('data-original-content', modalDiagram.textContent);
+                    }
+                    
+                    // Рендерим заново
+                    try {
+                        mermaid.init(undefined, modalDiagram).then(() => {
+                            modalDiagram.dataset.rendered = 'true';
+                            
+                            // Скрываем индикатор загрузки
+                            if (loadingIndicator) {
+                                loadingIndicator.style.display = 'none';
+                            }
+                            modalDiagram.style.display = 'block';
+                            
+                            // Убеждаемся, что SVG виден
+                            const svg = modalDiagram.querySelector('svg');
+                            if (svg) {
+                                svg.style.width = '100%';
+                                svg.style.height = 'auto';
+                                svg.style.maxWidth = 'none';
+                                svg.style.display = 'block';
+                            }
+                            
+                            // Добавляем интерактивность после рендеринга
+                            setTimeout(() => {
+                                addDiagramInteractivity('structure-diagram-modal');
+                            }, 500);
+                        }).catch(err => {
+                            console.error('Ошибка рендеринга Mermaid:', err);
+                            if (loadingIndicator) {
+                                loadingIndicator.style.display = 'none';
+                            }
+                            modalDiagram.innerHTML = '<div class="mermaid-error">Ошибка загрузки диаграммы. Пожалуйста, обновите страницу.</div>';
+                            modalDiagram.style.display = 'block';
+                        });
+                    } catch (err) {
+                        console.error('Критическая ошибка рендеринга:', err);
+                        if (loadingIndicator) {
+                            loadingIndicator.style.display = 'none';
+                        }
+                        if (modalDiagram) {
+                            modalDiagram.innerHTML = '<div class="mermaid-error">Критическая ошибка. Пожалуйста, обновите страницу.</div>';
+                            modalDiagram.style.display = 'block';
+                        }
+                    }
+                }
+            }, 200);
+        }
+
+        function closeStructureModal() {
+            const modal = document.getElementById('structureModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Закрытие модального окна при клике вне его
+        document.getElementById('structureModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeStructureModal();
+            }
+        });
+
+        // Закрытие модального окна по Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeStructureModal();
+            }
+        });
+
+        // Масштабирование диаграммы
+        let diagramScale = 1;
+        function zoomDiagram(direction) {
+            const diagram = document.getElementById('structure-diagram-modal');
+            if (!diagram) return;
+
+            if (direction === 'in') {
+                diagramScale = Math.min(diagramScale + 0.1, 2);
+            } else if (direction === 'out') {
+                diagramScale = Math.max(diagramScale - 0.1, 0.5);
+            } else if (direction === 'reset') {
+                diagramScale = 1;
+            }
+
+            const svg = diagram.querySelector('svg');
+            if (svg) {
+                svg.style.transform = `scale(${diagramScale})`;
+                svg.style.transformOrigin = 'top left';
+            } else {
+                diagram.style.transform = `scale(${diagramScale})`;
+                diagram.style.transformOrigin = 'top left';
+            }
+        }
+
+        // Добавление интерактивности к диаграмме
+        function addDiagramInteractivity(diagramId) {
+            const diagram = document.querySelector(`#${diagramId} svg`);
+            if (!diagram) return;
+
+            const nodes = diagram.querySelectorAll('.node');
+            const nodeInfo = document.getElementById('nodeInfo');
+
+            nodes.forEach(node => {
+                const nodeId = node.id;
+                // Извлекаем ключ узла из ID (например, flowchart-A-0 -> A)
+                let nodeKey = null;
+                
+                // Сначала пытаемся из ID
+                const match = nodeId.match(/flowchart-([A-Z0-9]+)/);
+                if (match) {
+                    nodeKey = match[1];
+                }
+                
+                // Если не нашли, ищем по тексту метки
+                if (!nodeKey) {
+                    const label = node.querySelector('.nodeLabel');
+                    if (label) {
+                        const text = label.textContent.trim().toLowerCase();
+                        
+                        // Маппинг текста на ключи
+                        const textToKey = {
+                            'core/': 'A',
+                            'basemodel': 'A1',
+                            'basetimestampedmodel': 'A2',
+                            'timestampedmodel': 'A3',
+                            'common/': 'B',
+                            'currency': 'B1',
+                            'kato': 'B2',
+                            'subjecttype': 'B3',
+                            'tenderinfo': 'B4',
+                            'accounts/': 'C',
+                            'userprofile': 'C1',
+                            'customerprofile': 'C2',
+                            'supplierprofile': 'C3',
+                            'operatorkzprofile': 'C4',
+                            'operatorcnprofile': 'C5',
+                            'carrierprofile': 'C6',
+                            'customsprofile': 'C7',
+                            'deals/': 'D',
+                            'deal': 'D1',
+                            'dealstatushistory': 'D2',
+                            'paymentscheme': 'D3',
+                            'platformpaymentreceived': 'D4',
+                            'state machine': 'D5',
+                            'dealpolicy': 'D6',
+                            'announces/': 'E',
+                            'announce': 'E1',
+                            'announcelot': 'E2',
+                            'lotfile': 'E3',
+                            'customers/': 'F',
+                            'interest': 'F1',
+                            'order': 'F2',
+                            'orderitem': 'F3',
+                            'suppliers/': 'G',
+                            'product': 'G1',
+                            'offer': 'G2',
+                            'offerannouncelot': 'G3',
+                            'operators_kz/': 'H',
+                            'operators_cn/': 'I',
+                            'carriers/': 'J',
+                            'customs/': 'K',
+                            'integrations/': 'L',
+                            'goszakupservice': 'L1',
+                            'samrukservice': 'L2',
+                            'nationalbankservice': 'L3'
+                        };
+                        
+                        for (const [key, value] of Object.entries(textToKey)) {
+                            if (text.includes(key)) {
+                                nodeKey = value;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Находим данные для этого узла
+                const nodeDataItem = nodeKey ? nodeData[nodeKey] : null;
+
+                if (nodeDataItem) {
+                    // Делаем все элементы узла кликабельными
+                    const nodeElements = node.querySelectorAll('rect, circle, ellipse, polygon, path');
+                    nodeElements.forEach(el => {
+                        el.style.cursor = 'pointer';
+                        
+                        el.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            
+                            // Сбрасываем expanded у всех узлов
+                            nodes.forEach(n => n.classList.remove('expanded'));
+                            
+                            // Переключаем класс expanded
+                            node.classList.toggle('expanded');
+                            
+                            // Показываем информацию
+                            showNodeInfo(nodeDataItem, e);
+                            
+                            // Подсвечиваем связанные рёбра
+                            highlightConnectedEdges(node, diagram);
+                        });
+
+                        el.addEventListener('mouseenter', function(e) {
+                            if (!node.classList.contains('expanded')) {
+                                showNodeInfo(nodeDataItem, e);
+                            }
+                        });
+                    });
+                }
+            });
+
+            // Скрываем информацию при клике вне узла
+            diagram.addEventListener('click', function(e) {
+                if (e.target === diagram || e.target.tagName === 'svg' || e.target.classList.contains('edgePath')) {
+                    hideNodeInfo();
+                    nodes.forEach(n => n.classList.remove('expanded'));
+                    diagram.querySelectorAll('.edgePath').forEach(edge => {
+                        edge.classList.remove('highlighted');
+                    });
+                }
+            });
+        }
+
+        function showNodeInfo(data, event) {
+            const nodeInfo = document.getElementById('nodeInfo');
+            if (!nodeInfo || !data) return;
+
+            nodeInfo.innerHTML = `
+                <button class="close-btn" onclick="hideNodeInfo()">×</button>
+                <h4>${data.title}</h4>
+                <p><strong>${data.description}</strong></p>
+                ${data.details ? `
+                    <ul>
+                        ${data.details.map(detail => `<li>${detail}</li>`).join('')}
+                    </ul>
+                ` : ''}
+            `;
+            
+            nodeInfo.classList.add('active');
+            
+            // Позиционируем относительно клика или курсора
+            const x = event ? event.clientX : window.innerWidth / 2;
+            const y = event ? event.clientY : window.innerHeight / 2;
+            
+            // Вычисляем позицию с учётом границ экрана
+            setTimeout(() => {
+                const rect = nodeInfo.getBoundingClientRect();
+                const padding = 20;
+                
+                let left = x + padding;
+                let top = y + padding;
+                
+                // Проверяем правую границу
+                if (left + rect.width > window.innerWidth - padding) {
+                    left = x - rect.width - padding;
+                }
+                
+                // Проверяем нижнюю границу
+                if (top + rect.height > window.innerHeight - padding) {
+                    top = y - rect.height - padding;
+                }
+                
+                // Проверяем левую границу
+                if (left < padding) {
+                    left = padding;
+                }
+                
+                // Проверяем верхнюю границу
+                if (top < padding) {
+                    top = padding;
+                }
+                
+                nodeInfo.style.left = `${left}px`;
+                nodeInfo.style.top = `${top}px`;
+            }, 10);
+        }
+
+        function hideNodeInfo() {
+            const nodeInfo = document.getElementById('nodeInfo');
+            if (nodeInfo) {
+                nodeInfo.classList.remove('active');
+            }
+        }
+
+        function highlightConnectedEdges(node, diagram) {
+            if (!diagram) diagram = document.querySelector('#structure-diagram-modal svg');
+            if (!diagram) return;
+
+            // Сбрасываем все подсветки
+            diagram.querySelectorAll('.edgePath').forEach(edge => {
+                edge.classList.remove('highlighted');
+            });
+
+            const nodeId = node.id;
+            
+            // Находим и подсвечиваем связанные рёбра
+            const edges = diagram.querySelectorAll('.edgePath');
+            edges.forEach(edge => {
+                const pathId = edge.id || '';
+                // Mermaid использует формат типа flowchart-A-B-0 для рёбер
+                if (pathId.includes(nodeId.split('-').slice(0, -1).join('-')) || 
+                    pathId.includes(nodeId.replace('flowchart-', '').split('-')[0])) {
+                    edge.classList.add('highlighted');
+                }
+            });
+        }
+
+        // Добавляем интерактивность к основной диаграмме после рендеринга
+        // Ждём полного рендеринга Mermaid
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const diagram = document.getElementById('structure-diagram');
+                if (diagram && diagram.querySelector('svg')) {
+                    addDiagramInteractivity('structure-diagram');
+                } else {
+                    // Если ещё не отрендерено, ждём ещё
+                    setTimeout(() => {
+                        addDiagramInteractivity('structure-diagram');
+                    }, 1000);
+                }
+            }, 500);
+        });
+
+        // Плавная прокрутка для навигации
+        document.querySelectorAll('.nav-menu a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId.startsWith('#')) {
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                        // Обновляем активную ссылку
+                        document.querySelectorAll('.nav-menu a').forEach(a => a.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                }
+            });
+        });
+
+        // Показ/скрытие кнопки "Наверх"
+        const scrollTopBtn = document.getElementById('scrollTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        });
+
+        // Подсветка активного раздела при прокрутке
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.nav-menu a[href^="#"]');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+

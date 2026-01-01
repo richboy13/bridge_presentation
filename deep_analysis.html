@@ -9,7 +9,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.5/dist/mermaid.min.js"></script>
+    <script>
+        // Проверяем поддержку mindmap при загрузке
+        window.addEventListener('load', function() {
+            if (typeof mermaid !== 'undefined') {
+                console.log('Mermaid версия:', mermaid.version || 'неизвестна');
+                // Проверяем, есть ли поддержка mindmap
+                const config = mermaid.getConfig ? mermaid.getConfig() : {};
+                console.log('Mermaid конфигурация:', config);
+            }
+        });
+    </script>
+    <script>
+        // Проверяем поддержку mindmap
+        if (typeof mermaid !== 'undefined') {
+            console.log('Mermaid загружен, версия:', mermaid.version || 'неизвестна');
+            console.log('Поддерживаемые диаграммы:', Object.keys(mermaid.defaultConfig || {}));
+        }
+    </script>
     <style>
         * {
             padding: 0;
@@ -328,7 +346,8 @@
             box-shadow: 0 5px 15px rgba(0, 149, 255, 0.2);
         }
 
-        .mermaid-container {
+        .mermaid-container,
+        .mindmap-container {
             position: relative;
             width: 100%;
             overflow: auto;
@@ -344,6 +363,362 @@
             background: transparent;
             border: none;
             padding: 0;
+        }
+
+        /* Mindmap Preview */
+        .mindmap-preview {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mindmap-preview-content {
+            text-align: center;
+            z-index: 1;
+        }
+
+        .mindmap-center {
+            font-size: 48px;
+            font-weight: 700;
+            color: #0095ff;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .mindmap-branches {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .mindmap-branch {
+            background: #fff;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #0095ff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .mindmap-branch:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 149, 255, 0.3);
+        }
+
+        /* Mindmap Modal */
+        .mindmap-modal-content {
+            width: 98vw;
+            height: 98vh;
+            max-width: none;
+            max-height: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mindmap-header {
+            padding: 20px 30px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .mindmap-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mindmap-controls button {
+            background: #0095ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .mindmap-controls button:hover {
+            background: #0077cc;
+            transform: scale(1.05);
+        }
+
+        .mindmap-wrapper {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            background: #fff;
+        }
+
+        .mindmap-canvas {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* Интерактивное дерево знаний */
+        .knowledge-tree {
+            font-family: "Play", sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            padding: 20px;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .tree-node {
+            margin: 4px 0;
+            position: relative;
+        }
+
+        .tree-node-content {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            min-height: 40px;
+            margin: 2px 0;
+        }
+
+        .tree-node-content:hover {
+            background: #f0f7ff;
+            transform: translateX(3px);
+        }
+
+        .tree-node-content.active {
+            background: #e8f4fd;
+            border-left: 3px solid #0095ff;
+        }
+
+        .tree-node-content[data-section] {
+            cursor: pointer;
+        }
+
+        .tree-node-content[data-section]:hover {
+            background: #f0f7ff;
+        }
+
+        .tree-toggle {
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            color: #666;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .tree-toggle:hover {
+            background: #0095ff;
+            color: #fff;
+        }
+
+        .tree-node.expanded > .tree-node-content > .tree-toggle {
+            background: #0095ff;
+            color: #fff;
+        }
+
+        .tree-node.expanded > .tree-node-content > .tree-toggle::before {
+            content: '−';
+        }
+
+        .tree-node:not(.expanded) > .tree-node-content > .tree-toggle::before {
+            content: '+';
+        }
+
+        .tree-node.leaf > .tree-node-content > .tree-toggle {
+            visibility: hidden;
+            width: 0;
+            margin: 0;
+        }
+
+        .tree-label {
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .tree-node.level-0 > .tree-node-content > .tree-label {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0095ff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tree-node.level-1 > .tree-node-content > .tree-label {
+            font-size: 17px;
+            font-weight: 600;
+            color: #0077cc;
+        }
+
+        .tree-node.level-2 > .tree-node-content > .tree-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .tree-node.level-3 > .tree-node-content > .tree-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .tree-node.level-4 > .tree-node-content > .tree-label {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .tree-children {
+            margin-left: 28px;
+            border-left: 2px solid #e0e0e0;
+            padding-left: 12px;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-10px);
+        }
+
+        .tree-node.expanded > .tree-children {
+            max-height: 10000px;
+            opacity: 1;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            transform: translateY(0);
+            border-left-color: #0095ff;
+        }
+
+        .tree-icon {
+            margin-right: 8px;
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        .tree-search {
+            margin-bottom: 20px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .tree-search:focus {
+            outline: none;
+            border-color: #0095ff;
+        }
+
+        .tree-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tree-control-btn {
+            padding: 8px 16px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.2s ease;
+        }
+
+        .tree-control-btn:hover {
+            background: #0095ff;
+            color: #fff;
+            border-color: #0095ff;
+        }
+
+        .tree-node.highlighted > .tree-node-content {
+            background: #fff3cd;
+            border-left: 3px solid #ffc107;
+        }
+
+        .tree-node.hidden {
+            display: none;
+        }
+
+        .tree-stats {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            background: #f9f9f9;
+            border-radius: 6px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .tree-stats span {
+            font-weight: 600;
+            color: #0095ff;
+        }
+
+        /* Плавная анимация для раскрытия */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tree-node.expanded > .tree-children > .tree-node {
+            animation: slideDown 0.2s ease-out;
+        }
+
+        /* Улучшенный скроллбар для дерева */
+        .mindmap-canvas::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .mindmap-canvas::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .mindmap-canvas::-webkit-scrollbar-thumb {
+            background: #0095ff;
+            border-radius: 4px;
+        }
+
+        .mindmap-canvas::-webkit-scrollbar-thumb:hover {
+            background: #0077cc;
         }
 
         .mermaid-zoom-btn {
@@ -942,6 +1317,143 @@
                         <li>Таможня не обрабатывает без подтверждения получения груза</li>
                     </ul>
                 </div>
+
+                <h3>Платёжная схема (Гибкая система управления денежными потоками)</h3>
+                <p>Платформа формирует <strong>платёжную схему</strong> (<code>PaymentScheme</code>), которая определяет:</p>
+                <ul>
+                    <li>Кто платит</li>
+                    <li>Кому платит</li>
+                    <li>За что платит</li>
+                    <li>В каком порядке</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>Важно:</strong> Платформа может <strong>динамически изменять</strong> платёжную схему, решая, кто будет оплачивать логистику и таможню. Например:
+                    <ul>
+                        <li>Схема 1: Оператор КЗ оплачивает логистику и таможню</li>
+                        <li>Схема 2: Платформа оплачивает логистику и таможню напрямую</li>
+                    </ul>
+                </div>
+
+                <h4>Структура платёжной схемы</h4>
+                <p><strong>Пример структуры (текущая схема через операторов):</strong></p>
+                <pre><code>{
+  "payments": [
+    {
+      "from": "platform",
+      "to": "operator_kz",
+      "amount": 1000.00,
+      "currency": "KZT",
+      "purpose": "supplier_payment",
+      "order": 1,
+      "status": "pending"
+    },
+    {
+      "from": "operator_kz",
+      "to": "operator_cn",
+      "amount": 1000.00,
+      "currency": "KZT",
+      "purpose": "supplier_payment",
+      "order": 2,
+      "status": "pending"
+    },
+    {
+      "from": "operator_cn",
+      "to": "supplier",
+      "amount": 1000.00,
+      "currency": "CNY",
+      "purpose": "supplier_payment",
+      "order": 3,
+      "status": "pending"
+    },
+    {
+      "from": "operator_kz",
+      "to": "carrier",
+      "amount": 100.00,
+      "currency": "KZT",
+      "purpose": "logistics",
+      "order": 4,
+      "status": "pending"
+    },
+    {
+      "from": "operator_kz",
+      "to": "customs",
+      "amount": 50.00,
+      "currency": "KZT",
+      "purpose": "customs_duties",
+      "order": 5,
+      "status": "pending"
+    }
+  ]
+}</code></pre>
+
+                <p><strong>Пример структуры (альтернативная схема - платформа платит напрямую):</strong></p>
+                <pre><code>{
+  "payments": [
+    {
+      "from": "platform",
+      "to": "operator_cn",
+      "amount": 1000.00,
+      "currency": "KZT",
+      "purpose": "supplier_payment",
+      "order": 1,
+      "status": "pending"
+    },
+    {
+      "from": "operator_cn",
+      "to": "supplier",
+      "amount": 1000.00,
+      "currency": "CNY",
+      "purpose": "supplier_payment",
+      "order": 2,
+      "status": "pending"
+    },
+    {
+      "from": "platform",
+      "to": "carrier",
+      "amount": 100.00,
+      "currency": "KZT",
+      "purpose": "logistics",
+      "order": 3,
+      "status": "pending"
+    },
+    {
+      "from": "platform",
+      "to": "customs",
+      "amount": 50.00,
+      "currency": "KZT",
+      "purpose": "customs_duties",
+      "order": 4,
+      "status": "pending"
+    }
+  ]
+}</code></pre>
+
+                <h4>Возможные значения полей</h4>
+                <ul>
+                    <li><strong>from</strong>: <code>"platform"</code>, <code>"operator_kz"</code>, <code>"operator_cn"</code></li>
+                    <li><strong>to</strong>: <code>"operator_kz"</code>, <code>"operator_cn"</code>, <code>"supplier"</code>, <code>"carrier"</code>, <code>"customs"</code></li>
+                    <li><strong>purpose</strong>: <code>"supplier_payment"</code>, <code>"logistics"</code>, <code>"customs_duties"</code></li>
+                    <li><strong>status</strong>: <code>"pending"</code>, <code>"completed"</code>, <code>"failed"</code></li>
+                </ul>
+
+                <h4>Управление схемой</h4>
+                <p>Платформа может:</p>
+                <ol>
+                    <li><strong>Создать схему</strong> при создании сделки</li>
+                    <li><strong>Обновить схему</strong> (создаётся новая версия, старая сохраняется для истории)</li>
+                    <li><strong>Выполнить платежи</strong> согласно схеме в правильном порядке</li>
+                    <li><strong>Просмотреть историю</strong> изменений схемы</li>
+                </ol>
+
+                <div class="warning-box">
+                    <strong>Исправление: Оплата поставщика</strong><br>
+                    <strong>Важно:</strong> Поставщик находится в Китае, поэтому:
+                    <ul>
+                        <li>❌ Оператор КЗ <strong>НЕ может</strong> оплачивать поставщика напрямую</li>
+                        <li>✅ Только <strong>Оператор CN</strong> оплачивает поставщика в Китае</li>
+                    </ul>
+                </div>
             </section>
 
             <section class="section" id="platform-workflow">
@@ -991,7 +1503,11 @@
                     <li><strong>Получение оплаты платформой</strong> - Средства блокируются, статус: <code>PAYMENT_RECEIVED</code></li>
                     <li><strong>Передача средств оператору КЗ</strong> - Статус: <code>FUNDS_TRANSFERRED</code></li>
                     <li><strong>Получение средств оператором CN</strong> - Статус: <code>OPERATOR_CN_FUNDS_RECEIVED</code></li>
-                    <li><strong>Оплата поставщика</strong> (Оператор КЗ) - Статус: <code>SUPPLIER_PAID</code></li>
+                    <li><strong>Оплата поставщика</strong> (Оператор CN) - Статус: <code>SUPPLIER_PAID</code>
+                        <div class="warning-box" style="margin-top: 10px; margin-bottom: 10px;">
+                            <strong>Важно:</strong> Только оператор CN может оплачивать поставщика, так как поставщик находится в Китае
+                        </div>
+                    </li>
                     <li><strong>Подтверждение оплаты поставщиком</strong> - Флаг: <code>supplier_payment_confirmed = True</code></li>
                 </ol>
 
@@ -1038,46 +1554,95 @@
                     </ul>
                 </div>
 
-                <h4>3. Оператор КЗ (Operator KZ)</h4>
-                <ul>
-                    <li>Получение средств от платформы</li>
-                    <li>Передача средств оператору CN</li>
-                    <li>Оплата поставщика</li>
-                    <li>Управление платёжными схемами</li>
-                </ul>
+                <div class="info-box">
+                    <h4>3. Оператор КЗ (Operator KZ)</h4>
+                    <p><strong>Профиль:</strong> <code>UserProfile</code> с <code>profile_type = OPERATOR_KZ</code></p>
+                    <p><strong>Возможности:</strong></p>
+                    <ul>
+                        <li>Получение средств от платформы</li>
+                        <li>Передача средств оператору CN</li>
+                        <li>Оплата логистики и таможни (если указано в платёжной схеме)</li>
+                        <li>Управление платёжными схемами (только просмотр)</li>
+                    </ul>
+                    <p><strong>Ограничения:</strong></p>
+                    <ul>
+                        <li>Видит только связанные сделки</li>
+                        <li>Не может инициировать платежи без платёжной схемы</li>
+                        <li><strong>НЕ может оплачивать поставщика</strong> (поставщик в Китае, оплачивает только оператор CN)</li>
+                    </ul>
+                </div>
 
-                <h4>4. Оператор CN (Operator CN)</h4>
-                <ul>
-                    <li>Получение средств от оператора КЗ</li>
-                    <li>Оплата поставщика в Китае</li>
-                    <li>Подтверждение получения средств</li>
-                </ul>
+                <div class="highlight-box">
+                    <h4>4. Оператор CN (Operator CN)</h4>
+                    <p><strong>Профиль:</strong> <code>UserProfile</code> с <code>profile_type = OPERATOR_CN</code></p>
+                    <p><strong>Возможности:</strong></p>
+                    <ul>
+                        <li>Получение средств от оператора КЗ или платформы</li>
+                        <li><strong>Оплата поставщика в Китае</strong> (единственный, кто может оплачивать поставщика)</li>
+                        <li>Подтверждение получения средств</li>
+                    </ul>
+                    <p><strong>Ограничения:</strong></p>
+                    <ul>
+                        <li>Видит только связанные сделки</li>
+                        <li>Может оплачивать только поставщика (не логистику и таможню)</li>
+                    </ul>
+                </div>
 
                 <h4>5. Перевозчик (Carrier)</h4>
+                <p><strong>Профиль:</strong> <code>UserProfile</code> с <code>profile_type = CARRIER</code></p>
+                <p><strong>Возможности:</strong></p>
                 <ul>
                     <li>Принятие груза от поставщика</li>
                     <li>Подтверждение получения груза</li>
                     <li>Транспортировка груза</li>
-                    <li>Доставка на таможню и заказчику</li>
+                    <li>Доставка на таможню</li>
+                    <li>Доставка заказчику</li>
+                    <li><strong>Получение оплаты за логистические услуги</strong> (от платформы или оператора КЗ согласно схеме)</li>
+                </ul>
+                <p><strong>Ограничения:</strong></p>
+                <ul>
+                    <li>Видит только связанные сделки</li>
+                    <li>Не может изменять финансовые статусы</li>
                 </ul>
 
                 <h4>6. Таможня (Customs)</h4>
+                <p><strong>Профиль:</strong> <code>UserProfile</code> с <code>profile_type = CUSTOMS</code></p>
+                <p><strong>Возможности:</strong></p>
                 <ul>
                     <li>Подтверждение получения груза</li>
                     <li>Обработка таможенного оформления</li>
                     <li>Назначение коридора (зелёный/жёлтый/красный)</li>
                     <li>Выпуск с таможни</li>
+                    <li><strong>Получение оплаты за таможенные услуги</strong> (от платформы или оператора КЗ согласно схеме)</li>
+                </ul>
+                <p><strong>Ограничения:</strong></p>
+                <ul>
+                    <li>Видит только связанные сделки</li>
+                    <li>Не может изменять финансовые статусы</li>
                 </ul>
 
-                <h4>7. Платформа (Platform)</h4>
-                <ul>
-                    <li>Получение оплаты от заказчиков</li>
-                    <li>Блокировка средств под сделки</li>
-                    <li>Передача средств операторам</li>
-                    <li>Подтверждение оплат</li>
-                    <li>Просмотр всех сделок</li>
-                    <li>Управление системой</li>
-                </ul>
+                <div class="highlight-box">
+                    <h4>7. Платформа (Platform)</h4>
+                    <p><strong>Профиль:</strong> <code>UserProfile</code> с <code>user.is_staff = True</code></p>
+                    <p><strong>Возможности:</strong></p>
+                    <ul>
+                        <li>Получение оплаты от заказчиков</li>
+                        <li>Блокировка средств под сделки</li>
+                        <li>Передача средств операторам</li>
+                        <li>Подтверждение оплат</li>
+                        <li>Просмотр всех сделок</li>
+                        <li>Управление системой</li>
+                        <li><strong>Создание и управление платёжными схемами</strong> (кто кому платит)</li>
+                        <li><strong>Изменение платёжных схем</strong> (создание новых версий)</li>
+                        <li><strong>Оплата логистики и таможни напрямую</strong> (если указано в схеме)</li>
+                        <li><strong>Выполнение платежей</strong> согласно платёжной схеме</li>
+                    </ul>
+                    <p><strong>Ограничения:</strong></p>
+                    <ul>
+                        <li>Не может создавать сделки от имени пользователей</li>
+                        <li>Не может изменять статусы без бизнес-логики</li>
+                    </ul>
+                </div>
 
                 <h3>Матрица взаимодействия</h3>
                 <table>
@@ -1106,31 +1671,31 @@
                             <td><strong>Оператор КЗ</strong></td>
                             <td>Связанные сделки</td>
                             <td>-</td>
-                            <td>Финансовый статус (оплата поставщика)</td>
+                            <td>Финансовый статус (передача оператору CN, оплата логистики/таможни)</td>
                         </tr>
                         <tr>
                             <td><strong>Оператор CN</strong></td>
                             <td>Связанные сделки</td>
                             <td>-</td>
-                            <td>Финансовый статус (подтверждение получения)</td>
+                            <td>Финансовый статус (оплата поставщика, подтверждение получения)</td>
                         </tr>
                         <tr>
                             <td><strong>Перевозчик</strong></td>
                             <td>Связанные сделки</td>
                             <td>-</td>
-                            <td>Статус груза (принятие, транспортировка, доставка)</td>
+                            <td>Статус груза (принятие, транспортировка, доставка), получение оплаты</td>
                         </tr>
                         <tr>
                             <td><strong>Таможня</strong></td>
                             <td>Связанные сделки</td>
                             <td>-</td>
-                            <td>Статус документов, статус груза (таможня)</td>
+                            <td>Статус документов, статус груза (таможня), получение оплаты</td>
                         </tr>
                         <tr>
                             <td><strong>Платформа</strong></td>
                             <td>Все сделки</td>
-                            <td>-</td>
-                            <td>Все статусы (через бизнес-логику)</td>
+                            <td>PaymentScheme</td>
+                            <td>Все статусы (через бизнес-логику), управление платёжными схемами</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1159,6 +1724,47 @@
                     <li>Flatpickr (даты)</li>
                 </ul>
 
+                <h3>Структура данных</h3>
+                <h4>Базовые классы</h4>
+                <ul>
+                    <li><code>BaseModel</code> - UUID primary key</li>
+                    <li><code>TimestampedModel</code> - create_date, update_date</li>
+                    <li><code>BaseTimestampedModel</code> - UUID + timestamps</li>
+                </ul>
+
+                <h4>Модель Deal (центральная)</h4>
+                <p>Сделка содержит:</p>
+                <ul>
+                    <li>Связь с лотом (<code>announce_lot</code>)</li>
+                    <li>Заказчик (<code>customer</code>)</li>
+                    <li>Поставщик (<code>supplier</code>)</li>
+                    <li>Участники: <code>operator_kz</code>, <code>operator_cn</code>, <code>carrier</code>, <code>customs</code></li>
+                    <li>Три защищённых статуса: <code>_financial_status</code>, <code>_cargo_status</code>, <code>_document_status</code></li>
+                    <li>Блокировка средств (<code>funds_locked</code>)</li>
+                </ul>
+
+                <h4>Платёжная схема (PaymentScheme)</h4>
+                <p>Гибкая система управления денежными потоками:</p>
+                <ul>
+                    <li>Поля: <code>status</code>, <code>version</code>, <code>previous_version</code></li>
+                    <li>Методы: <code>get_active_payments()</code>, <code>get_next_payment()</code>, <code>mark_payment_completed()</code>, <code>update_scheme()</code></li>
+                    <li>Версионирование для истории изменений</li>
+                </ul>
+
+                <h4>Новые модели</h4>
+                <ul>
+                    <li><code>CarrierPayment</code> - оплата перевозчику за логистические услуги</li>
+                    <li><code>CustomsPayment</code> - оплата таможне за таможенные услуги</li>
+                </ul>
+
+                <h4>PaymentExecutor сервис</h4>
+                <p>Сервис для выполнения платежей согласно платёжной схеме:</p>
+                <ul>
+                    <li><code>can_execute_payment()</code> - проверка прав на выполнение платежа</li>
+                    <li><code>validate_payment_order()</code> - проверка порядка выполнения</li>
+                    <li><code>execute_payment()</code> - выполнение платежа для всех типов получателей</li>
+                </ul>
+
                 <h3>API архитектура</h3>
                 <p><strong>Основной endpoint:</strong> <code>/api/v1/deals/</code></p>
                 <p><strong>Действия:</strong></p>
@@ -1171,7 +1777,12 @@
                     <li><code>POST /api/v1/deals/{id}/initiate-payment/</code> - Инициирование оплаты (заказчик)</li>
                     <li><code>POST /api/v1/deals/{id}/confirm-payment/</code> - Подтверждение оплаты (платформа)</li>
                     <li><code>POST /api/v1/deals/{id}/transfer-funds/</code> - Передача средств (платформа)</li>
-                    <li><code>POST /api/v1/deals/{id}/pay-supplier/</code> - Оплата поставщика (оператор КЗ)</li>
+                    <li><code>POST /api/v1/deals/{id}/create-payment-scheme/</code> - Создание платёжной схемы (платформа)</li>
+                    <li><code>POST /api/v1/deals/{id}/update-payment-scheme/</code> - Обновление платёжной схемы (платформа)</li>
+                    <li><code>POST /api/v1/deals/{id}/execute-payment/</code> - Выполнение платежа по схеме</li>
+                    <li><code>GET /api/v1/deals/{id}/payment-scheme/</code> - Просмотр платёжной схемы</li>
+                    <li><code>GET /api/v1/deals/{id}/payment-scheme/history/</code> - История изменений схемы</li>
+                    <li><code>POST /api/v1/deals/{id}/pay-supplier/</code> - Оплата поставщика (оператор CN) - устаревший метод, использовать execute-payment</li>
                     <li><code>POST /api/v1/deals/{id}/accept-cargo/</code> - Принятие груза (перевозчик)</li>
                     <li><code>POST /api/v1/deals/{id}/deliver-to-customs/</code> - Доставка на таможню (перевозчик)</li>
                     <li><code>POST /api/v1/deals/{id}/process-customs/</code> - Обработка таможни (таможня)</li>
@@ -1249,17 +1860,31 @@
                 
                 <h3>1. Общая структура проекта</h3>
                 <div class="info-box" style="margin-bottom: 20px;">
-                    <strong>💡 Интерактивная диаграмма:</strong>
+                    <strong>💡 Интерактивная карта знаний (Knowledge Tree):</strong>
                     <ul style="margin-top: 10px; margin-bottom: 0;">
-                        <li>Нажмите <strong>"🔍 Увеличить"</strong> для детального просмотра в полноэкранном режиме</li>
-                        <li><strong>Кликайте на элементы</strong> диаграммы для получения подробной информации</li>
-                        <li><strong>Наведите курсор</strong> на элемент для быстрого просмотра информации</li>
-                        <li>Нажмите <strong>Escape</strong> или кликните вне диаграммы для закрытия</li>
+                        <li>Нажмите <strong>"🔍 Открыть в полноэкранном режиме"</strong> для детального просмотра</li>
+                        <li><strong>Кликайте на узлы</strong> для раскрытия/сворачивания ветвей</li>
+                        <li>Используйте <strong>поиск</strong> для быстрого нахождения элементов</li>
+                        <li>Используйте кнопки управления для массового раскрытия/сворачивания</li>
+                        <li>Нажмите <strong>Escape</strong> или кликните вне окна для закрытия</li>
                     </ul>
                 </div>
-                <div class="mermaid-container" id="structure-diagram-container">
-                    <button class="mermaid-zoom-btn" onclick="openStructureModal()">🔍 Увеличить</button>
-                    <div class="mermaid" id="structure-diagram" style="min-height: 500px; overflow: visible;">
+                <div class="mindmap-container" id="structure-diagram-container">
+                    <button class="mermaid-zoom-btn" onclick="openMindMapModal()">🔍 Открыть в полноэкранном режиме</button>
+                    <div class="mindmap-preview" id="mindmap-preview">
+                        <div class="mindmap-preview-content">
+                            <div class="mindmap-center">Bridge CRM</div>
+                            <div class="mindmap-branches">
+                                <div class="mindmap-branch">Архитектура</div>
+                                <div class="mindmap-branch">Модули</div>
+                                <div class="mindmap-branch">Роли</div>
+                                <div class="mindmap-branch">Статусы</div>
+                                <div class="mindmap-branch">API</div>
+                                <div class="mindmap-branch">Безопасность</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mermaid" id="structure-diagram" style="display: none;">
 graph TB
     subgraph "Core Layer"
         A[core/] --> A1[BaseModel]
@@ -1330,87 +1955,29 @@ graph TB
                     </div>
                 </div>
 
-                <!-- Модальное окно для увеличенной диаграммы -->
-                <div class="modal" id="structureModal">
-                    <div class="modal-content">
-                        <button class="modal-close" onclick="closeStructureModal()">×</button>
-                        <h3 style="margin-bottom: 20px; color: #0095ff;">Общая структура проекта Bridge CRM</h3>
-                        <div class="diagram-controls">
-                            <button onclick="zoomDiagram('in')" title="Увеличить">+</button>
-                            <button onclick="zoomDiagram('out')" title="Уменьшить">−</button>
-                            <button onclick="zoomDiagram('reset')" title="Сбросить">⌂</button>
+                <!-- Модальное окно для ментальной карты -->
+                <div class="modal" id="mindmapModal">
+                    <div class="modal-content mindmap-modal-content">
+                        <button class="modal-close" onclick="closeMindMapModal()">×</button>
+                        <div class="mindmap-header">
+                            <h3 style="margin: 0; color: #0095ff;">Интерактивная карта знаний Bridge CRM</h3>
+                            <div class="mindmap-controls">
+                                <button onclick="expandAllTree()" title="Развернуть всё">📂</button>
+                                <button onclick="collapseAllTree()" title="Свернуть всё">📁</button>
+                                <button onclick="expandFirstLevel()" title="Развернуть первый уровень">🔍</button>
+                            </div>
                         </div>
-                        <div id="structure-diagram-loading" class="mermaid-loading" style="display: none;">
-                            Загрузка диаграммы
-                        </div>
-                        <div class="mermaid" id="structure-diagram-modal" style="transform-origin: top left;">
-graph TB
-    subgraph "Core Layer"
-        A[core/] --> A1[BaseModel]
-        A --> A2[BaseTimestampedModel]
-        A --> A3[TimestampedModel]
-    end
-    
-    subgraph "Common Layer"
-        B[common/] --> B1[Currency]
-        B --> B2[Kato]
-        B --> B3[SubjectType]
-        B --> B4[TenderInfo]
-    end
-    
-    subgraph "User Management"
-        C[accounts/] --> C1[UserProfile]
-        C --> C2[CustomerProfile]
-        C --> C3[SupplierProfile]
-        C --> C4[OperatorKZProfile]
-        C --> C5[OperatorCNProfile]
-        C --> C6[CarrierProfile]
-        C --> C7[CustomsProfile]
-    end
-    
-    subgraph "Deal-Centric Architecture"
-        D[deals/] --> D1[Deal]
-        D --> D2[DealStatusHistory]
-        D --> D3[PaymentScheme]
-        D --> D4[PlatformPaymentReceived]
-        D --> D5[State Machine]
-        D --> D6[DealPolicy]
-    end
-    
-    subgraph "Business Entities"
-        E[announces/] --> E1[Announce]
-        E --> E2[AnnounceLot]
-        E --> E3[LotFile]
-        
-        F[customers/] --> F1[Interest]
-        F --> F2[Order]
-        F --> F3[OrderItem]
-        
-        G[suppliers/] --> G1[Product]
-        G --> G2[Offer]
-        G --> G3[OfferAnnounceLot]
-    end
-    
-    subgraph "Role Modules"
-        H[operators_kz/]
-        I[operators_cn/]
-        J[carriers/]
-        K[customs/]
-    end
-    
-    subgraph "Integrations"
-        L[integrations/] --> L1[GoszakupService]
-        L --> L2[SamrukService]
-        L --> L3[NationalBankService]
-    end
-    
-    C1 --> D1
-    E2 --> D1
-    F2 --> D1
-    G2 --> D1
-    D1 --> D2
-    D1 --> D3
-    D1 --> D4
+                        <div class="mindmap-wrapper" id="mindmap-wrapper">
+                            <div class="mindmap-canvas" id="mindmap-canvas" style="padding: 20px;">
+                                <div class="tree-controls">
+                                    <button class="tree-control-btn" onclick="expandAllTree()">📂 Развернуть всё</button>
+                                    <button class="tree-control-btn" onclick="collapseAllTree()">📁 Свернуть всё</button>
+                                    <button class="tree-control-btn" onclick="expandFirstLevel()">🔍 Развернуть первый уровень</button>
+                                </div>
+                                <input type="text" class="tree-search" id="treeSearch" placeholder="🔍 Поиск по карте знаний..." oninput="searchTree(this.value)">
+                                <div class="tree-stats" id="treeStats">Всего узлов: <span id="totalNodes">0</span> | Видимых: <span id="visibleNodes">0</span></div>
+                                <div class="knowledge-tree" id="knowledgeTree"></div>
+                            </div>
                         </div>
                         <div class="node-info" id="nodeInfo"></div>
                     </div>
@@ -1461,7 +2028,13 @@ graph LR
     
     subgraph "Оператор КЗ"
         O1[Получает средства] --> O2[Передаёт оператору CN]
-        O2 --> O3[Оплачивает поставщика]
+        O2 --> O3[Оплачивает логистику]
+        O3 --> O4[Оплачивает таможню]
+    end
+    
+    subgraph "Оператор CN"
+        OC1[Получает средства] --> OC2[Оплачивает поставщика CN]
+        Note over OC2: Единственный кто может оплачивать поставщика
     end
     
     subgraph "Перевозчик (Carrier)"
@@ -1480,7 +2053,10 @@ graph LR
     C2 --> D
     C3 --> P1
     P3 --> O1
-    O3 --> S2
+    O2 --> OC1
+    OC2 --> S2
+    O3 -.->|Оплата| CR1
+    O4 -.->|Оплата| CS1
     S3 --> CR1
     CR3 --> CS1
     CS3 --> CR4
@@ -1511,8 +2087,9 @@ sequenceDiagram
     OKZ->>OCN: 6. Передаёт средства
     Note over OKZ,OCN: financial_status = OPERATOR_CN_FUNDS_RECEIVED
     
-    OCN->>S: 7. Оплачивает поставщика
+    OCN->>S: 7. Оплачивает поставщика (в Китае)
     Note over OCN,S: financial_status = SUPPLIER_PAID
+    Note over OCN,S: Только оператор CN может оплачивать поставщика
     
     S->>S: 8. Подтверждает получение
     Note over S: supplier_payment_confirmed = True
@@ -1567,12 +2144,35 @@ sequenceDiagram
 
                 <h3>Области для улучшения</h3>
                 <ol>
-                    <li><strong>Операторы, перевозчики, таможня</strong> - пока не имеют полной реализации в сделках</li>
-                    <li><strong>Платёжная схема</strong> - можно автоматизировать выполнение платежей</li>
+                    <li><strong>Платёжная схема</strong> - ✅ <strong>РЕАЛИЗОВАНО</strong> - гибкая система управления денежными потоками
+                        <ul>
+                            <li>✅ Добавлены модели CarrierPayment и CustomsPayment</li>
+                            <li>✅ Расширена PaymentScheme (статусы, версии, методы управления)</li>
+                            <li>✅ Создан PaymentExecutor для выполнения платежей</li>
+                            <li>✅ API endpoints для управления схемой</li>
+                            <li>✅ Тесты созданы и протестированы (17 тестов прошли успешно)</li>
+                        </ul>
+                    </li>
                     <li><strong>Уведомления</strong> - можно добавить систему уведомлений для участников</li>
                     <li><strong>Отчёты</strong> - можно добавить аналитику и отчёты по сделкам</li>
-                    <li><strong>Тестирование</strong> - увеличить покрытие тестами</li>
+                    <li><strong>Тестирование</strong> - увеличить покрытие тестами (особенно для PaymentExecutor и новых моделей)</li>
                 </ol>
+
+                <div class="highlight-box">
+                    <h3>Статус реализации гибкой системы платежей</h3>
+                    <p><strong>Все этапы реализации завершены:</strong></p>
+                    <ul>
+                        <li>✅ <strong>Этап 1:</strong> Расширение модели Deal (добавлены поля operator_kz, operator_cn, carrier, customs)</li>
+                        <li>✅ <strong>Этап 2:</strong> Модели для оплаты перевозчиков и таможни (CarrierPayment, CustomsPayment)</li>
+                        <li>✅ <strong>Этап 3:</strong> Расширение PaymentScheme (статусы, версии, методы управления)</li>
+                        <li>✅ <strong>Этап 4:</strong> PaymentExecutor сервис (выполнение платежей по схеме)</li>
+                        <li>✅ <strong>Этап 5:</strong> API Endpoints (create-payment-scheme, update-payment-scheme, execute-payment, payment-scheme, payment-scheme/history)</li>
+                        <li>✅ <strong>Этап 6:</strong> Обновление DealPolicy (can_create_payment_scheme, can_update_payment_scheme, can_execute_payment)</li>
+                        <li>✅ <strong>Этап 7:</strong> Миграции созданы и применены</li>
+                        <li>✅ <strong>Этап 8:</strong> Документация обновлена</li>
+                        <li>✅ <strong>Этап 9:</strong> Тесты созданы и протестированы (17 тестов прошли успешно)</li>
+                    </ul>
+                </div>
             </section>
 
             <hr>
@@ -1661,10 +2261,29 @@ sequenceDiagram
                 ]
             },
             'D2': { title: 'DealStatusHistory', description: 'История изменения статусов (Event Sourcing подход)' },
-            'D3': { title: 'PaymentScheme', description: 'Платёжная схема - кто платит, кому, за что, в каком порядке' },
+                            'D3': { 
+                                title: 'PaymentScheme', 
+                                description: 'Платёжная схема - гибкая система управления денежными потоками',
+                                details: [
+                                    'Кто платит, кому, за что, в каком порядке',
+                                    'Версионирование схем',
+                                    'Управление статусами платежей',
+                                    'История изменений',
+                                    'PaymentExecutor для выполнения платежей'
+                                ]
+                            },
             'D4': { title: 'PlatformPaymentReceived', description: 'Получение оплаты платформой от заказчика' },
             'D5': { title: 'State Machine', description: 'Конечный автомат для управления переходами статусов' },
-            'D6': { title: 'DealPolicy', description: 'Централизованная бизнес-логика проверок прав доступа' },
+                            'D6': { 
+                                title: 'DealPolicy', 
+                                description: 'Централизованная бизнес-логика проверок прав доступа',
+                                details: [
+                                    'can_create_payment_scheme',
+                                    'can_update_payment_scheme',
+                                    'can_execute_payment',
+                                    'Проверки прав для всех ролей'
+                                ]
+                            },
             'E': {
                 title: 'announces/ - Объявления',
                 description: 'Объявления о тендерах',
@@ -1703,8 +2322,22 @@ sequenceDiagram
             'G3': { title: 'OfferAnnounceLot', description: 'Связь предложения с лотом и продуктом' },
             'H': { title: 'operators_kz/', description: 'Модуль оператора Казахстан' },
             'I': { title: 'operators_cn/', description: 'Модуль оператора Китай' },
-            'J': { title: 'carriers/', description: 'Модуль перевозчиков' },
-            'K': { title: 'customs/', description: 'Модуль таможни' },
+                            'J': { 
+                                title: 'carriers/', 
+                                description: 'Модуль перевозчиков',
+                                details: [
+                                    'CargoTransport - транспортировка груза',
+                                    'CarrierPayment - оплата за логистические услуги'
+                                ]
+                            },
+                            'K': { 
+                                title: 'customs/', 
+                                description: 'Модуль таможни',
+                                details: [
+                                    'CustomsDeclaration - таможенное оформление',
+                                    'CustomsPayment - оплата за таможенные услуги'
+                                ]
+                            },
             'L': {
                 title: 'integrations/ - Интеграции',
                 description: 'Внешние API (read-only)',
@@ -1721,8 +2354,9 @@ sequenceDiagram
 
         // Инициализация Mermaid
         mermaid.initialize({ 
-            startOnLoad: true,
+            startOnLoad: false, // Отключаем автозагрузку, будем рендерить вручную
             theme: 'default',
+            securityLevel: 'loose',
             themeVariables: {
                 primaryColor: '#0095ff',
                 primaryTextColor: '#000',
@@ -1735,132 +2369,674 @@ sequenceDiagram
                 useMaxWidth: true,
                 htmlLabels: true,
                 curve: 'basis'
+            },
+            mindmap: {
+                padding: 10
             }
         });
+        
+        // Ждем полной загрузки Mermaid
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Mermaid инициализирован');
+            });
+        } else {
+            console.log('Mermaid инициализирован');
+        }
 
-        // Функции для модального окна
-        function openStructureModal() {
-            const modal = document.getElementById('structureModal');
-            const loadingIndicator = document.getElementById('structure-diagram-loading');
-            const modalDiagram = document.getElementById('structure-diagram-modal');
+        // Функции для ментальной карты
+        let mindMapScale = 1;
+        let mindMapPanX = 0;
+        let mindMapPanY = 0;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+
+        // Структура данных для интерактивного дерева знаний
+        const knowledgeTreeData = {
+            label: "Bridge CRM",
+            level: 0,
+            children: [
+                {
+                    label: "Архитектура",
+                    level: 1,
+                    children: [
+                        { label: "Deal-центричная", level: 2 },
+                        { label: "Модульная Django", level: 2 },
+                        { label: "State Machine", level: 2 },
+                        { label: "Event Sourcing", level: 2 }
+                    ]
+                },
+                {
+                    label: "Модули",
+                    level: 1,
+                    children: [
+                        {
+                            label: "core",
+                            level: 2,
+                            children: [
+                                { label: "BaseModel", level: 3 },
+                                { label: "BaseTimestampedModel", level: 3 },
+                                { label: "TimestampedModel", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "common",
+                            level: 2,
+                            children: [
+                                { label: "Currency", level: 3 },
+                                { label: "Kato", level: 3 },
+                                { label: "SubjectType", level: 3 },
+                                { label: "TenderInfo", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "accounts",
+                            level: 2,
+                            children: [
+                                { label: "UserProfile", level: 3 },
+                                { label: "Роли профилей", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "deals",
+                            level: 2,
+                            children: [
+                                { label: "Deal", level: 3 },
+                                { label: "DealStatusHistory", level: 3 },
+                                {
+                                    label: "PaymentScheme",
+                                    level: 3,
+                                    children: [
+                                        { label: "Гибкая система", level: 4 },
+                                        { label: "Версионирование", level: 4 },
+                                        { label: "Управление потоками", level: 4 }
+                                    ]
+                                },
+                                { label: "State Machine", level: 3 },
+                                { label: "DealPolicy", level: 3 },
+                                { label: "PaymentExecutor", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "customers",
+                            level: 2,
+                            children: [
+                                { label: "Interest", level: 3 },
+                                { label: "Order", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "suppliers",
+                            level: 2,
+                            children: [
+                                { label: "Product", level: 3 },
+                                { label: "Offer", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "operators_kz",
+                            level: 2,
+                            children: [
+                                { label: "PlatformToOperatorTransfer", level: 3 },
+                                { label: "OperatorKZFundsReceived", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "operators_cn",
+                            level: 2,
+                            children: [
+                                { label: "SupplierPayment", level: 3 },
+                                { label: "OperatorCNFundsReceived", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "carriers",
+                            level: 2,
+                            children: [
+                                { label: "CargoTransport", level: 3 },
+                                { label: "CarrierPayment", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "customs",
+                            level: 2,
+                            children: [
+                                { label: "CustomsDeclaration", level: 3 },
+                                { label: "CustomsPayment", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "integrations",
+                            level: 2,
+                            children: [
+                                { label: "ГосЗакуп", level: 3 },
+                                { label: "Самрук", level: 3 },
+                                { label: "НБ РК", level: 3 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    label: "Роли",
+                    level: 1,
+                    children: [
+                        {
+                            label: "Заказчик",
+                            level: 2,
+                            children: [
+                                { label: "Создание Order", level: 3 },
+                                { label: "Выбор поставщика", level: 3 },
+                                { label: "Инициирование оплаты", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "Поставщик",
+                            level: 2,
+                            children: [
+                                { label: "Создание Offer", level: 3 },
+                                { label: "Подтверждение оплаты", level: 3 },
+                                { label: "Передача груза", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "Платформа",
+                            level: 2,
+                            children: [
+                                { label: "Получение оплаты", level: 3 },
+                                { label: "Блокировка средств", level: 3 },
+                                { label: "Передача операторам", level: 3 },
+                                { label: "Управление платёжными схемами", level: 3 },
+                                { label: "Оплата логистики и таможни", level: 3 },
+                                { label: "Выполнение платежей по схеме", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "Оператор КЗ",
+                            level: 2,
+                            children: [
+                                { label: "Получение средств", level: 3 },
+                                { label: "Передача оператору CN", level: 3 },
+                                { label: "Оплата логистики", level: 3 },
+                                { label: "Оплата таможни", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "Оператор CN",
+                            level: 2,
+                            children: [
+                                { label: "Получение средств", level: 3 },
+                                { label: "Оплата поставщика CN", level: 3 },
+                                { label: "Единственный кто может оплачивать поставщика", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "Перевозчик",
+                            level: 2,
+                            children: [
+                                { label: "Принятие груза", level: 3 },
+                                { label: "Транспортировка", level: 3 },
+                                { label: "Доставка", level: 3 },
+                                { label: "Получение оплаты за логистику", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "Таможня",
+                            level: 2,
+                            children: [
+                                { label: "Подтверждение груза", level: 3 },
+                                { label: "Обработка документов", level: 3 },
+                                { label: "Выпуск груза", level: 3 },
+                                { label: "Получение оплаты за услуги", level: 3 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    label: "Статусы",
+                    level: 1,
+                    children: [
+                        {
+                            label: "Финансовый",
+                            level: 2,
+                            children: [
+                                { label: "PENDING", level: 3 },
+                                { label: "PAYMENT_INITIATED", level: 3 },
+                                { label: "PAYMENT_RECEIVED", level: 3 },
+                                { label: "FUNDS_TRANSFERRED", level: 3 },
+                                { label: "OPERATOR_CN_FUNDS_RECEIVED", level: 3 },
+                                { label: "SUPPLIER_PAID", level: 3 },
+                                { label: "COMPLETED", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "Груз",
+                            level: 2,
+                            children: [
+                                { label: "NOT_STARTED", level: 3 },
+                                { label: "CARGO_TRANSFERRED", level: 3 },
+                                { label: "IN_TRANSIT", level: 3 },
+                                { label: "AT_CUSTOMS", level: 3 },
+                                { label: "CUSTOMS_CLEARED", level: 3 },
+                                { label: "DELIVERED", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "Документы",
+                            level: 2,
+                            children: [
+                                { label: "PENDING", level: 3 },
+                                { label: "SUBMITTED", level: 3 },
+                                { label: "UNDER_REVIEW", level: 3 },
+                                { label: "CORRIDOR_ASSIGNED", level: 3 },
+                                { label: "CLEARED", level: 3 },
+                                { label: "REJECTED", level: 3 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    label: "API",
+                    level: 1,
+                    children: [
+                        {
+                            label: "DealViewSet",
+                            level: 2,
+                            children: [
+                                { label: "create", level: 3 },
+                                { label: "list", level: 3 },
+                                { label: "retrieve", level: 3 },
+                                { label: "submit-offer", level: 3 },
+                                { label: "select-supplier", level: 3 },
+                                { label: "initiate-payment", level: 3 },
+                                { label: "confirm-payment", level: 3 },
+                                { label: "transfer-funds", level: 3 },
+                                { label: "create-payment-scheme", level: 3 },
+                                { label: "update-payment-scheme", level: 3 },
+                                { label: "execute-payment", level: 3 },
+                                { label: "payment-scheme", level: 3 },
+                                { label: "payment-scheme/history", level: 3 },
+                                { label: "accept-cargo", level: 3 },
+                                { label: "deliver-to-customs", level: 3 },
+                                { label: "process-customs", level: 3 },
+                                { label: "complete", level: 3 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    label: "Безопасность",
+                    level: 1,
+                    children: [
+                        {
+                            label: "Permissions",
+                            level: 2,
+                            children: [
+                                { label: "View-level", level: 3 },
+                                { label: "Object-level", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "DealPolicy",
+                            level: 2,
+                            children: [
+                                { label: "Централизованные проверки", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "Защищённые поля",
+                            level: 2,
+                            children: [
+                                { label: "_financial_status", level: 3 },
+                                { label: "_cargo_status", level: 3 },
+                                { label: "_document_status", level: 3 }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    label: "Интеграции",
+                    level: 1,
+                    children: [
+                        {
+                            label: "ГосЗакуп",
+                            level: 2,
+                            children: [
+                                { label: "GraphQL API", level: 3 },
+                                { label: "Автосинхронизация", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "Самрук",
+                            level: 2,
+                            children: [
+                                { label: "REST API", level: 3 },
+                                { label: "Автосинхронизация", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "НБ РК",
+                            level: 2,
+                            children: [
+                                { label: "RSS XML", level: 3 },
+                                { label: "Курсы валют", level: 3 }
+                            ]
+                        },
+                        {
+                            label: "NCANode",
+                            level: 2,
+                            children: [
+                                { label: "ЭЦП", level: 3 },
+                                { label: "Верификация", level: 3 }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
+        function openMindMapModal() {
+            const modal = document.getElementById('mindmapModal');
+            const mindmapWrapper = document.getElementById('mindmap-wrapper');
             
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
             
-            // Сбрасываем масштаб
-            diagramScale = 1;
-            
-            // Показываем индикатор загрузки
-            if (loadingIndicator) {
-                loadingIndicator.style.display = 'flex';
-            }
-            if (modalDiagram) {
-                modalDiagram.style.display = 'none';
-            }
-            
-            // Перерисовываем диаграмму в модальном окне после небольшой задержки
-            setTimeout(() => {
-                if (modalDiagram) {
-                    // Очищаем предыдущий рендер если был
-                    if (modalDiagram.dataset.rendered) {
-                        const svg = modalDiagram.querySelector('svg');
-                        if (svg) svg.remove();
-                        modalDiagram.removeAttribute('data-processed');
-                        modalDiagram.innerHTML = modalDiagram.getAttribute('data-original-content') || modalDiagram.innerHTML;
-                    } else {
-                        // Сохраняем оригинальное содержимое
-                        modalDiagram.setAttribute('data-original-content', modalDiagram.textContent);
-                    }
-                    
-                    // Рендерим заново
-                    try {
-                        mermaid.init(undefined, modalDiagram).then(() => {
-                            modalDiagram.dataset.rendered = 'true';
-                            
-                            // Скрываем индикатор загрузки
-                            if (loadingIndicator) {
-                                loadingIndicator.style.display = 'none';
-                            }
-                            modalDiagram.style.display = 'block';
-                            
-                            // Убеждаемся, что SVG виден
-                            const svg = modalDiagram.querySelector('svg');
-                            if (svg) {
-                                svg.style.width = '100%';
-                                svg.style.height = 'auto';
-                                svg.style.maxWidth = 'none';
-                                svg.style.display = 'block';
-                            }
-                            
-                            // Добавляем интерактивность после рендеринга
-                            setTimeout(() => {
-                                addDiagramInteractivity('structure-diagram-modal');
-                            }, 500);
-                        }).catch(err => {
-                            console.error('Ошибка рендеринга Mermaid:', err);
-                            if (loadingIndicator) {
-                                loadingIndicator.style.display = 'none';
-                            }
-                            modalDiagram.innerHTML = '<div class="mermaid-error">Ошибка загрузки диаграммы. Пожалуйста, обновите страницу.</div>';
-                            modalDiagram.style.display = 'block';
-                        });
-                    } catch (err) {
-                        console.error('Критическая ошибка рендеринга:', err);
-                        if (loadingIndicator) {
-                            loadingIndicator.style.display = 'none';
-                        }
-                        if (modalDiagram) {
-                            modalDiagram.innerHTML = '<div class="mermaid-error">Критическая ошибка. Пожалуйста, обновите страницу.</div>';
-                            modalDiagram.style.display = 'block';
-                        }
-                    }
+            if (mindmapWrapper) {
+                mindmapWrapper.style.display = 'block';
+                // Рендерим дерево если еще не отрендерено
+                const tree = document.getElementById('knowledgeTree');
+                if (tree) {
+                    // Очищаем старое дерево
+                    tree.innerHTML = '';
+                    // Рендерим новое дерево
+                    renderKnowledgeTree(knowledgeTreeData, tree, 0);
+                    updateTreeStats();
+                    // Раскрываем первый уровень по умолчанию
+                    expandFirstLevel();
                 }
-            }, 200);
+            }
         }
 
-        function closeStructureModal() {
-            const modal = document.getElementById('structureModal');
+        function handleMindMapSuccess(loadingIndicator, mindmapWrapper, mindmapDiagram) {
+            console.log('handleMindMapSuccess вызван');
+            
+            // Скрываем индикатор загрузки
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            if (mindmapWrapper) {
+                mindmapWrapper.style.display = 'block';
+            }
+            
+            // Убеждаемся, что SVG виден
+            const svg = mindmapDiagram.querySelector('svg');
+            console.log('SVG найден:', !!svg);
+            
+            if (svg) {
+                console.log('SVG размеры:', svg.getBBox());
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = 'none';
+                svg.style.display = 'block';
+                svg.style.transform = `scale(${mindMapScale}) translate(${mindMapPanX}px, ${mindMapPanY}px)`;
+                svg.style.transformOrigin = 'center center';
+                
+                // Добавляем интерактивность
+                setTimeout(() => {
+                    setupMindMapInteractivity();
+                }, 100);
+            } else {
+                // Ждем немного и проверяем снова
+                console.log('SVG не найден, ждем...');
+                setTimeout(() => {
+                    const svg2 = mindmapDiagram.querySelector('svg');
+                    if (svg2) {
+                        console.log('SVG найден после ожидания');
+                        handleMindMapSuccess(loadingIndicator, mindmapWrapper, mindmapDiagram);
+                    } else {
+                        console.error('SVG не был создан после рендеринга');
+                        console.log('Содержимое mindmapDiagram:', mindmapDiagram.innerHTML.substring(0, 200));
+                        throw new Error('SVG не был создан после рендеринга. Проверьте консоль для деталей.');
+                    }
+                }, 1000);
+            }
+        }
+
+        function handleMindMapError(err, loadingIndicator, mindmapWrapper, diagramText) {
+            console.error('Ошибка рендеринга Mermaid:', err);
+            console.error('Текст диаграммы:', diagramText ? diagramText.substring(0, 200) : 'нет текста');
+            
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            if (mindmapWrapper) {
+                mindmapWrapper.innerHTML = `<div class="mermaid-error">
+                    <p><strong>Ошибка загрузки ментальной карты</strong></p>
+                    <p>Ошибка: ${err.message || 'Неизвестная ошибка'}</p>
+                    <p>Пожалуйста, обновите страницу или проверьте консоль браузера (F12) для деталей.</p>
+                    <p style="font-size: 12px; margin-top: 10px; color: #666;">Если проблема сохраняется, возможно, ваша версия браузера не поддерживает mindmap диаграммы Mermaid.</p>
+                </div>`;
+                mindmapWrapper.style.display = 'block';
+            }
+        }
+
+        function closeMindMapModal() {
+            const modal = document.getElementById('mindmapModal');
             modal.classList.remove('active');
             document.body.style.overflow = 'auto';
         }
 
+        // Функции для интерактивного дерева знаний
+        function renderKnowledgeTree(node, container, level = 0) {
+            const nodeElement = document.createElement('div');
+            nodeElement.className = `tree-node level-${level} ${node.children && node.children.length > 0 ? '' : 'leaf'}`;
+            
+            const content = document.createElement('div');
+            content.className = 'tree-node-content';
+            
+            // Добавляем иконку в зависимости от уровня
+            if (level === 0) {
+                content.setAttribute('data-section', 'intro');
+            }
+            
+            const toggle = document.createElement('span');
+            toggle.className = 'tree-toggle';
+            
+            const label = document.createElement('span');
+            label.className = 'tree-label';
+            label.textContent = node.label;
+            
+            content.appendChild(toggle);
+            content.appendChild(label);
+            
+            // Обработчик клика для раскрытия/сворачивания
+            if (node.children && node.children.length > 0) {
+                content.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    nodeElement.classList.toggle('expanded');
+                    updateTreeStats();
+                });
+            } else {
+                // Для листовых узлов добавляем возможность навигации
+                const sectionMap = {
+                    'Архитектура': 'architecture',
+                    'Модули': 'architecture',
+                    'Роли': 'roles',
+                    'Статусы': 'business-processes',
+                    'API': 'technical',
+                    'Безопасность': 'security',
+                    'Интеграции': 'integrations'
+                };
+                
+                const parentLabel = getParentLabel(nodeElement);
+                if (sectionMap[parentLabel]) {
+                    content.style.cursor = 'pointer';
+                    content.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const sectionId = sectionMap[parentLabel];
+                        const section = document.getElementById(sectionId);
+                        if (section) {
+                            closeMindMapModal();
+                            setTimeout(() => {
+                                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 300);
+                        }
+                    });
+                }
+            }
+            
+            nodeElement.appendChild(content);
+            
+            // Добавляем дочерние элементы
+            if (node.children && node.children.length > 0) {
+                const childrenContainer = document.createElement('div');
+                childrenContainer.className = 'tree-children';
+                
+                node.children.forEach(child => {
+                    renderKnowledgeTree(child, childrenContainer, level + 1);
+                });
+                
+                nodeElement.appendChild(childrenContainer);
+            }
+            
+            container.appendChild(nodeElement);
+        }
+
+        function getParentLabel(element) {
+            let current = element;
+            while (current) {
+                const label = current.querySelector('.tree-label');
+                if (label) {
+                    const text = label.textContent;
+                    if (['Архитектура', 'Модули', 'Роли', 'Статусы', 'API', 'Безопасность', 'Интеграции'].includes(text)) {
+                        return text;
+                    }
+                }
+                current = current.parentElement;
+            }
+            return null;
+        }
+
+        function expandAllTree() {
+            document.querySelectorAll('.tree-node').forEach(node => {
+                if (node.querySelector('.tree-children')) {
+                    node.classList.add('expanded');
+                }
+            });
+            updateTreeStats();
+        }
+
+        function collapseAllTree() {
+            document.querySelectorAll('.tree-node').forEach(node => {
+                node.classList.remove('expanded');
+            });
+            updateTreeStats();
+        }
+
+        function expandFirstLevel() {
+            collapseAllTree();
+            const tree = document.getElementById('knowledgeTree');
+            if (tree) {
+                const firstLevelNodes = tree.querySelectorAll('.tree-node.level-0 > .tree-children > .tree-node');
+                firstLevelNodes.forEach(node => {
+                    node.classList.add('expanded');
+                });
+            }
+            updateTreeStats();
+        }
+
+        function searchTree(query) {
+            const searchTerm = query.toLowerCase().trim();
+            const allNodes = document.querySelectorAll('.tree-node');
+            let visibleCount = 0;
+            let totalCount = 0;
+            
+            if (!searchTerm) {
+                // Показываем все узлы
+                allNodes.forEach(node => {
+                    node.classList.remove('hidden', 'highlighted');
+                    totalCount++;
+                    visibleCount++;
+                });
+            } else {
+                // Скрываем все узлы
+                allNodes.forEach(node => {
+                    node.classList.add('hidden');
+                    node.classList.remove('highlighted');
+                    totalCount++;
+                });
+                
+                // Показываем совпадающие узлы и их родителей
+                allNodes.forEach(node => {
+                    const label = node.querySelector('.tree-label');
+                    if (label && label.textContent.toLowerCase().includes(searchTerm)) {
+                        // Показываем узел
+                        node.classList.remove('hidden');
+                        node.classList.add('highlighted');
+                        visibleCount++;
+                        
+                        // Раскрываем и показываем всех родителей
+                        let parent = node.parentElement;
+                        while (parent && parent.classList.contains('tree-children')) {
+                            parent.classList.remove('hidden');
+                            const parentNode = parent.previousElementSibling;
+                            if (parentNode && parentNode.classList.contains('tree-node-content')) {
+                                const grandParent = parentNode.closest('.tree-node');
+                                if (grandParent) {
+                                    grandParent.classList.remove('hidden');
+                                    grandParent.classList.add('expanded');
+                                    visibleCount++;
+                                }
+                            }
+                            parent = parent.parentElement;
+                        }
+                        
+                        // Раскрываем и показываем всех детей
+                        const children = node.querySelectorAll('.tree-node');
+                        children.forEach(child => {
+                            child.classList.remove('hidden');
+                            visibleCount++;
+                        });
+                        if (children.length > 0) {
+                            node.classList.add('expanded');
+                        }
+                    }
+                });
+            }
+            
+            updateTreeStats(visibleCount, totalCount);
+        }
+
+        function updateTreeStats(visible = null, total = null) {
+            const statsEl = document.getElementById('treeStats');
+            if (!statsEl) return;
+            
+            if (visible === null || total === null) {
+                const allNodes = document.querySelectorAll('.tree-node');
+                const visibleNodes = Array.from(allNodes).filter(node => !node.classList.contains('hidden'));
+                visible = visibleNodes.length;
+                total = allNodes.length;
+            }
+            
+            document.getElementById('totalNodes').textContent = total;
+            document.getElementById('visibleNodes').textContent = visible;
+        }
+
+
         // Закрытие модального окна при клике вне его
-        document.getElementById('structureModal')?.addEventListener('click', function(e) {
+        document.getElementById('mindmapModal')?.addEventListener('click', function(e) {
             if (e.target === this) {
-                closeStructureModal();
+                closeMindMapModal();
             }
         });
 
         // Закрытие модального окна по Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                closeStructureModal();
+                closeMindMapModal();
             }
         });
-
-        // Масштабирование диаграммы
-        let diagramScale = 1;
-        function zoomDiagram(direction) {
-            const diagram = document.getElementById('structure-diagram-modal');
-            if (!diagram) return;
-
-            if (direction === 'in') {
-                diagramScale = Math.min(diagramScale + 0.1, 2);
-            } else if (direction === 'out') {
-                diagramScale = Math.max(diagramScale - 0.1, 0.5);
-            } else if (direction === 'reset') {
-                diagramScale = 1;
-            }
-
-            const svg = diagram.querySelector('svg');
-            if (svg) {
-                svg.style.transform = `scale(${diagramScale})`;
-                svg.style.transformOrigin = 'top left';
-            } else {
-                diagram.style.transform = `scale(${diagramScale})`;
-                diagram.style.transformOrigin = 'top left';
-            }
-        }
 
         // Добавление интерактивности к диаграмме
         function addDiagramInteractivity(diagramId) {

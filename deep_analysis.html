@@ -11,11 +11,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.5/dist/mermaid.min.js"></script>
     <script>
-        // Простая проверка загрузки Mermaid
+        // Проверяем поддержку mindmap при загрузке
+        window.addEventListener('load', function() {
+            if (typeof mermaid !== 'undefined') {
+                console.log('Mermaid версия:', mermaid.version || 'неизвестна');
+                // Проверяем, есть ли поддержка mindmap
+                const config = mermaid.getConfig ? mermaid.getConfig() : {};
+                console.log('Mermaid конфигурация:', config);
+            }
+        });
+    </script>
+    <script>
+        // Проверяем поддержку mindmap
         if (typeof mermaid !== 'undefined') {
             console.log('Mermaid загружен, версия:', mermaid.version || 'неизвестна');
-        } else {
-            console.error('Mermaid не загружен!');
+            console.log('Поддерживаемые диаграммы:', Object.keys(mermaid.defaultConfig || {}));
         }
     </script>
     <style>
@@ -709,6 +719,105 @@
 
         .mindmap-canvas::-webkit-scrollbar-thumb:hover {
             background: #0077cc;
+        }
+
+        /* Стили для кнопок открытия диаграмм */
+        .diagram-expand-btn {
+            background: #0095ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            font-family: "Play", sans-serif;
+        }
+
+        .diagram-expand-btn:hover {
+            background: #0077cc;
+            transform: scale(1.05);
+        }
+
+        /* Модальное окно для диаграмм */
+        .diagram-modal-content {
+            width: 98vw;
+            height: 98vh;
+            max-width: none;
+            max-height: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .diagram-header {
+            padding: 20px 30px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .diagram-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .diagram-controls button {
+            background: #0095ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .diagram-controls button:hover {
+            background: #0077cc;
+            transform: scale(1.05);
+        }
+
+        .diagram-wrapper {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            background: #fff;
+            padding: 20px;
+            cursor: grab;
+        }
+
+        .diagram-wrapper:active {
+            cursor: grabbing;
+        }
+
+        .diagram-canvas {
+            width: 100%;
+            min-height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            transition: transform 0.3s ease;
+            padding: 20px;
+        }
+
+        .diagram-canvas svg {
+            max-width: none;
+            width: auto;
+            height: auto;
+            min-width: 800px;
+        }
+
+        @media (max-width: 1200px) {
+            .diagram-canvas svg {
+                min-width: 600px;
+            }
         }
 
         .mermaid-zoom-btn {
@@ -1973,8 +2082,29 @@ graph TB
                     </div>
                 </div>
 
+                <!-- Модальное окно для диаграмм -->
+                <div class="modal" id="diagramModal">
+                    <div class="modal-content diagram-modal-content">
+                        <button class="modal-close" onclick="closeDiagramModal()">×</button>
+                        <div class="diagram-header">
+                            <h3 id="diagramModalTitle" style="margin: 0; color: #0095ff;">Диаграмма</h3>
+                            <div class="diagram-controls">
+                                <button onclick="zoomDiagramIn()" title="Увеличить">➕</button>
+                                <button onclick="zoomDiagramOut()" title="Уменьшить">➖</button>
+                                <button onclick="resetDiagramZoom()" title="Сбросить масштаб и позицию">🔍</button>
+                                <button onclick="resetDiagramPosition()" title="Сбросить позицию">📍</button>
+                                <span id="diagramZoomLevel" style="margin-left: 10px; font-size: 14px;">100%</span>
+                            </div>
+                        </div>
+                        <div class="diagram-wrapper" id="diagram-wrapper">
+                            <div class="diagram-canvas" id="diagram-canvas"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <h3>2. Жизненный цикл сделки (Deal Flow)</h3>
-                <div class="mermaid">
+                <button class="diagram-expand-btn" onclick="openDiagramModal('diagram-1')" title="Открыть в полном размере">🔍 Открыть в полном размере</button>
+                <div class="mermaid" id="diagram-1">
 stateDiagram-v2
     [*] --> Created: Создание Deal
     
@@ -1985,7 +2115,7 @@ stateDiagram-v2
     PaymentInitiated --> PaymentReceived: Платформа получает оплату
     PaymentReceived --> FundsTransferred: Платформа передаёт средства оператору КЗ
     FundsTransferred --> OperatorCNFundsReceived: Оператор CN получает средства
-    OperatorCNFundsReceived --> SupplierPaid: Оператор КЗ оплачивает поставщика
+    OperatorCNFundsReceived --> SupplierPaid: Оператор CN оплачивает поставщика
     
     SupplierPaid --> CargoTransferred: Поставщик передаёт груз перевозчику
     CargoTransferred --> InTransit: Перевозчик принимает груз
@@ -1998,71 +2128,64 @@ stateDiagram-v2
                 </div>
 
                 <h3>3. Взаимодействие ролей в сделке</h3>
-<div class="mermaid">
-graph TD
+                <button class="diagram-expand-btn" onclick="openDiagramModal('diagram-2')" title="Открыть в полном размере">🔍 Открыть в полном размере</button>
+                <div class="mermaid" id="diagram-2">
+graph LR
     subgraph "Заказчик (Customer)"
-        C1["Создаёт Order"] --> C2["Выбирает поставщика"]
-        C2 --> C3["Инициирует оплату"]
-        C3 --> C4["Завершает сделку"]
+        C1[Создаёт Order] --> C2[Выбирает поставщика]
+        C2 --> C3[Инициирует оплату]
+        C3 --> C4[Завершает сделку]
     end
     
     subgraph "Поставщик (Supplier)"
-        S1["Создаёт Offer"] --> S2["Подтверждает оплату"]
-        S2 --> S3["Передаёт груз"]
+        S1[Создаёт Offer] --> S2[Подтверждает оплату]
+        S2 --> S3[Передаёт груз]
     end
     
     subgraph "Платформа (Platform)"
-        P1["Получает оплату"] --> P2["Блокирует средства"]
-        P2 --> P3["Передаёт оператору КЗ"]
+        P1[Получает оплату] --> P2[Блокирует средства]
+        P2 --> P3[Передаёт оператору КЗ]
     end
     
     subgraph "Оператор КЗ"
-        O1["Получает средства"] --> O2["Передаёт оператору CN"]
-        O2 --> O3["Оплачивает логистику"]
-        O3 --> O4["Оплачивает таможню"]
+        O1[Получает средства] --> O2[Передаёт оператору CN]
+        O2 --> O3[Оплачивает логистику]
+        O3 --> O4[Оплачивает таможню]
     end
     
     subgraph "Оператор CN"
-        OC1["Получает средства"] --> OC2["Оплачивает поставщика CN"]
+        OC1[Получает средства] --> OC2["Оплачивает поставщика CN<br/>(Единственный кто может оплачивать поставщика)"]
     end
     
     subgraph "Перевозчик (Carrier)"
-        CR1["Принимает груз"] --> CR2["Транспортирует"]
-        CR2 --> CR3["Доставляет на таможню"]
-        CR3 --> CR4["Доставляет заказчику"]
+        CR1[Принимает груз] --> CR2[Транспортирует]
+        CR2 --> CR3[Доставляет на таможню]
+        CR3 --> CR4[Доставляет заказчику]
     end
     
     subgraph "Таможня (Customs)"
-        CS1["Подтверждает получение"] --> CS2["Обрабатывает документы"]
-        CS2 --> CS3["Выпускает груз"]
+        CS1[Подтверждает получение] --> CS2[Обрабатывает документы]
+        CS2 --> CS3[Выпускает груз]
     end
     
-    D["Deal"]
-    
-    C1 --> D
+    C1 --> D[Deal]
     S1 --> D
     C2 --> D
     C3 --> P1
     P3 --> O1
     O2 --> OC1
     OC2 --> S2
-    O3 -. "Оплата" .-> CR1
-    O4 -. "Оплата" .-> CS1
+    O3 -.->|Оплата| CR1
+    O4 -.->|Оплата| CS1
     S3 --> CR1
     CR3 --> CS1
     CS3 --> CR4
     CR4 --> C4
-    
-    style OC2 fill:#ff6b6b,stroke:#333,stroke-width:2px
-    style D fill:#0095ff,stroke:#0077cc,stroke-width:3px,color:#fff
-</div>
-<div class="info-box" style="margin-top: 10px;">
-    <strong>Примечание:</strong> Только оператор CN может оплачивать поставщика, так как поставщик находится в Китае.
-    Оператор CN выделен красным цветом для наглядности.
-</div>
+                </div>
 
                 <h3>4. Финансовый поток</h3>
-                <div class="mermaid">
+                <button class="diagram-expand-btn" onclick="openDiagramModal('diagram-3')" title="Открыть в полном размере">🔍 Открыть в полном размере</button>
+                <div class="mermaid" id="diagram-3">
 sequenceDiagram
     participant C as Заказчик
     participant P as Платформа
@@ -2094,7 +2217,8 @@ sequenceDiagram
                 </div>
 
                 <h3>5. Логистический поток</h3>
-                <div class="mermaid">
+                <button class="diagram-expand-btn" onclick="openDiagramModal('diagram-4')" title="Открыть в полном размере">🔍 Открыть в полном размере</button>
+                <div class="mermaid" id="diagram-4">
 sequenceDiagram
     participant S as Поставщик
     participant CR as Перевозчик
@@ -2186,6 +2310,242 @@ sequenceDiagram
     <a href="#intro" class="scroll-top" id="scrollTop">↑</a>
 
     <script>
+        // Сразу определяем функции для диаграмм, чтобы они были доступны глобально
+        (function() {
+            // Переменные для модального окна диаграмм
+            let diagramZoom = 1;
+            const diagramZoomStep = 0.2;
+            const diagramZoomMin = 0.5;
+            const diagramZoomMax = 3;
+            let diagramPanX = 0;
+            let diagramPanY = 0;
+            let isDraggingDiagram = false;
+            let diagramDragStartX = 0;
+            let diagramDragStartY = 0;
+            let diagramDragStartPanX = 0;
+            let diagramDragStartPanY = 0;
+
+            // Делаем функцию глобальной сразу
+            window.openDiagramModal = function(diagramId) {
+                console.log('openDiagramModal вызвана с ID:', diagramId);
+                const diagramElement = document.getElementById(diagramId);
+                if (!diagramElement) {
+                    console.error(`Диаграмма с ID ${diagramId} не найдена`);
+                    return;
+                }
+                console.log('Диаграмма найдена:', diagramElement);
+
+                const modal = document.getElementById('diagramModal');
+                const diagramCanvas = document.getElementById('diagram-canvas');
+                const diagramTitle = document.getElementById('diagramModalTitle');
+                
+                if (!modal || !diagramCanvas || !diagramTitle) {
+                    console.error('Элементы модального окна не найдены');
+                    return;
+                }
+                
+                // Определяем заголовок на основе ID диаграммы
+                const titles = {
+                    'diagram-1': 'Жизненный цикл сделки (Deal Flow)',
+                    'diagram-2': 'Взаимодействие ролей в сделке',
+                    'diagram-3': 'Финансовый поток',
+                    'diagram-4': 'Логистический поток'
+                };
+                
+                diagramTitle.textContent = titles[diagramId] || 'Диаграмма';
+                
+                // Очищаем canvas
+                diagramCanvas.innerHTML = '';
+                
+                // Пытаемся найти уже отрендеренный SVG
+                const svgElement = diagramElement.querySelector('svg');
+                if (svgElement) {
+                    // Клонируем SVG с глубоким копированием
+                    const clonedSvg = svgElement.cloneNode(true);
+                    clonedSvg.style.width = '100%';
+                    clonedSvg.style.height = 'auto';
+                    clonedSvg.style.maxWidth = 'none';
+                    diagramCanvas.appendChild(clonedSvg);
+                } else {
+                    // Если SVG ещё не отрендерен, создаём контейнер и ждём
+                    const waitContainer = document.createElement('div');
+                    waitContainer.style.padding = '20px';
+                    waitContainer.style.textAlign = 'center';
+                    waitContainer.innerHTML = '<p>Загрузка диаграммы...</p>';
+                    diagramCanvas.appendChild(waitContainer);
+                    
+                    // Проверяем каждые 200мс, пока не появится SVG
+                    const checkInterval = setInterval(() => {
+                        const svg = diagramElement.querySelector('svg');
+                        if (svg) {
+                            clearInterval(checkInterval);
+                            const clonedSvg = svg.cloneNode(true);
+                            clonedSvg.style.width = '100%';
+                            clonedSvg.style.height = 'auto';
+                            clonedSvg.style.maxWidth = 'none';
+                            diagramCanvas.innerHTML = '';
+                            diagramCanvas.appendChild(clonedSvg);
+                        }
+                    }, 200);
+                    
+                    // Останавливаем проверку через 5 секунд
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        if (diagramCanvas.querySelector('div')) {
+                            diagramCanvas.innerHTML = '<div style="padding: 20px; text-align: center; color: #d32f2f;"><p>Не удалось загрузить диаграмму. Пожалуйста, обновите страницу.</p></div>';
+                        }
+                    }, 5000);
+                }
+                
+                // Сбрасываем масштаб и позицию
+                diagramZoom = 1;
+                diagramPanX = 0;
+                diagramPanY = 0;
+                updateDiagramZoom();
+                
+                // Добавляем обработчики для перетаскивания
+                setupDiagramDrag();
+                
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            };
+
+            function updateDiagramZoom() {
+                const diagramCanvas = document.getElementById('diagram-canvas');
+                if (diagramCanvas) {
+                    diagramCanvas.style.transform = `translate(${diagramPanX}px, ${diagramPanY}px) scale(${diagramZoom})`;
+                    diagramCanvas.style.transformOrigin = 'top center';
+                    
+                    const zoomLevel = document.getElementById('diagramZoomLevel');
+                    if (zoomLevel) {
+                        zoomLevel.textContent = Math.round(diagramZoom * 100) + '%';
+                    }
+                }
+            }
+
+            function setupDiagramDrag() {
+                const diagramWrapper = document.getElementById('diagram-wrapper');
+                const diagramCanvas = document.getElementById('diagram-canvas');
+                
+                if (!diagramWrapper || !diagramCanvas) return;
+                
+                // Удаляем старые обработчики, если они есть
+                diagramWrapper.removeEventListener('mousedown', handleDiagramMouseDown);
+                document.removeEventListener('mousemove', handleDiagramMouseMove);
+                document.removeEventListener('mouseup', handleDiagramMouseUp);
+                
+                // Добавляем новые обработчики
+                diagramWrapper.addEventListener('mousedown', handleDiagramMouseDown);
+                document.addEventListener('mousemove', handleDiagramMouseMove);
+                document.addEventListener('mouseup', handleDiagramMouseUp);
+            }
+
+            function handleDiagramMouseDown(e) {
+                if (e.button !== 0) return;
+                if (e.target.closest('button') || e.target.closest('.diagram-controls')) {
+                    return;
+                }
+                
+                isDraggingDiagram = true;
+                diagramDragStartX = e.clientX;
+                diagramDragStartY = e.clientY;
+                diagramDragStartPanX = diagramPanX;
+                diagramDragStartPanY = diagramPanY;
+                
+                const diagramWrapper = document.getElementById('diagram-wrapper');
+                if (diagramWrapper) {
+                    diagramWrapper.style.cursor = 'grabbing';
+                }
+                
+                e.preventDefault();
+            }
+
+            function handleDiagramMouseMove(e) {
+                if (!isDraggingDiagram) return;
+                
+                const deltaX = e.clientX - diagramDragStartX;
+                const deltaY = e.clientY - diagramDragStartY;
+                
+                diagramPanX = diagramDragStartPanX + deltaX;
+                diagramPanY = diagramDragStartPanY + deltaY;
+                
+                updateDiagramZoom();
+                e.preventDefault();
+            }
+
+            function handleDiagramMouseUp(e) {
+                if (isDraggingDiagram) {
+                    isDraggingDiagram = false;
+                    const diagramWrapper = document.getElementById('diagram-wrapper');
+                    if (diagramWrapper) {
+                        diagramWrapper.style.cursor = 'grab';
+                    }
+                }
+            }
+
+            window.closeDiagramModal = function() {
+                const modal = document.getElementById('diagramModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                    diagramZoom = 1;
+                    diagramPanX = 0;
+                    diagramPanY = 0;
+                    isDraggingDiagram = false;
+                }
+            };
+
+            window.zoomDiagramIn = function() {
+                if (diagramZoom < diagramZoomMax) {
+                    diagramZoom = Math.min(diagramZoom + diagramZoomStep, diagramZoomMax);
+                    updateDiagramZoom();
+                }
+            };
+
+            window.zoomDiagramOut = function() {
+                if (diagramZoom > diagramZoomMin) {
+                    diagramZoom = Math.max(diagramZoom - diagramZoomStep, diagramZoomMin);
+                    updateDiagramZoom();
+                }
+            };
+
+            window.resetDiagramZoom = function() {
+                diagramZoom = 1;
+                diagramPanX = 0;
+                diagramPanY = 0;
+                updateDiagramZoom();
+            };
+
+            window.resetDiagramPosition = function() {
+                diagramPanX = 0;
+                diagramPanY = 0;
+                updateDiagramZoom();
+            };
+
+            // Инициализация обработчиков перетаскивания при загрузке
+            document.addEventListener('DOMContentLoaded', function() {
+                setupDiagramDrag();
+                console.log('Функции диаграмм инициализированы');
+            });
+
+            // Масштабирование диаграммы колесиком мыши
+            document.addEventListener('DOMContentLoaded', function() {
+                const diagramWrapper = document.getElementById('diagram-wrapper');
+                if (diagramWrapper) {
+                    diagramWrapper.addEventListener('wheel', function(e) {
+                        if (e.ctrlKey || e.metaKey) {
+                            e.preventDefault();
+                            if (e.deltaY < 0) {
+                                window.zoomDiagramIn();
+                            } else {
+                                window.zoomDiagramOut();
+                            }
+                        }
+                    }, { passive: false });
+                }
+            });
+        })();
+
         // Данные для интерактивности
         const nodeData = {
             'A': {
@@ -2259,29 +2619,29 @@ sequenceDiagram
                 ]
             },
             'D2': { title: 'DealStatusHistory', description: 'История изменения статусов (Event Sourcing подход)' },
-            'D3': { 
-                title: 'PaymentScheme', 
-                description: 'Платёжная схема - гибкая система управления денежными потоками',
-                details: [
-                    'Кто платит, кому, за что, в каком порядке',
-                    'Версионирование схем',
-                    'Управление статусами платежей',
-                    'История изменений',
-                    'PaymentExecutor для выполнения платежей'
-                ]
-            },
+                            'D3': { 
+                                title: 'PaymentScheme', 
+                                description: 'Платёжная схема - гибкая система управления денежными потоками',
+                                details: [
+                                    'Кто платит, кому, за что, в каком порядке',
+                                    'Версионирование схем',
+                                    'Управление статусами платежей',
+                                    'История изменений',
+                                    'PaymentExecutor для выполнения платежей'
+                                ]
+                            },
             'D4': { title: 'PlatformPaymentReceived', description: 'Получение оплаты платформой от заказчика' },
             'D5': { title: 'State Machine', description: 'Конечный автомат для управления переходами статусов' },
-            'D6': { 
-                title: 'DealPolicy', 
-                description: 'Централизованная бизнес-логика проверок прав доступа',
-                details: [
-                    'can_create_payment_scheme',
-                    'can_update_payment_scheme',
-                    'can_execute_payment',
-                    'Проверки прав для всех ролей'
-                ]
-            },
+                            'D6': { 
+                                title: 'DealPolicy', 
+                                description: 'Централизованная бизнес-логика проверок прав доступа',
+                                details: [
+                                    'can_create_payment_scheme',
+                                    'can_update_payment_scheme',
+                                    'can_execute_payment',
+                                    'Проверки прав для всех ролей'
+                                ]
+                            },
             'E': {
                 title: 'announces/ - Объявления',
                 description: 'Объявления о тендерах',
@@ -2320,22 +2680,22 @@ sequenceDiagram
             'G3': { title: 'OfferAnnounceLot', description: 'Связь предложения с лотом и продуктом' },
             'H': { title: 'operators_kz/', description: 'Модуль оператора Казахстан' },
             'I': { title: 'operators_cn/', description: 'Модуль оператора Китай' },
-            'J': { 
-                title: 'carriers/', 
-                description: 'Модуль перевозчиков',
-                details: [
-                    'CargoTransport - транспортировка груза',
-                    'CarrierPayment - оплата за логистические услуги'
-                ]
-            },
-            'K': { 
-                title: 'customs/', 
-                description: 'Модуль таможни',
-                details: [
-                    'CustomsDeclaration - таможенное оформление',
-                    'CustomsPayment - оплата за таможенные услуги'
-                ]
-            },
+                            'J': { 
+                                title: 'carriers/', 
+                                description: 'Модуль перевозчиков',
+                                details: [
+                                    'CargoTransport - транспортировка груза',
+                                    'CarrierPayment - оплата за логистические услуги'
+                                ]
+                            },
+                            'K': { 
+                                title: 'customs/', 
+                                description: 'Модуль таможни',
+                                details: [
+                                    'CustomsDeclaration - таможенное оформление',
+                                    'CustomsPayment - оплата за таможенные услуги'
+                                ]
+                            },
             'L': {
                 title: 'integrations/ - Интеграции',
                 description: 'Внешние API (read-only)',
@@ -2349,6 +2709,129 @@ sequenceDiagram
             'L2': { title: 'SamrukService', description: 'Сервис для работы с API Самрук через REST' },
             'L3': { title: 'NationalBankService', description: 'Сервис для получения курсов валют из НБ РК' }
         };
+
+        // Инициализация Mermaid
+        mermaid.initialize({ 
+            startOnLoad: false, // Отключаем автозагрузку, будем рендерить вручную
+            theme: 'default',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#0095ff',
+                primaryTextColor: '#000',
+                primaryBorderColor: '#0077cc',
+                lineColor: '#0095ff',
+                secondaryColor: '#e8f4fd',
+                tertiaryColor: '#fafafa'
+            },
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            mindmap: {
+                padding: 10
+            }
+        });
+        
+        // Функция для рендеринга всех Mermaid диаграмм
+        async function renderAllMermaidDiagrams() {
+            const mermaidElements = document.querySelectorAll('.mermaid:not([data-processed])');
+            console.log(`Найдено ${mermaidElements.length} диаграмм Mermaid для рендеринга`);
+            
+            if (mermaidElements.length === 0) {
+                console.log('Нет диаграмм для рендеринга');
+                return;
+            }
+            
+            // Рендерим каждую диаграмму отдельно для лучшего контроля ошибок
+            for (let i = 0; i < mermaidElements.length; i++) {
+                const element = mermaidElements[i];
+                const id = element.id || `mermaid-${Date.now()}-${i}`;
+                if (!element.id) {
+                    element.id = id;
+                }
+                
+                try {
+                    const graphDefinition = element.textContent.trim();
+                    if (!graphDefinition) {
+                        console.warn(`Пустая диаграмма в элементе ${id}`);
+                        element.setAttribute('data-processed', 'empty');
+                        continue;
+                    }
+                    
+                    // Для Mermaid 10.x используем mermaid.run() или mermaid.render()
+                    if (typeof mermaid.run === 'function') {
+                        // Mermaid 10.x - используем run для автоматической обработки
+                        // Но сначала нужно сохранить определение
+                        const originalText = element.textContent;
+                        element.setAttribute('data-mermaid-definition', graphDefinition);
+                        // mermaid.run() обработает элемент автоматически
+                        await mermaid.run({
+                            nodes: [element],
+                            suppressErrors: false
+                        });
+                        element.setAttribute('data-processed', 'true');
+                        console.log(`Диаграмма ${id} успешно отрендерена через mermaid.run()`);
+                    } else if (typeof mermaid.render === 'function') {
+                        // Старый API - используем render
+                        const { svg } = await mermaid.render(id + '-svg', graphDefinition);
+                        element.innerHTML = svg;
+                        element.setAttribute('data-processed', 'true');
+                        console.log(`Диаграмма ${id} успешно отрендерена через mermaid.render()`);
+                    } else {
+                        console.error(`Неизвестный API Mermaid для элемента ${id}`);
+                        element.setAttribute('data-processed', 'error');
+                    }
+                } catch (error) {
+                    console.error(`Ошибка при рендеринге диаграммы ${id}:`, error);
+                    element.innerHTML = `<div class="mermaid-error" style="padding: 20px; color: #d32f2f; border: 1px solid #d32f2f; border-radius: 4px; background: #ffebee;">
+                        <strong>Ошибка загрузки диаграммы:</strong><br>
+                        ${error.message || 'Неизвестная ошибка'}<br>
+                        <small>Проверьте синтаксис диаграммы в консоли браузера</small>
+                    </div>`;
+                    element.setAttribute('data-processed', 'error');
+                }
+            }
+            
+            console.log('Рендеринг диаграмм завершен');
+        }
+        
+        // Ждем полной загрузки Mermaid и рендерим диаграммы
+        function initMermaidDiagrams() {
+            if (typeof mermaid === 'undefined') {
+                console.error('Mermaid не загружен, повторная попытка через 500мс...');
+                setTimeout(initMermaidDiagrams, 500);
+                return;
+            }
+            
+            console.log('Mermaid инициализирован, версия:', mermaid.version || 'неизвестна');
+            console.log('Доступные методы:', {
+                run: typeof mermaid.run,
+                render: typeof mermaid.render,
+                initialize: typeof mermaid.initialize
+            });
+            
+            // Небольшая задержка для гарантии полной загрузки DOM
+            setTimeout(() => {
+                renderAllMermaidDiagrams();
+            }, 200);
+        }
+        
+        // Инициализируем после загрузки страницы
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMermaidDiagrams);
+        } else {
+            // Если DOM уже загружен, инициализируем сразу
+            initMermaidDiagrams();
+        }
+
+        // Функции для ментальной карты
+        let mindMapScale = 1;
+        let mindMapPanX = 0;
+        let mindMapPanY = 0;
+        let isDragging = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
 
         // Структура данных для интерактивного дерева знаний
         const knowledgeTreeData = {
@@ -2693,335 +3176,110 @@ sequenceDiagram
             ]
         };
 
-        // ОСНОВНАЯ ИНИЦИАЛИЗАЦИЯ
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM загружен, инициализируем Mermaid...');
-            
-            // Проверяем, загружен ли Mermaid
-            if (typeof mermaid === 'undefined') {
-                console.error('Mermaid не загружен!');
-                // Показываем сообщение об ошибке
-                document.querySelectorAll('.mermaid').forEach(el => {
-                    el.innerHTML = '<div class="mermaid-error">Библиотека диаграмм не загружена. Пожалуйста, обновите страницу.</div>';
-                });
-                return;
-            }
-            
-            console.log('Mermaid версия:', mermaid.version || 'неизвестна');
-            
-            // Инициализируем Mermaid с явными настройками
-            try {
-                mermaid.initialize({ 
-                    startOnLoad: true,
-                    theme: 'default',
-                    securityLevel: 'loose',
-                    themeVariables: {
-                        primaryColor: '#0095ff',
-                        primaryTextColor: '#000',
-                        primaryBorderColor: '#0077cc',
-                        lineColor: '#0095ff',
-                        secondaryColor: '#e8f4fd',
-                        tertiaryColor: '#fafafa',
-                        fontSize: '16px'
-                    },
-                    flowchart: {
-                        useMaxWidth: true,
-                        htmlLabels: true,
-                        curve: 'basis'
-                    },
-                    sequence: {
-                        useMaxWidth: true,
-                        height: 40,
-                        actorFontSize: 16,
-                        noteFontSize: 14,
-                        messageFontSize: 16
-                    },
-                    state: {
-                        useMaxWidth: true,
-                        height: 40,
-                        fontSize: 16
-                    },
-                    mindmap: {
-                        useMaxWidth: true
-                    }
-                });
-                
-                console.log('Mermaid успешно инициализирован');
-                
-                // Инициализируем все диаграммы
-                initMermaidDiagrams();
-                
-            } catch (error) {
-                console.error('Ошибка при инициализации Mermaid:', error);
-                document.querySelectorAll('.mermaid').forEach(el => {
-                    el.innerHTML = '<div class="mermaid-error">Ошибка инициализации диаграмм. Подробности в консоли (F12).</div>';
-                });
-            }
-            
-            // Обновляем навигацию
-            updateNavigation();
-            
-            // Инициализируем кнопку "Наверх"
-            initScrollTopButton();
-        });
-        
-        // ФУНКЦИЯ ДЛЯ РЕНДЕРИНГА ДИАГРАММ
-function initMermaidDiagrams() {
-    console.log('Инициализация диаграмм Mermaid...');
-    
-    // Находим все блоки с классом mermaid
-    const mermaidElements = document.querySelectorAll('.mermaid:not([data-processed="true"])');
-    console.log('Найдено новых элементов mermaid:', mermaidElements.length);
-    
-    mermaidElements.forEach((element, index) => {
-        try {
-            // Получаем текст диаграммы
-            const diagramText = element.textContent.trim();
-            
-            if (!diagramText) {
-                console.warn(`Диаграмма ${index + 1} пуста`);
-                return;
-            }
-            
-            console.log(`Рендерим диаграмму ${index + 1}, тип:`, diagramText.split('\n')[0]);
-            
-            // Временно заменяем содержимое на индикатор загрузки
-            const originalHTML = element.innerHTML;
-            element.innerHTML = '<div class="mermaid-loading">Рендеринг диаграммы...</div>';
-            
-            // Генерируем уникальный ID для диаграммы
-            const diagramId = 'mermaid-diagram-' + index + '-' + Date.now();
-            
-            // Рендерим диаграмму - используем правильный метод
-            mermaid.render(diagramId, diagramText).then(({ svg, bindFunctions }) => {
-                // Заменяем содержимое на отрендеренную SVG
-                element.innerHTML = svg;
-                element.setAttribute('data-processed', 'true');
-                
-                // Вызываем функции привязки
-                if (bindFunctions) {
-                    bindFunctions(element);
-                }
-                
-                // Добавляем кнопку увеличения для больших диаграмм
-                if (element.closest('.mermaid-container') || index === 0) {
-                    addZoomButton(element, index, diagramText);
-                }
-                
-                console.log(`Диаграмма ${index + 1} успешно отрендерена`);
-            }).catch(error => {
-                throw error;
-            });
-            
-        } catch (error) {
-            console.error(`Ошибка при рендеринге диаграммы ${index + 1}:`, error);
-            
-            // Показываем ошибку пользователю
-            element.innerHTML = `
-                <div class="mermaid-error">
-                    <p><strong>Ошибка при отображении диаграммы ${index + 1}</strong></p>
-                    <p>${error.message}</p>
-                    <details style="margin-top: 10px;">
-                        <summary>Показать исходный код</summary>
-                        <pre style="background: #fff; padding: 10px; border: 1px solid #ddd; margin-top: 10px; overflow: auto; font-size: 12px; max-height: 200px;">${element.textContent}</pre>
-                    </details>
-                </div>
-            `;
-        }
-    });
-}
-        
-        // ФУНКЦИЯ ДЛЯ КНОПКИ УВЕЛИЧЕНИЯ
-        function addZoomButton(diagramElement, index, diagramText) {
-            const container = diagramElement.closest('.mindmap-container') || diagramElement.closest('.mermaid-container') || diagramElement.parentElement;
-            
-            if (!container) return;
-            
-            const button = document.createElement('button');
-            button.className = 'mermaid-zoom-btn';
-            button.textContent = '🔍 Увеличить';
-            button.onclick = function(e) {
-                e.stopPropagation();
-                openDiagramModal(index, diagramText);
-            };
-            
-            // Убедимся, что позиционирование правильное
-            container.style.position = 'relative';
-            
-            // Проверяем, есть ли уже кнопка
-            if (!container.querySelector('.mermaid-zoom-btn')) {
-                container.appendChild(button);
-            }
-        }
-        
-        // ФУНКЦИЯ ДЛЯ МОДАЛЬНОГО ОКНА С ДИАГРАММОЙ
-function openDiagramModal(index, diagramText) {
-    const modal = document.createElement('div');
-    modal.className = 'modal active';
-    modal.id = 'diagramModal-' + index;
-    
-    modal.innerHTML = `
-        <div class="modal-content" style="max-width: 90vw; max-height: 90vh; overflow: auto; background: #fff;">
-            <button class="modal-close" onclick="closeDiagramModal(${index})">×</button>
-            <div style="margin-bottom: 20px; text-align: center;">
-                <button onclick="zoomDiagramIn(${index})" style="margin: 0 5px; padding: 8px 15px; background: #0095ff; color: white; border: none; border-radius: 5px; cursor: pointer;">+ Увеличить</button>
-                <button onclick="zoomDiagramOut(${index})" style="margin: 0 5px; padding: 8px 15px; background: #0095ff; color: white; border: none; border-radius: 5px; cursor: pointer;">- Уменьшить</button>
-                <button onclick="resetDiagramZoom(${index})" style="margin: 0 5px; padding: 8px 15px; background: #0095ff; color: white; border: none; border-radius: 5px; cursor: pointer;">⟳ Сбросить</button>
-            </div>
-            <div class="mermaid" id="modal-diagram-${index}" style="background: white; padding: 20px; border-radius: 10px;">${diagramText}</div>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    document.body.style.overflow = 'hidden';
-    
-    // Рендерим диаграмму в модальном окне
-    setTimeout(() => {
-        const modalDiagram = document.getElementById('modal-diagram-' + index);
-        if (modalDiagram && diagramText) {
-            try {
-                // Используем mermaid.run для рендеринга в модальном окне
-                mermaid.run({
-                    querySelector: `#modal-diagram-${index}`,
-                    suppressErrors: false
-                }).then(() => {
-                    const svg = modalDiagram.querySelector('svg');
-                    if (svg) {
-                        svg.dataset.originalTransform = 'scale(1)';
-                        svg.style.transform = 'scale(1)';
-                        svg.style.transformOrigin = 'center center';
-                        svg.style.transition = 'transform 0.3s ease';
-                    }
-                }).catch(error => {
-                    console.error('Ошибка при рендеринге в модальном окне:', error);
-                    modalDiagram.innerHTML = `<div class="mermaid-error">${error.message}</div>`;
-                });
-            } catch (error) {
-                console.error('Критическая ошибка:', error);
-                modalDiagram.innerHTML = `<div class="mermaid-error">${error.message}</div>`;
-            }
-        }
-    }, 100);
-}
-        
-        // ФУНКЦИИ ДЛЯ УПРАВЛЕНИЯ ЗУМОМ (глобальные)
-        window.zoomDiagramIn = function(index) {
-            const svg = document.querySelector(`#modal-diagram-${index} svg`);
-            if (svg) {
-                const currentScale = parseFloat(svg.style.transform.replace('scale(', '').replace(')', '')) || 1;
-                svg.style.transform = `scale(${currentScale * 1.2})`;
-            }
-        };
-        
-        window.zoomDiagramOut = function(index) {
-            const svg = document.querySelector(`#modal-diagram-${index} svg`);
-            if (svg) {
-                const currentScale = parseFloat(svg.style.transform.replace('scale(', '').replace(')', '')) || 1;
-                svg.style.transform = `scale(${Math.max(0.5, currentScale / 1.2)})`;
-            }
-        };
-        
-        window.resetDiagramZoom = function(index) {
-            const svg = document.querySelector(`#modal-diagram-${index} svg`);
-            if (svg) {
-                svg.style.transform = 'scale(1)';
-            }
-        };
-        
-        window.closeDiagramModal = function(index) {
-            const modal = document.getElementById('diagramModal-' + index);
-            if (modal) {
-                modal.remove();
-            }
-            document.body.style.overflow = 'auto';
-        };
-        
-        // ФУНКЦИЯ ДЛЯ НАВИГАЦИИ
-        function updateNavigation() {
-            const sections = document.querySelectorAll('.section');
-            const navLinks = document.querySelectorAll('.nav-menu a[href^="#"]');
-            
-            function updateActiveNav() {
-                let current = '';
-                const scrollPosition = window.scrollY + 100;
-                
-                sections.forEach(section => {
-                    const sectionTop = section.offsetTop;
-                    const sectionHeight = section.clientHeight;
-                    
-                    if (scrollPosition >= sectionTop) {
-                        current = section.getAttribute('id');
-                    }
-                });
-                
-                navLinks.forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${current}`) {
-                        link.classList.add('active');
-                    }
-                });
-            }
-            
-            window.addEventListener('scroll', updateActiveNav);
-            updateActiveNav();
-        }
-        
-        // ФУНКЦИЯ ДЛЯ КНОПКИ "НАВЕРХ"
-        function initScrollTopButton() {
-            const scrollTopBtn = document.getElementById('scrollTop');
-            if (!scrollTopBtn) return;
-            
-            window.addEventListener('scroll', () => {
-                if (window.pageYOffset > 300) {
-                    scrollTopBtn.classList.add('visible');
-                } else {
-                    scrollTopBtn.classList.remove('visible');
-                }
-            });
-            
-            scrollTopBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            });
-        }
-        
-        // ФУНКЦИИ ДЛЯ МЕНТАЛЬНОЙ КАРТЫ (ДЕРЕВА ЗНАНИЙ)
         function openMindMapModal() {
             const modal = document.getElementById('mindmapModal');
-            if (!modal) return;
+            const mindmapWrapper = document.getElementById('mindmap-wrapper');
             
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
             
-            // Инициализируем дерево знаний
-            setTimeout(() => {
-                const treeContainer = document.getElementById('knowledgeTree');
-                if (treeContainer && !treeContainer.hasChildNodes()) {
-                    renderKnowledgeTree(knowledgeTreeData, treeContainer, 0);
+            if (mindmapWrapper) {
+                mindmapWrapper.style.display = 'block';
+                // Рендерим дерево если еще не отрендерено
+                const tree = document.getElementById('knowledgeTree');
+                if (tree) {
+                    // Очищаем старое дерево
+                    tree.innerHTML = '';
+                    // Рендерим новое дерево
+                    renderKnowledgeTree(knowledgeTreeData, tree, 0);
                     updateTreeStats();
+                    // Раскрываем первый уровень по умолчанию
                     expandFirstLevel();
                 }
-            }, 100);
-        }
-        
-        function closeMindMapModal() {
-            const modal = document.getElementById('mindmapModal');
-            if (modal) {
-                modal.classList.remove('active');
-                document.body.style.overflow = 'auto';
             }
         }
-        
-        // Функции для дерева знаний
+
+        function handleMindMapSuccess(loadingIndicator, mindmapWrapper, mindmapDiagram) {
+            console.log('handleMindMapSuccess вызван');
+            
+            // Скрываем индикатор загрузки
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            if (mindmapWrapper) {
+                mindmapWrapper.style.display = 'block';
+            }
+            
+            // Убеждаемся, что SVG виден
+            const svg = mindmapDiagram.querySelector('svg');
+            console.log('SVG найден:', !!svg);
+            
+            if (svg) {
+                console.log('SVG размеры:', svg.getBBox());
+                svg.style.width = '100%';
+                svg.style.height = 'auto';
+                svg.style.maxWidth = 'none';
+                svg.style.display = 'block';
+                svg.style.transform = `scale(${mindMapScale}) translate(${mindMapPanX}px, ${mindMapPanY}px)`;
+                svg.style.transformOrigin = 'center center';
+                
+                // Добавляем интерактивность
+                setTimeout(() => {
+                    setupMindMapInteractivity();
+                }, 100);
+            } else {
+                // Ждем немного и проверяем снова
+                console.log('SVG не найден, ждем...');
+                setTimeout(() => {
+                    const svg2 = mindmapDiagram.querySelector('svg');
+                    if (svg2) {
+                        console.log('SVG найден после ожидания');
+                        handleMindMapSuccess(loadingIndicator, mindmapWrapper, mindmapDiagram);
+                    } else {
+                        console.error('SVG не был создан после рендеринга');
+                        console.log('Содержимое mindmapDiagram:', mindmapDiagram.innerHTML.substring(0, 200));
+                        throw new Error('SVG не был создан после рендеринга. Проверьте консоль для деталей.');
+                    }
+                }, 1000);
+            }
+        }
+
+        function handleMindMapError(err, loadingIndicator, mindmapWrapper, diagramText) {
+            console.error('Ошибка рендеринга Mermaid:', err);
+            console.error('Текст диаграммы:', diagramText ? diagramText.substring(0, 200) : 'нет текста');
+            
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+            if (mindmapWrapper) {
+                mindmapWrapper.innerHTML = `<div class="mermaid-error">
+                    <p><strong>Ошибка загрузки ментальной карты</strong></p>
+                    <p>Ошибка: ${err.message || 'Неизвестная ошибка'}</p>
+                    <p>Пожалуйста, обновите страницу или проверьте консоль браузера (F12) для деталей.</p>
+                    <p style="font-size: 12px; margin-top: 10px; color: #666;">Если проблема сохраняется, возможно, ваша версия браузера не поддерживает mindmap диаграммы Mermaid.</p>
+                </div>`;
+                mindmapWrapper.style.display = 'block';
+            }
+        }
+
+        function closeMindMapModal() {
+            const modal = document.getElementById('mindmapModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Функции для интерактивного дерева знаний
         function renderKnowledgeTree(node, container, level = 0) {
             const nodeElement = document.createElement('div');
             nodeElement.className = `tree-node level-${level} ${node.children && node.children.length > 0 ? '' : 'leaf'}`;
             
             const content = document.createElement('div');
             content.className = 'tree-node-content';
+            
+            // Добавляем иконку в зависимости от уровня
+            if (level === 0) {
+                content.setAttribute('data-section', 'intro');
+            }
             
             const toggle = document.createElement('span');
             toggle.className = 'tree-toggle';
@@ -3040,6 +3298,33 @@ function openDiagramModal(index, diagramText) {
                     nodeElement.classList.toggle('expanded');
                     updateTreeStats();
                 });
+            } else {
+                // Для листовых узлов добавляем возможность навигации
+                const sectionMap = {
+                    'Архитектура': 'architecture',
+                    'Модули': 'architecture',
+                    'Роли': 'roles',
+                    'Статусы': 'business-processes',
+                    'API': 'technical',
+                    'Безопасность': 'security',
+                    'Интеграции': 'integrations'
+                };
+                
+                const parentLabel = getParentLabel(nodeElement);
+                if (sectionMap[parentLabel]) {
+                    content.style.cursor = 'pointer';
+                    content.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const sectionId = sectionMap[parentLabel];
+                        const section = document.getElementById(sectionId);
+                        if (section) {
+                            closeMindMapModal();
+                            setTimeout(() => {
+                                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 300);
+                        }
+                    });
+                }
             }
             
             nodeElement.appendChild(content);
@@ -3058,7 +3343,22 @@ function openDiagramModal(index, diagramText) {
             
             container.appendChild(nodeElement);
         }
-        
+
+        function getParentLabel(element) {
+            let current = element;
+            while (current) {
+                const label = current.querySelector('.tree-label');
+                if (label) {
+                    const text = label.textContent;
+                    if (['Архитектура', 'Модули', 'Роли', 'Статусы', 'API', 'Безопасность', 'Интеграции'].includes(text)) {
+                        return text;
+                    }
+                }
+                current = current.parentElement;
+            }
+            return null;
+        }
+
         function expandAllTree() {
             document.querySelectorAll('.tree-node').forEach(node => {
                 if (node.querySelector('.tree-children')) {
@@ -3067,14 +3367,14 @@ function openDiagramModal(index, diagramText) {
             });
             updateTreeStats();
         }
-        
+
         function collapseAllTree() {
             document.querySelectorAll('.tree-node').forEach(node => {
                 node.classList.remove('expanded');
             });
             updateTreeStats();
         }
-        
+
         function expandFirstLevel() {
             collapseAllTree();
             const tree = document.getElementById('knowledgeTree');
@@ -3086,27 +3386,38 @@ function openDiagramModal(index, diagramText) {
             }
             updateTreeStats();
         }
-        
+
         function searchTree(query) {
             const searchTerm = query.toLowerCase().trim();
             const allNodes = document.querySelectorAll('.tree-node');
             let visibleCount = 0;
-            let totalCount = allNodes.length;
+            let totalCount = 0;
             
             if (!searchTerm) {
+                // Показываем все узлы
                 allNodes.forEach(node => {
                     node.classList.remove('hidden', 'highlighted');
+                    totalCount++;
                     visibleCount++;
                 });
             } else {
+                // Скрываем все узлы
+                allNodes.forEach(node => {
+                    node.classList.add('hidden');
+                    node.classList.remove('highlighted');
+                    totalCount++;
+                });
+                
+                // Показываем совпадающие узлы и их родителей
                 allNodes.forEach(node => {
                     const label = node.querySelector('.tree-label');
                     if (label && label.textContent.toLowerCase().includes(searchTerm)) {
+                        // Показываем узел
                         node.classList.remove('hidden');
                         node.classList.add('highlighted');
                         visibleCount++;
                         
-                        // Раскрываем и показываем родителей
+                        // Раскрываем и показываем всех родителей
                         let parent = node.parentElement;
                         while (parent && parent.classList.contains('tree-children')) {
                             parent.classList.remove('hidden');
@@ -3121,16 +3432,23 @@ function openDiagramModal(index, diagramText) {
                             }
                             parent = parent.parentElement;
                         }
-                    } else {
-                        node.classList.add('hidden');
-                        node.classList.remove('highlighted');
+                        
+                        // Раскрываем и показываем всех детей
+                        const children = node.querySelectorAll('.tree-node');
+                        children.forEach(child => {
+                            child.classList.remove('hidden');
+                            visibleCount++;
+                        });
+                        if (children.length > 0) {
+                            node.classList.add('expanded');
+                        }
                     }
                 });
             }
             
             updateTreeStats(visibleCount, totalCount);
         }
-        
+
         function updateTreeStats(visible = null, total = null) {
             const statsEl = document.getElementById('treeStats');
             if (!statsEl) return;
@@ -3142,38 +3460,262 @@ function openDiagramModal(index, diagramText) {
                 total = allNodes.length;
             }
             
-            const totalNodesSpan = document.getElementById('totalNodes');
-            const visibleNodesSpan = document.getElementById('visibleNodes');
-            
-            if (totalNodesSpan) totalNodesSpan.textContent = total;
-            if (visibleNodesSpan) visibleNodesSpan.textContent = visible;
+            document.getElementById('totalNodes').textContent = total;
+            document.getElementById('visibleNodes').textContent = visible;
         }
-        
-        // Делаем функции глобальными для HTML кнопок
-        window.expandAllTree = expandAllTree;
-        window.collapseAllTree = collapseAllTree;
-        window.expandFirstLevel = expandFirstLevel;
-        window.searchTree = searchTree;
-        
-        // Обработчик для закрытия модальных окон по Escape
+
+
+        // Закрытие модального окна при клике вне его
+        document.getElementById('mindmapModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMindMapModal();
+            }
+        });
+
+        // Закрытие модального окна по Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                const modals = document.querySelectorAll('.modal.active');
-                modals.forEach(modal => {
-                    modal.classList.remove('active');
-                    document.body.style.overflow = 'auto';
-                });
+                closeMindMapModal();
+                closeDiagramModal();
             }
         });
-        
-        // Обработчик для клика вне модального окна
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('active');
-                document.body.style.overflow = 'auto';
+
+        // Закрытие модального окна диаграммы по клику вне его
+        document.getElementById('diagramModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDiagramModal();
             }
         });
-        
+
+
+        // Добавление интерактивности к диаграмме
+        function addDiagramInteractivity(diagramId) {
+            const diagram = document.querySelector(`#${diagramId} svg`);
+            if (!diagram) return;
+
+            const nodes = diagram.querySelectorAll('.node');
+            const nodeInfo = document.getElementById('nodeInfo');
+
+            nodes.forEach(node => {
+                const nodeId = node.id;
+                // Извлекаем ключ узла из ID (например, flowchart-A-0 -> A)
+                let nodeKey = null;
+                
+                // Сначала пытаемся из ID
+                const match = nodeId.match(/flowchart-([A-Z0-9]+)/);
+                if (match) {
+                    nodeKey = match[1];
+                }
+                
+                // Если не нашли, ищем по тексту метки
+                if (!nodeKey) {
+                    const label = node.querySelector('.nodeLabel');
+                    if (label) {
+                        const text = label.textContent.trim().toLowerCase();
+                        
+                        // Маппинг текста на ключи
+                        const textToKey = {
+                            'core/': 'A',
+                            'basemodel': 'A1',
+                            'basetimestampedmodel': 'A2',
+                            'timestampedmodel': 'A3',
+                            'common/': 'B',
+                            'currency': 'B1',
+                            'kato': 'B2',
+                            'subjecttype': 'B3',
+                            'tenderinfo': 'B4',
+                            'accounts/': 'C',
+                            'userprofile': 'C1',
+                            'customerprofile': 'C2',
+                            'supplierprofile': 'C3',
+                            'operatorkzprofile': 'C4',
+                            'operatorcnprofile': 'C5',
+                            'carrierprofile': 'C6',
+                            'customsprofile': 'C7',
+                            'deals/': 'D',
+                            'deal': 'D1',
+                            'dealstatushistory': 'D2',
+                            'paymentscheme': 'D3',
+                            'platformpaymentreceived': 'D4',
+                            'state machine': 'D5',
+                            'dealpolicy': 'D6',
+                            'announces/': 'E',
+                            'announce': 'E1',
+                            'announcelot': 'E2',
+                            'lotfile': 'E3',
+                            'customers/': 'F',
+                            'interest': 'F1',
+                            'order': 'F2',
+                            'orderitem': 'F3',
+                            'suppliers/': 'G',
+                            'product': 'G1',
+                            'offer': 'G2',
+                            'offerannouncelot': 'G3',
+                            'operators_kz/': 'H',
+                            'operators_cn/': 'I',
+                            'carriers/': 'J',
+                            'customs/': 'K',
+                            'integrations/': 'L',
+                            'goszakupservice': 'L1',
+                            'samrukservice': 'L2',
+                            'nationalbankservice': 'L3'
+                        };
+                        
+                        for (const [key, value] of Object.entries(textToKey)) {
+                            if (text.includes(key)) {
+                                nodeKey = value;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Находим данные для этого узла
+                const nodeDataItem = nodeKey ? nodeData[nodeKey] : null;
+
+                if (nodeDataItem) {
+                    // Делаем все элементы узла кликабельными
+                    const nodeElements = node.querySelectorAll('rect, circle, ellipse, polygon, path');
+                    nodeElements.forEach(el => {
+                        el.style.cursor = 'pointer';
+                        
+                        el.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            
+                            // Сбрасываем expanded у всех узлов
+                            nodes.forEach(n => n.classList.remove('expanded'));
+                            
+                            // Переключаем класс expanded
+                            node.classList.toggle('expanded');
+                            
+                            // Показываем информацию
+                            showNodeInfo(nodeDataItem, e);
+                            
+                            // Подсвечиваем связанные рёбра
+                            highlightConnectedEdges(node, diagram);
+                        });
+
+                        el.addEventListener('mouseenter', function(e) {
+                            if (!node.classList.contains('expanded')) {
+                                showNodeInfo(nodeDataItem, e);
+                            }
+                        });
+                    });
+                }
+            });
+
+            // Скрываем информацию при клике вне узла
+            diagram.addEventListener('click', function(e) {
+                if (e.target === diagram || e.target.tagName === 'svg' || e.target.classList.contains('edgePath')) {
+                    hideNodeInfo();
+                    nodes.forEach(n => n.classList.remove('expanded'));
+                    diagram.querySelectorAll('.edgePath').forEach(edge => {
+                        edge.classList.remove('highlighted');
+                    });
+                }
+            });
+        }
+
+        function showNodeInfo(data, event) {
+            const nodeInfo = document.getElementById('nodeInfo');
+            if (!nodeInfo || !data) return;
+
+            nodeInfo.innerHTML = `
+                <button class="close-btn" onclick="hideNodeInfo()">×</button>
+                <h4>${data.title}</h4>
+                <p><strong>${data.description}</strong></p>
+                ${data.details ? `
+                    <ul>
+                        ${data.details.map(detail => `<li>${detail}</li>`).join('')}
+                    </ul>
+                ` : ''}
+            `;
+            
+            nodeInfo.classList.add('active');
+            
+            // Позиционируем относительно клика или курсора
+            const x = event ? event.clientX : window.innerWidth / 2;
+            const y = event ? event.clientY : window.innerHeight / 2;
+            
+            // Вычисляем позицию с учётом границ экрана
+            setTimeout(() => {
+                const rect = nodeInfo.getBoundingClientRect();
+                const padding = 20;
+                
+                let left = x + padding;
+                let top = y + padding;
+                
+                // Проверяем правую границу
+                if (left + rect.width > window.innerWidth - padding) {
+                    left = x - rect.width - padding;
+                }
+                
+                // Проверяем нижнюю границу
+                if (top + rect.height > window.innerHeight - padding) {
+                    top = y - rect.height - padding;
+                }
+                
+                // Проверяем левую границу
+                if (left < padding) {
+                    left = padding;
+                }
+                
+                // Проверяем верхнюю границу
+                if (top < padding) {
+                    top = padding;
+                }
+                
+                nodeInfo.style.left = `${left}px`;
+                nodeInfo.style.top = `${top}px`;
+            }, 10);
+        }
+
+        function hideNodeInfo() {
+            const nodeInfo = document.getElementById('nodeInfo');
+            if (nodeInfo) {
+                nodeInfo.classList.remove('active');
+            }
+        }
+
+        function highlightConnectedEdges(node, diagram) {
+            if (!diagram) diagram = document.querySelector('#structure-diagram-modal svg');
+            if (!diagram) return;
+
+            // Сбрасываем все подсветки
+            diagram.querySelectorAll('.edgePath').forEach(edge => {
+                edge.classList.remove('highlighted');
+            });
+
+            const nodeId = node.id;
+            
+            // Находим и подсвечиваем связанные рёбра
+            const edges = diagram.querySelectorAll('.edgePath');
+            edges.forEach(edge => {
+                const pathId = edge.id || '';
+                // Mermaid использует формат типа flowchart-A-B-0 для рёбер
+                if (pathId.includes(nodeId.split('-').slice(0, -1).join('-')) || 
+                    pathId.includes(nodeId.replace('flowchart-', '').split('-')[0])) {
+                    edge.classList.add('highlighted');
+                }
+            });
+        }
+
+        // Добавляем интерактивность к основной диаграмме после рендеринга
+        // Ждём полного рендеринга Mermaid
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const diagram = document.getElementById('structure-diagram');
+                if (diagram && diagram.querySelector('svg')) {
+                    addDiagramInteractivity('structure-diagram');
+                } else {
+                    // Если ещё не отрендерено, ждём ещё
+                    setTimeout(() => {
+                        addDiagramInteractivity('structure-diagram');
+                    }, 1000);
+                }
+            }, 500);
+        });
+
         // Плавная прокрутка для навигации
         document.querySelectorAll('.nav-menu a').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -3193,7 +3735,40 @@ function openDiagramModal(index, diagramText) {
                 }
             });
         });
+
+        // Показ/скрытие кнопки "Наверх"
+        const scrollTopBtn = document.getElementById('scrollTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        });
+
+        // Подсветка активного раздела при прокрутке
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.nav-menu a[href^="#"]');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
     </script>
 </body>
 
 </html>
+

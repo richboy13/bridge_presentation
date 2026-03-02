@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bridge Qazaqstan</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F8F5EF;
+  --cream2: #F0ECE3;
+  --cream3: #E8E2D6;
+  --gold: #9A7B3C;
+  --gold-light: #C4A05A;
+  --dark: #1C1A16;
+  --mid: #3D3A34;
+  --text: #4A4640;
+  --text-light: #7A766E;
+  --white: #FFFFFF;
+  --border: #DDD8CE;
+  --border-gold: rgba(154,123,60,0.25);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 48px;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes lineGrow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible { opacity: 1; transform: none; }
+
+.progress-bar {
+  position: fixed; top: 0; left: 0;
+  height: 2px; width: 0%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  z-index: 999;
+  transition: width 0.1s linear;
+}
+
+/* HEADER */
+header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.header-inner {
+  display: flex; align-items: center;
+  justify-content: space-between; height: 56px;
+}
+.header-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; font-weight: 600;
+  color: var(--dark); letter-spacing: 0.3px;
+}
+.header-logo span { color: var(--gold); }
+.header-tag {
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--text-light);
+}
+
+/* HERO */
+.hero {
+  background: var(--white);
+  padding: 72px 0 56px;
+  border-bottom: 1px solid var(--border);
+}
+.hero-eyebrow {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+  animation: fadeUp 0.7s ease both;
+}
+.hero-eyebrow::before {
+  content: ''; display: block;
+  width: 24px; height: 1px; background: var(--gold);
+}
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(40px, 5.5vw, 68px);
+  font-weight: 500; line-height: 1.05;
+  color: var(--dark); letter-spacing: -0.5px;
+  animation: fadeUp 0.7s ease 0.1s both;
+}
+.hero-title em { font-style: normal; color: var(--gold); }
+.hero-sub {
+  margin-top: 20px; font-size: 13.5px;
+  color: var(--text-light); max-width: 500px;
+  line-height: 1.8; animation: fadeUp 0.7s ease 0.2s both;
+}
+.hero-rule {
+  margin: 40px 0; height: 1px;
+  background: linear-gradient(90deg, var(--gold-light), transparent);
+  transform-origin: left; animation: lineGrow 0.9s ease 0.35s both;
+}
+
+/* STATS */
+.stats-row {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--border);
+  animation: fadeUp 0.7s ease 0.4s both;
+}
+.stat {
+  padding: 28px 28px 24px;
+  position: relative; transition: background 0.25s;
+}
+.stat:hover { background: var(--cream); }
+.stat + .stat { border-left: 1px solid var(--border); }
+.stat-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 44px; font-weight: 500;
+  color: var(--dark); line-height: 1; letter-spacing: -1px;
+}
+.stat-val .g { color: var(--gold); }
+.stat-val .sm { font-size: 22px; letter-spacing: 0; font-weight: 400; color: var(--gold); }
+.stat-lbl {
+  margin-top: 6px; font-size: 10px; font-weight: 500;
+  letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-light);
+}
+.stat-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px; background: var(--gold);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s ease;
+}
+.stat:hover .stat-bar { transform: scaleX(1); }
+
+/* SECTIONS */
+.section { padding: 72px 0; }
+.section-alt { background: var(--white); }
+
+.eyebrow {
+  font-size: 9.5px; font-weight: 600;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.eyebrow::after {
+  content: ''; flex: 0 0 32px; height: 1px;
+  background: var(--gold-light);
+}
+.section-h {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 3.5vw, 42px); font-weight: 500;
+  color: var(--dark); line-height: 1.15; margin-bottom: 12px;
+}
+.section-lead {
+  font-size: 13px; color: var(--text-light);
+  max-width: 520px; line-height: 1.85; margin-bottom: 48px;
+}
+
+/* MARKET */
+.market-cols {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 40px; align-items: start;
+}
+.flow { display: flex; flex-direction: column; }
+.flow-node {
+  border: 1px solid var(--border); background: var(--white);
+  padding: 16px 20px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.flow-node:hover {
+  border-color: var(--gold-light);
+  box-shadow: 0 2px 12px rgba(154,123,60,0.08);
+}
+.flow-node-lbl {
+  font-size: 9px; font-weight: 600;
+  letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 4px;
+}
+.flow-node-txt { font-size: 11.5px; color: var(--text-light); line-height: 1.6; }
+.flow-arr {
+  display: flex; align-items: center;
+  padding: 0 20px; height: 28px; position: relative;
+}
+.flow-arr::before {
+  content: ''; position: absolute;
+  left: 24px; top: 50%; width: 1px; height: 100%;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, var(--border-gold), transparent);
+}
+.flow-arr::after {
+  content: ''; position: absolute;
+  bottom: 2px; left: 20px;
+  width: 9px; height: 9px;
+  border-right: 1px solid var(--gold-light);
+  border-bottom: 1px solid var(--gold-light);
+  transform: rotate(45deg);
+}
+.problems { display: flex; flex-direction: column; gap: 2px; }
+.prob {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 16px; border-left: 2px solid var(--border);
+  background: var(--cream); transition: border-color 0.25s, background 0.25s;
+}
+.prob:hover { border-left-color: var(--gold); background: var(--cream2); }
+.prob-n {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px; font-weight: 400;
+  color: var(--cream3); line-height: 1; min-width: 32px;
+  transition: color 0.25s;
+}
+.prob:hover .prob-n { color: var(--gold-light); }
+.prob-title { font-size: 11.5px; font-weight: 600; color: var(--dark); margin-bottom: 3px; }
+.prob-desc  { font-size: 11px; color: var(--text-light); line-height: 1.65; }
+
+/* PLATFORM */
+.platform-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 2px; background: var(--border);
+  border: 1px solid var(--border);
+}
+.p-card {
+  background: var(--white); padding: 32px;
+  position: relative; overflow: hidden; transition: background 0.25s;
+}
+.p-card:hover { background: var(--cream); }
+.p-card::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.p-card:hover::after { opacity: 1; }
+.p-icon {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border-gold);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+}
+.p-icon svg { width: 16px; height: 16px; stroke: var(--gold); }
+.p-title { font-size: 12.5px; font-weight: 600; color: var(--dark); margin-bottom: 8px; }
+.p-text  { font-size: 11.5px; color: var(--text-light); line-height: 1.75; }
+.platform-note {
+  margin-top: 24px; padding: 20px 24px;
+  border: 1px solid var(--border-gold);
+  background: rgba(154,123,60,0.03);
+  font-size: 12px; color: var(--text); line-height: 1.75;
+}
+
+/* TIMING */
+.timing-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+}
+.t-card {
+  padding: 24px; border: 1px solid var(--border);
+  background: var(--white);
+  transition: border-color 0.25s, background 0.25s;
+}
+.t-card:hover { border-color: var(--gold-light); background: var(--cream); }
+.t-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px; font-weight: 400; color: var(--cream3);
+  line-height: 1; margin-bottom: 10px; transition: color 0.25s;
+}
+.t-card:hover .t-num { color: var(--gold-light); }
+.t-title { font-size: 12px; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+.t-text  { font-size: 11px; color: var(--text-light); line-height: 1.7; }
+
+/* ADVANTAGE */
+.adv-layout {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 40px; align-items: start;
+}
+.adv-list { display: flex; flex-direction: column; }
+.adv-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+  transition: padding-left 0.25s;
+}
+.adv-item:hover { padding-left: 6px; }
+.adv-item:first-child { border-top: 1px solid var(--border); }
+.adv-dot {
+  width: 5px; height: 5px; background: var(--gold);
+  border-radius: 50%; margin-top: 8px; flex-shrink: 0;
+}
+.adv-text { font-size: 12px; color: var(--text); line-height: 1.7; }
+.adv-text strong { color: var(--dark); font-weight: 600; }
+.stage-box {
+  border: 1px solid var(--border); background: var(--white); padding: 32px;
+}
+.stage-lbl {
+  font-size: 9px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 24px;
+}
+.stage-steps { display: flex; flex-direction: column; }
+.s-step {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 14px 0; border-bottom: 1px solid var(--border);
+}
+.s-step:last-child { border-bottom: none; }
+.s-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  margin-top: 5px; flex-shrink: 0;
+}
+.s-done   { background: var(--gold); }
+.s-active { background: transparent; border: 2px solid var(--gold); }
+.s-next   { background: transparent; border: 1px solid var(--border); }
+.s-title  { font-size: 12px; font-weight: 600; color: var(--dark); }
+.s-desc   { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+/* INVESTMENT */
+.invest-section {
+  background: var(--dark); color: #D8D4CC; padding: 72px 0;
+}
+.invest-eyebrow {
+  font-size: 9.5px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gold-light);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+}
+.invest-eyebrow::after {
+  content: ''; flex: 0 0 32px; height: 1px;
+  background: rgba(196,160,90,0.4);
+}
+.invest-h {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 3.5vw, 42px); font-weight: 500;
+  color: #F0ECE3; line-height: 1.15; margin-bottom: 40px;
+}
+.invest-layout {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 40px; align-items: start;
+}
+.amount-box {
+  padding: 36px; border: 1px solid rgba(196,160,90,0.2);
+  background: rgba(196,160,90,0.04);
+}
+.amount-lbl {
+  font-size: 9px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(196,160,90,0.7); margin-bottom: 16px;
+}
+.amount-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 64px; font-weight: 500; color: #F0ECE3;
+  line-height: 1; letter-spacing: -2px;
+}
+.amount-val .cur {
+  font-size: 32px; vertical-align: super;
+  color: var(--gold-light); letter-spacing: 0;
+}
+.amount-val .unit {
+  font-size: 26px; color: var(--gold-light); letter-spacing: 0;
+}
+.amount-rule {
+  width: 48px; height: 1px;
+  background: rgba(196,160,90,0.4); margin: 20px 0;
+}
+.amount-desc { font-size: 12px; color: #8A8680; line-height: 1.8; }
+.terms { display: flex; flex-direction: column; gap: 2px; }
+.term {
+  padding: 24px 28px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.03);
+  transition: background 0.25s, border-color 0.25s;
+}
+.term:hover {
+  background: rgba(196,160,90,0.05);
+  border-color: rgba(196,160,90,0.25);
+}
+.term-lbl {
+  font-size: 9px; font-weight: 600; letter-spacing: 2.5px;
+  text-transform: uppercase; color: #5A5750; margin-bottom: 8px;
+}
+.term-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 44px; font-weight: 500;
+  color: #F0ECE3; line-height: 1; letter-spacing: -0.5px;
+}
+.term-sub { font-size: 11px; color: #6A6660; margin-top: 5px; }
+.term-or {
+  padding: 10px 28px; font-size: 9px; font-weight: 600;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: #4A4740; text-align: center;
+}
+.invest-note {
+  margin-top: 32px; padding: 20px 24px;
+  border: 1px solid rgba(196,160,90,0.15);
+  background: rgba(196,160,90,0.04);
+  font-size: 12px; color: #7A7670; line-height: 1.8; text-align: center;
+}
+
+/* FOOTER */
+footer {
+  background: var(--white); border-top: 1px solid var(--border);
+  padding: 48px 0 40px;
+}
+.footer-inner {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 40px;
+}
+.footer-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 600;
+  color: var(--dark); margin-bottom: 6px; letter-spacing: 0.3px;
+}
+.footer-info { font-size: 11.5px; color: var(--text-light); line-height: 1.8; }
+.footer-contacts { text-align: right; }
+.footer-contact {
+  display: block; font-size: 12px; color: var(--text);
+  text-decoration: none; line-height: 2; transition: color 0.2s;
+}
+.footer-contact:hover { color: var(--gold); }
+.footer-rule {
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-light), transparent);
+  margin-bottom: 36px;
+}
+.disclaimer {
+  margin-top: 32px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 10px; color: var(--text-light);
+  line-height: 1.75; text-align: center;
+}
+
+@media (max-width: 720px) {
+  .wrap { padding: 0 20px; }
+  .stats-row, .market-cols, .timing-grid,
+  .adv-layout, .invest-layout { grid-template-columns: 1fr; }
+  .platform-grid { grid-template-columns: 1fr; }
+  .footer-inner { flex-direction: column; }
+  .footer-contacts { text-align: left; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="prog"></div>
+
+<header>
+  <div class="wrap header-inner">
+    <div class="header-logo">Bridge <span>Qazaqstan</span></div>
+    <div class="header-tag">Инвестиционный меморандум</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-eyebrow">Цифровая платформа · Казахстан — Китай</div>
+    <h1 class="hero-title">Инфраструктура<br>для <em>импортного</em> рынка</h1>
+    <p class="hero-sub">Платформа для структурирования операций по направлению Китай — Казахстан. Автоматизация расчётов, координация участников, прозрачность сделок.</p>
+    <div class="hero-rule"></div>
+    <div class="stats-row reveal">
+      <div class="stat">
+        <div class="stat-val">$<span id="c1">0</span><span class="sm"> млрд+</span></div>
+        <div class="stat-lbl">Ежегодный объём импорта</div>
+        <div class="stat-bar"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" style="font-size:26px;padding-top:10px;">Pre-<span class="g">Revenue</span></div>
+        <div class="stat-lbl">Стадия проекта</div>
+        <div class="stat-bar"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" style="font-size:26px;padding-top:10px;">MVP <span class="g">готов</span></div>
+        <div class="stat-lbl">Тестирование платформы</div>
+        <div class="stat-bar"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="market">
+  <div class="wrap">
+    <div class="eyebrow reveal">Контекст рынка</div>
+    <h2 class="section-h reveal">Рынок, который<br>работает вручную</h2>
+    <p class="section-lead reveal">Несмотря на объём свыше $15 млрд, операционная инфраструктура рынка остаётся фрагментированной и технологически не оцифрованной.</p>
+    <div class="market-cols">
+      <div class="flow reveal">
+        <div class="flow-node">
+          <div class="flow-node-lbl">Заказчик</div>
+          <div class="flow-node-txt">Согласование через мессенджеры, ручные таблицы, разрозненная документация</div>
+        </div>
+        <div class="flow-arr"></div>
+        <div class="flow-node">
+          <div class="flow-node-lbl">Поставщик (Китай)</div>
+          <div class="flow-node-txt">Разрыв коммуникации, нестандартная контрактация, курсовые риски</div>
+        </div>
+        <div class="flow-arr"></div>
+        <div class="flow-node">
+          <div class="flow-node-lbl">Логистика</div>
+          <div class="flow-node-txt">Разрозненные агенты, отсутствие единого трекинга и ответственности</div>
+        </div>
+        <div class="flow-arr"></div>
+        <div class="flow-node">
+          <div class="flow-node-lbl">Таможенный брокер</div>
+          <div class="flow-node-txt">Ручной расчёт ТНВЭД, риск штрафов, нет интеграции с другими звеньями</div>
+        </div>
+      </div>
+      <div class="problems reveal" style="transition-delay:0.15s">
+        <div class="prob">
+          <div class="prob-n">01</div>
+          <div>
+            <div class="prob-title">Мессенджеры вместо системы</div>
+            <div class="prob-desc">Сделки координируются через WhatsApp. Документация рассеяна, история теряется.</div>
+          </div>
+        </div>
+        <div class="prob">
+          <div class="prob-n">02</div>
+          <div>
+            <div class="prob-title">Ручной расчёт себестоимости</div>
+            <div class="prob-desc">Каждая поставка — ручной сбор данных по курсам, пошлинам, фрахту и страховке.</div>
+          </div>
+        </div>
+        <div class="prob">
+          <div class="prob-n">03</div>
+          <div>
+            <div class="prob-title">Разрозненная цепочка</div>
+            <div class="prob-desc">Логистика и таможня работают независимо. Нет единого контура — нет прозрачности.</div>
+          </div>
+        </div>
+        <div class="prob">
+          <div class="prob-n">04</div>
+          <div>
+            <div class="prob-title">Позиция не занята</div>
+            <div class="prob-desc">Крупные игроки не решают проблему комплексно. Рынок ждёт консолидатора.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="platform">
+  <div class="wrap">
+    <div class="eyebrow reveal">Решение</div>
+    <h2 class="section-h reveal">Платформа, объединяющая<br>участников сделки</h2>
+    <p class="section-lead reveal">Bridge Qazaqstan не принимает товарные и логистические риски — создаётся инфраструктура, через которую проходит сделка, с комиссионной моделью дохода.</p>
+    <div class="platform-grid reveal" style="transition-delay:0.1s">
+      <div class="p-card">
+        <div class="p-icon"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg></div>
+        <div class="p-title">Единое пространство сделки</div>
+        <div class="p-text">Заказчик, поставщик, логист и брокер — в одном цифровом контуре. Документация, статусы и коммуникация в одном месте.</div>
+      </div>
+      <div class="p-card">
+        <div class="p-icon"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008Zm0 2.25h.008v.008H8.25V13.5Zm0 2.25h.008v.008H8.25v-.008Zm2.25-4.5h.008v.008H10.5v-.008Zm0 2.25h.008v.008H10.5V13.5Zm0 2.25h.008v.008H10.5v-.008Zm2.25-4.5h.008v.008H12.75v-.008Zm0 2.25h.008v.008H12.75V13.5Zm0 2.25h.008v.008H12.75v-.008Zm2.25-4.5h.008v.008H15v-.008Zm0 2.25h.008v.008H15V13.5Zm0 2.25h.008v.008H15v-.008ZM4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"/></svg></div>
+        <div class="p-title">Автоматизация расчётов</div>
+        <div class="p-text">Себестоимость, таможенные пошлины и ТНВЭД рассчитываются автоматически. Человеческий фактор исключён.</div>
+      </div>
+      <div class="p-card">
+        <div class="p-icon"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"/></svg></div>
+        <div class="p-title">Прозрачность операций</div>
+        <div class="p-text">Каждая транзакция фиксируется и доступна для аудита. Формируется проверяемая история сделок.</div>
+      </div>
+      <div class="p-card">
+        <div class="p-icon"><svg fill="none" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg></div>
+        <div class="p-title">Координация цепочки</div>
+        <div class="p-text">Устранение разрывов между участниками. Платформа не замещает, а координирует взаимодействие.</div>
+      </div>
+    </div>
+    <div class="platform-note reveal" style="transition-delay:0.2s">
+      Платформа формирует <strong>комиссионный доход с каждой транзакции</strong>, не принимая на себя товарные и логистические риски.
+    </div>
+  </div>
+</section>
+
+<section class="section" id="timing">
+  <div class="wrap">
+    <div class="eyebrow reveal">Момент входа</div>
+    <h2 class="section-h reveal">Окно возможностей</h2>
+    <p class="section-lead reveal">Совпадение нескольких факторов формирует оптимальный момент для занятия позиции первого консолидирующего игрока.</p>
+    <div class="timing-grid">
+      <div class="t-card reveal"><div class="t-num">01</div><div class="t-title">Рост товарооборота</div><div class="t-text">Объём торговли Казахстан — Китай устойчиво растёт, увеличивая транзакционную базу.</div></div>
+      <div class="t-card reveal" style="transition-delay:0.08s"><div class="t-num">02</div><div class="t-title">Запрос на порядок</div><div class="t-text">Участники готовы к цифровизации. Усталость от хаотичных процессов достигла критической точки.</div></div>
+      <div class="t-card reveal" style="transition-delay:0.16s"><div class="t-num">03</div><div class="t-title">Регуляторное давление</div><div class="t-text">Требования к прозрачности операций ужесточаются. Цифровой контур становится необходимостью.</div></div>
+      <div class="t-card reveal" style="transition-delay:0.24s"><div class="t-num">04</div><div class="t-title">Рынок не централизован</div><div class="t-text">Крупные игроки не закрывают проблему комплексно. Позиция консолидатора свободна.</div></div>
+      <div class="t-card reveal" style="transition-delay:0.32s"><div class="t-num">05</div><div class="t-title">MVP готов к запуску</div><div class="t-text">Платформа разработана и тестируется. Инвестиции идут в масштабирование, не в создание с нуля.</div></div>
+      <div class="t-card reveal" style="transition-delay:0.4s"><div class="t-num">06</div><div class="t-title">Эффект первого игрока</div><div class="t-text">Сетевой эффект усиливается с каждым новым участником. Ранний вход критически важен.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="advantage">
+  <div class="wrap">
+    <div class="eyebrow reveal">Конкурентное положение</div>
+    <h2 class="section-h reveal">Практики рынка<br>создают платформу</h2>
+    <div class="adv-layout">
+      <div class="adv-list reveal">
+        <div class="adv-item"><div class="adv-dot"></div><div class="adv-text"><strong>Опыт на стороне заказчика</strong> — понимание боли импортёра изнутри, а не через теорию</div></div>
+        <div class="adv-item"><div class="adv-dot"></div><div class="adv-text"><strong>Работа с китайскими поставщиками</strong> — прямые связи, специфика переговоров и контрактации</div></div>
+        <div class="adv-item"><div class="adv-dot"></div><div class="adv-text"><strong>Реальная логистика в Китае</strong> — знание маршрутов, агентов и временных параметров</div></div>
+        <div class="adv-item"><div class="adv-dot"></div><div class="adv-text"><strong>Таможенный брокеридж</strong> — понимание ТНВЭД, ставок пошлин и рисков классификации</div></div>
+        <div class="adv-item"><div class="adv-dot"></div><div class="adv-text"><strong>Слабые места модели</strong> — автоматизируется реальная практика, а не теоретический процесс</div></div>
+      </div>
+      <div class="stage-box reveal" style="transition-delay:0.15s">
+        <div class="stage-lbl">Стадия проекта</div>
+        <div class="stage-steps">
+          <div class="s-step"><div class="s-dot s-done"></div><div><div class="s-title">MVP разработан</div><div class="s-desc">Ключевой функционал платформы реализован</div></div></div>
+          <div class="s-step"><div class="s-dot s-active"></div><div><div class="s-title">Тестирование</div><div class="s-desc">Проверка с реальными участниками рынка</div></div></div>
+          <div class="s-step"><div class="s-dot s-next"></div><div><div class="s-title">Коммерческий запуск</div><div class="s-desc">Выход на рынок, захват первых транзакций</div></div></div>
+          <div class="s-step"><div class="s-dot s-next"></div><div><div class="s-title">Масштабирование</div><div class="s-desc">Расширение сети и объёма оборота</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="invest-section" id="investment">
+  <div class="wrap">
+    <div class="invest-eyebrow reveal">Параметры участия</div>
+    <h2 class="invest-h reveal">Инвестиционная возможность</h2>
+    <div class="invest-layout">
+      <div class="amount-box reveal">
+        <div class="amount-lbl">Объём инвестиций</div>
+        <div class="amount-val"><span class="cur">$</span>1<span class="unit"> 000 000</span></div>
+        <div class="amount-rule"></div>
+        <div class="amount-desc">
+          Средства направляются на ускоренное масштабирование разработки, выход в коммерческий режим и захват доли рынка.<br><br>
+          Детальная финансовая модель и стратегия масштабирования предоставляются при личной встрече.
+        </div>
+      </div>
+      <div class="terms reveal" style="transition-delay:0.15s">
+        <div class="term">
+          <div class="term-lbl">Доля чистой прибыли</div>
+          <div class="term-val">50%</div>
+          <div class="term-sub">от чистой прибыли компании</div>
+        </div>
+        <div class="term-or">до достижения</div>
+        <div class="term">
+          <div class="term-lbl">Предел выплат</div>
+          <div class="term-val">$3 000 000</div>
+          <div class="term-sub">совокупный объём возврата инвестору</div>
+        </div>
+        <div class="term-or">или</div>
+        <div class="term">
+          <div class="term-lbl">Срок участия</div>
+          <div class="term-val">60 мес.</div>
+          <div class="term-sub">максимальный период выплат</div>
+        </div>
+      </div>
+    </div>
+    <div class="invest-note reveal" style="transition-delay:0.2s">
+      Формат участия ограничен по сроку и совокупному объёму дохода. Проект находится в стадии, когда возможно занять позицию до масштабного роста.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-rule"></div>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">Bridge Qazaqstan</div>
+        <div class="footer-info">Bridge Qazaqstan LLP<br>153 Almagul 27, Almaty, Kazakhstan. 050060</div>
+      </div>
+      <div class="footer-contacts">
+        <a class="footer-contact" href="tel:+77718820101">+7 771 882 0101</a>
+        <a class="footer-contact" href="mailto:bridge.qazaqstan@gmail.com">bridge.qazaqstan@gmail.com</a>
+      </div>
+    </div>
+    <div class="disclaimer">Настоящий документ носит информационный характер и не является публичной офертой. Финансовые показатели и условия участия уточняются в ходе переговоров.</div>
+  </div>
+</footer>
+
+<script>
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    document.getElementById('prog').style.width = pct + '%';
+  });
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  function counter(el, to, dur = 1400) {
+    const start = performance.now();
+    (function step(now) {
+      const p = Math.min((now - start) / dur, 1);
+      el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * to);
+      if (p < 1) requestAnimationFrame(step);
+    })(start);
+  }
+  const c1 = document.getElementById('c1');
+  new IntersectionObserver(([e], obs) => {
+    if (e.isIntersecting) { counter(c1, 15); obs.disconnect(); }
+  }, { threshold: 0.5 }).observe(c1);
+</script>
+</body>
+</html>

@@ -17,6 +17,7 @@
 - **Структура БД**: [database_structure.html](https://richboy13.github.io/bridge_presentation/database_structure.html) - документация базы данных
 - **План проекта**: [project_plan.html](https://richboy13.github.io/bridge_presentation/project_plan.html)
 - **Roadmap**: [roadmap.html](https://richboy13.github.io/bridge_presentation/roadmap.html)
+- **Bridge Qazaqstan (одностраничная)**: [Bridge_Qazaqstan_full_onePage.html](https://richboy13.github.io/bridge_presentation/Bridge_Qazaqstan_full_onePage.html) - полная презентация Bridge Qazaqstan в одном документе
 
 ## 📋 Настройка GitHub Pages
 

@@ -166,11 +166,87 @@ table.ct tr:last-child td{border-bottom:none;}
 .g-dl{position:absolute;top:2px;bottom:2px;width:2px;border-radius:1px;}
 .g-today{position:absolute;top:-4px;bottom:-4px;width:1.5px;background:var(--blue);opacity:.7;}
 .g-today-lbl{position:absolute;top:-16px;font-size:8px;color:var(--blue);white-space:nowrap;transform:translateX(-50%);}
+
+/* Mobile header (visible only on small screens) */
+.mobile-hdr{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:var(--bg2);border-bottom:1px solid var(--border);z-index:100;align-items:center;padding:0 16px;gap:12px;}
+.mobile-hdr .menu-btn{width:44px;height:44px;flex-shrink:0;border:none;background:var(--bg3);border-radius:var(--r);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;-webkit-tap-highlight-color:transparent;}
+.mobile-hdr .menu-btn:hover,.mobile-hdr .menu-btn:active{background:var(--bg4);}
+.mobile-hdr .menu-btn svg{width:22px;height:22px;}
+.mobile-hdr .m-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:600;letter-spacing:.04em;color:var(--text);}
+.sidebar-close{display:none;position:absolute;top:12px;right:12px;width:40px;height:40px;border:none;background:var(--bg3);border-radius:var(--r);color:var(--text);cursor:pointer;align-items:center;justify-content:center;transition:background .2s;}
+.sidebar-close:hover{background:var(--bg4);}
+.sidebar-close svg{width:18px;height:18px;}
+
+/* Backdrop for sidebar overlay */
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;opacity:0;transition:opacity .25s ease;}
+body.sidebar-open .sidebar-backdrop{display:block;opacity:1;}
+
+/* Responsive: sidebar as drawer */
+@media (max-width: 900px){
+  .app{flex-direction:column;}
+  .mobile-hdr{display:flex;}
+  .main{padding-top:56px;min-height:100vh;}
+  .sidebar{position:fixed;top:0;left:0;bottom:0;width:min(320px,85vw);max-width:320px;z-index:999;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);box-shadow:4px 0 24px rgba(0,0,0,.25);}
+  body.sidebar-open .sidebar{transform:translateX(0);}
+  .sidebar-close{display:flex;}
+  .sidebar .brand{padding-right:48px;}
+  .mhdr{padding:16px 20px 12px;}
+  .content{padding:16px 20px;}
+  .pstats{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .scard{padding:12px 14px;}
+  .sval{font-size:16px;}
+  .thdr{padding:14px 16px;min-height:52px;}
+  .tcb{width:22px;height:22px;margin-top:2px;}
+  .tname{font-size:14px;}
+  .nph{padding:12px 20px;min-height:48px;}
+  .nlbl{font-size:13px;}
+  .vbtn{padding:10px;font-size:12px;min-height:44px;}
+  .ov-wrap{padding:16px 20px;}
+  .ov-pct{font-size:20px;}
+  .gv{padding:16px 20px;}
+  .g-row{flex-wrap:wrap;}
+  .g-lc{width:100%;margin-bottom:6px;padding-right:0;}
+  .g-tl{min-width:280px;overflow-x:auto;}
+  .g-wlbl-row{margin-left:0;}
+  .g-slbl{margin-left:0;}
+  table.ct{display:block;overflow-x:auto;}
+  table.ct th,table.ct td{padding:8px 10px;font-size:12px;}
+  .ac-form{grid-template-columns:1fr 1fr auto;gap:8px;}
+  .tip-txt{max-width:260px;left:50%;transform:translateX(-50%);}
+}
+
+@media (max-width: 480px){
+  .pstats{grid-template-columns:1fr;}
+  .sidebar{width:100%;max-width:100%;}
+}
+
+/* Touch-friendly */
+@media (hover: none){
+  .tcb,.scb,.vbtn,.nav-btn,.add-btn,.ssave,.nt-save,.dl-clr,.cdel,.sdel{min-height:44px;min-width:44px;}
+  .nph{min-height:48px;}
+}
+
+@media (max-width: 900px){
+  body.sidebar-open{overflow: hidden;}
+  .mobile-hdr{padding-left: max(16px, env(safe-area-inset-left));padding-right: max(16px, env(safe-area-inset-right));padding-top: env(safe-area-inset-top);height: calc(56px + env(safe-area-inset-top, 0px));}
+  .main{padding-top: calc(56px + env(safe-area-inset-top, 0px));}
+  .sidebar{padding-top: env(safe-area-inset-top);padding-left: env(safe-area-inset-left);}
+}
 </style>
 </head>
 <body>
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()" aria-hidden="true"></div>
+<header class="mobile-hdr">
+  <button type="button" class="menu-btn" id="menu-btn" onclick="toggleSidebar()" aria-label="Открыть меню">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <span class="m-title">Трекер инвестора</span>
+</header>
 <div class="app">
-<div class="sidebar">
+<div class="sidebar" id="sidebar">
+  <button type="button" class="sidebar-close" id="sidebar-close" onclick="closeSidebar()" aria-label="Закрыть меню">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
   <div class="brand">
     <div class="brand-title">ТРЕКЕР<br>ИНВЕСТОРА</div>
     <div class="brand-date">Старт: 13 марта 2026</div>
@@ -543,23 +619,32 @@ function updOv(){
   if(state.view==='gantt')rendGantt();
 }
 
+function toggleSidebar(){
+  document.body.classList.toggle('sidebar-open');
+  document.getElementById('sidebar-backdrop').setAttribute('aria-hidden',document.body.classList.contains('sidebar-open')?'false':'true');
+}
+function closeSidebar(){
+  document.body.classList.remove('sidebar-open');
+  document.getElementById('sidebar-backdrop').setAttribute('aria-hidden','true');
+}
 function rendNav(){
-  const c=document.getElementById('nav');c.innerHTML='';
+  const c=document.getElementById('nav');if(!c)return;c.innerHTML='';
   PHASES.forEach(p=>{
     const d=p.tasks.filter(t=>gt(t.id).done).length;
     const pct=Math.round(d/p.tasks.length*100);
     const el=document.createElement('div');
     el.className='nph'+(state.phase===p.id?' active':'');
     el.innerHTML='<div class="ndot" style="background:'+p.color+'"></div><div class="nlbl">'+p.title+'</div><div class="npct">'+pct+'%</div>';
-    el.onclick=()=>{state.phase=p.id;rendNav();rendMain();};
+    el.onclick=()=>{state.phase=p.id;rendNav();rendMain();if(window.innerWidth<=900)closeSidebar();};
     c.appendChild(el);
   });
 }
 
 function setView(v){
   state.view=v;
-  ['tasks','gantt'].forEach(x=>{document.getElementById('vb-'+x).classList.toggle('active',x===v);});
+  ['tasks','gantt'].forEach(x=>{const b=document.getElementById('vb-'+x);if(b)b.classList.toggle('active',x===v);});
   rendMain();
+  if(window.innerWidth<=900)closeSidebar();
 }
 function rendMain(){state.view==='tasks'?rendTasks():rendGantt();}
 

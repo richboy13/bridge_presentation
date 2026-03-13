@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Трекер привлечения инвестора</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;500;600&family=Geologica:wght@300;400;500&display=swap');
+:root {
+  --bg:#0e0f11;--bg2:#161719;--bg3:#1e2024;--bg4:#252629;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0ede8;--text2:#9a9791;--text3:#5c5a57;
+  --green:#4caf81;--green-bg:rgba(76,175,129,0.12);
+  --blue:#5b9cf0;--blue-bg:rgba(91,156,240,0.12);
+  --amber:#e8a44a;--amber-bg:rgba(232,164,74,0.12);
+  --red:#e05c5c;--red-bg:rgba(224,92,92,0.12);
+  --purple:#9b7fe8;--purple-bg:rgba(155,127,232,0.12);
+  --r:8px;--r2:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-size:14px;}
+body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px;}
+.app{display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:256px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.main{flex:1;overflow-y:auto;}
+.brand{padding:18px 20px;border-bottom:1px solid var(--border);}
+.brand-title{font-family:'Unbounded',sans-serif;font-size:10px;font-weight:600;letter-spacing:.06em;line-height:1.6;}
+.brand-date{font-size:11px;color:var(--text3);margin-top:3px;}
+.ov-wrap{padding:14px 20px;border-bottom:1px solid var(--border);}
+.ov-pct{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:500;margin-bottom:6px;}
+.ov-bar{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-bottom:7px;}
+.ov-fill{height:100%;background:var(--green);border-radius:2px;transition:width .4s;}
+.ov-nums{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);}
+.nav{padding:10px 0;flex:1;}
+.nph{padding:8px 20px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:background .15s;border-left:3px solid transparent;}
+.nph:hover{background:var(--bg3);}
+.nph.active{background:var(--bg3);border-left-color:var(--green);}
+.ndot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.nlbl{flex:1;font-size:12px;color:var(--text2);line-height:1.3;}
+.nph.active .nlbl{color:var(--text);}
+.npct{font-size:10px;color:var(--text3);font-family:'Unbounded',sans-serif;}
+.sb-bot{padding:14px 20px;border-top:1px solid var(--border);}
+.vbtns{display:flex;gap:5px;}
+.vbtn{flex:1;padding:6px;font-size:11px;font-family:'Geologica',sans-serif;border:1px solid var(--border2);border-radius:var(--r);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;}
+.vbtn.active,.vbtn:hover{background:var(--bg3);color:var(--text);}
+.mhdr{padding:20px 28px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10;display:flex;align-items:center;gap:12px;}
+.mhdr-title{font-family:'Unbounded',sans-serif;font-size:12px;font-weight:500;flex:1;}
+.dbadge{font-size:10px;color:var(--text3);padding:3px 9px;border:1px solid var(--border);border-radius:20px;}
+.content{padding:20px 28px;}
+.pstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:20px;}
+.scard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px;}
+.sval{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:500;}
+.slbl{font-size:10px;color:var(--text3);margin-top:2px;}
+.tasks{display:flex;flex-direction:column;gap:7px;}
+.tc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;transition:border-color .2s;}
+.tc:hover{border-color:var(--border2);}
+.tc.overdue{border-left:3px solid var(--red);}
+.tc.done-card{opacity:.5;}
+.thdr{padding:11px 13px;display:flex;align-items:flex-start;gap:9px;cursor:pointer;}
+.tcb{width:17px;height:17px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;}
+.tcb.ck{background:var(--green);border-color:var(--green);}
+.tcb.ck::after{content:'';display:block;width:8px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translateY(-1px);}
+.tmain{flex:1;min-width:0;}
+.tnrow{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.tname{font-size:13px;font-weight:500;color:var(--text);line-height:1.4;}
+.tname.sk{text-decoration:line-through;color:var(--text3);}
+.tag{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500;white-space:nowrap;}
+.tag-nda{background:var(--amber-bg);color:var(--amber);}
+.tag-od{background:var(--red-bg);color:var(--red);}
+.tag-td{background:var(--blue-bg);color:var(--blue);}
+.tag-sn{background:var(--purple-bg);color:var(--purple);}
+.tmeta{display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap;}
+.tmi{font-size:11px;color:var(--text3);}
+.texp{font-size:16px;color:var(--text3);line-height:1;padding:0 3px;cursor:pointer;transition:transform .2s,color .15s;flex-shrink:0;user-select:none;}
+.texp:hover{color:var(--text2);}
+.texp.op{transform:rotate(90deg);}
+.tbody{display:none;border-top:1px solid var(--border);}
+.tbody.op{display:block;}
+.tbi{padding:13px;display:flex;flex-direction:column;gap:13px;}
+.tipbox{background:var(--bg3);border-radius:var(--r);padding:9px 11px;font-size:12px;color:var(--text2);line-height:1.6;}
+.tipbox b{color:var(--amber);}
+.sec-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;}
+.dl-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.dl-lbl{font-size:11px;color:var(--text3);white-space:nowrap;}
+.dl-inp{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:5px 9px;color:var(--text);font-family:'Geologica',sans-serif;font-size:12px;cursor:pointer;}
+.dl-inp::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer;}
+.dl-clr{font-size:11px;color:var(--text3);cursor:pointer;padding:4px 8px;border:1px solid var(--border);border-radius:var(--r);background:transparent;transition:all .15s;font-family:'Geologica',sans-serif;}
+.dl-clr:hover{color:var(--text);}
+.subs-wrap{}
+.subs-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.subs-ttl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;}
+.add-btn{font-size:11px;color:var(--blue);cursor:pointer;background:transparent;border:none;font-family:'Geologica',sans-serif;padding:0;}
+.add-btn:hover{color:var(--text);}
+.slist{display:flex;flex-direction:column;gap:3px;}
+.si{display:flex;align-items:flex-start;gap:7px;padding:6px 8px;background:var(--bg3);border-radius:var(--r);}
+.scb{width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border2);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:1px;}
+.scb.ck{background:var(--green);border-color:var(--green);}
+.scb.ck::after{content:'';display:block;width:7px;height:4px;border-left:1.5px solid #fff;border-bottom:1.5px solid #fff;transform:rotate(-45deg) translateY(-1px);}
+.stxt{flex:1;font-size:12px;color:var(--text2);line-height:1.4;cursor:pointer;}
+.stxt.sk{text-decoration:line-through;color:var(--text3);}
+.sdel{font-size:13px;cursor:pointer;background:none;border:none;color:var(--text3);transition:color .15s;line-height:1;padding:1px 2px;flex-shrink:0;}
+.sdel:hover{color:var(--red);}
+.sinp-row{display:flex;gap:6px;margin-top:4px;}
+.sinp{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:6px 9px;color:var(--text);font-family:'Geologica',sans-serif;font-size:12px;}
+.sinp::placeholder{color:var(--text3);}
+.ssave{padding:6px 11px;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(91,156,240,.3);border-radius:var(--r);cursor:pointer;font-size:11px;font-family:'Geologica',sans-serif;white-space:nowrap;}
+.ssave:hover{background:rgba(91,156,240,.2);}
+.ct-wrap{}
+.ct-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.stage-flow{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:8px;align-items:center;}
+.sf-step{display:flex;align-items:center;gap:3px;}
+.sf-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sf-nm{font-size:10px;color:var(--text3);}
+.sf-arr{font-size:9px;color:var(--text3);margin-left:1px;}
+table.ct{width:100%;border-collapse:collapse;font-size:11px;}
+table.ct th{text-align:left;color:var(--text3);font-weight:400;padding:4px 7px;border-bottom:1px solid var(--border);}
+table.ct td{padding:5px 7px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle;}
+table.ct tr:last-child td{border-bottom:none;}
+.cdel{cursor:pointer;background:none;border:none;color:var(--text3);transition:color .15s;font-size:12px;}
+.cdel:hover{color:var(--red);}
+.sbadge{font-size:10px;padding:2px 6px;border-radius:7px;white-space:nowrap;display:inline-block;}
+.cs0{background:var(--bg4);color:var(--text3);}
+.cs1{background:var(--blue-bg);color:var(--blue);}
+.cs2{background:var(--amber-bg);color:var(--amber);}
+.cs3{background:var(--purple-bg);color:var(--purple);}
+.cs4{background:var(--green-bg);color:var(--green);}
+.cs5{background:rgba(76,175,129,.25);color:var(--green);font-weight:500;}
+.cstg-sel{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:2px 5px;color:var(--text2);font-size:10px;font-family:'Geologica',sans-serif;cursor:pointer;}
+.ac-form{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:5px;margin-top:7px;}
+.ci{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:5px 8px;color:var(--text);font-family:'Geologica',sans-serif;font-size:11px;min-width:0;}
+.ci::placeholder{color:var(--text3);}
+.nt-area{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px;color:var(--text);font-family:'Geologica',sans-serif;font-size:12px;resize:vertical;min-height:65px;line-height:1.6;}
+.nt-area::placeholder{color:var(--text3);}
+.nt-bot{display:flex;align-items:center;margin-top:5px;gap:8px;}
+.nt-save{padding:5px 12px;background:var(--green-bg);color:var(--green);border:1px solid rgba(76,175,129,.3);border-radius:var(--r);cursor:pointer;font-size:11px;font-family:'Geologica',sans-serif;}
+.nt-ok{font-size:11px;color:var(--green);opacity:0;transition:opacity .3s;}
+.emp{font-size:12px;color:var(--text3);padding:4px 0;}
+.tip-ico{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);font-size:9px;color:var(--text3);cursor:help;margin-left:3px;flex-shrink:0;position:relative;}
+.tip-ico:hover .tip-txt{display:block;}
+.tip-txt{display:none;position:absolute;left:18px;top:-4px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:8px 11px;font-size:11px;color:var(--text2);width:230px;z-index:200;line-height:1.5;pointer-events:none;font-weight:400;}
+/* GANTT */
+.gv{padding:20px 28px;}
+.g-hdr{margin-bottom:18px;}
+.g-title{font-family:'Unbounded',sans-serif;font-size:12px;margin-bottom:3px;}
+.g-sub{font-size:11px;color:var(--text3);}
+.g-legend{display:flex;gap:14px;font-size:11px;color:var(--text3);margin-bottom:14px;flex-wrap:wrap;}
+.g-li{display:flex;align-items:center;gap:5px;}
+.g-li-dot{width:12px;height:12px;border-radius:3px;}
+.g-wlbl-row{display:flex;margin-left:190px;margin-bottom:4px;}
+.g-wlbl{flex:1;text-align:center;font-size:9px;color:var(--text3);font-family:'Unbounded',sans-serif;}
+.g-slbl{margin-left:190px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;margin-top:14px;}
+.g-row{display:flex;align-items:center;margin-bottom:3px;min-height:32px;}
+.g-lc{width:190px;flex-shrink:0;font-size:11px;color:var(--text2);padding-right:12px;}
+.g-lc strong{display:block;color:var(--text);font-weight:500;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.g-lc span{font-size:10px;color:var(--text3);}
+.g-tl{flex:1;position:relative;height:26px;}
+.g-bg{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;}
+.g-bgc{flex:1;border-right:1px solid var(--border);}
+.g-bgc:last-child{border-right:none;}
+.g-bt{position:absolute;top:5px;left:0;right:0;height:16px;}
+.g-bbg{position:absolute;height:16px;border-radius:3px;opacity:.2;}
+.g-bfill{position:absolute;height:16px;border-radius:3px;transition:width .4s;}
+.g-dl{position:absolute;top:2px;bottom:2px;width:2px;border-radius:1px;}
+.g-today{position:absolute;top:-4px;bottom:-4px;width:1.5px;background:var(--blue);opacity:.7;}
+.g-today-lbl{position:absolute;top:-16px;font-size:8px;color:var(--blue);white-space:nowrap;transform:translateX(-50%);}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sidebar">
+  <div class="brand">
+    <div class="brand-title">ТРЕКЕР<br>ИНВЕСТОРА</div>
+    <div class="brand-date">Старт: 13 марта 2026</div>
+  </div>
+  <div class="ov-wrap">
+    <div class="ov-pct" id="ov-pct">0%</div>
+    <div class="ov-bar"><div class="ov-fill" id="ov-fill" style="width:0%"></div></div>
+    <div class="ov-nums"><span id="ov-done">0 готово</span><span id="ov-tot">0 задач</span></div>
+  </div>
+  <div class="nav" id="nav"></div>
+  <div class="sb-bot">
+    <div class="vbtns">
+      <button class="vbtn active" id="vb-tasks" onclick="setView('tasks')">Задачи</button>
+      <button class="vbtn" id="vb-gantt" onclick="setView('gantt')">Ганта</button>
+    </div>
+  </div>
+</div>
+<div class="main" id="main"></div>
+</div>
+<script>
+const TODAY = new Date('2026-03-13');
+const TODAYSTR = '2026-03-13';
+const TW = { // tooltips
+  'One Page':'Одностраничный PDF — краткое описание проекта для первого знакомства. Цель: продать встречу, а не раскрыть продукт.',
+  'Pitch Deck':'Презентация 10–15 слайдов. Полная версия — только лично или под NDA.',
+  'NDA':'Non-Disclosure Agreement — соглашение о неразглашении. Подписывается ДО передачи деталей инвестору.',
+  'Due Diligence':'Глубокая проверка компании инвестором: финансы, юридические документы, команда, продукт.',
+  'Term Sheet':'Предварительное соглашение об условиях сделки: оценка, доля, права. Не финальный договор.',
+  'Traction':'Реальные показатели роста: пользователи, выручка, темп. Доказывает, что продукт работает.',
+  'Data Room':'Защищённая папка с документами компании. Открывается только заинтересованным инвесторам после NDA.',
+  'Outreach':'Массовые обращения к инвесторам — письма, LinkedIn, Telegram. Нужен объём: 20–30 в день.',
+  'Investor Brief':'Детальный документ 5–10 стр: рынок, стратегия, финансы, команда, риски.',
+  'Warm intro':'Знакомство через общего знакомого. В 5–10 раз эффективнее холодного письма.',
+  'VC':'Venture Capital — венчурный фонд. Профессиональные инвесторы, берут долю в компании.',
+  'CAC':'Customer Acquisition Cost — стоимость привлечения одного клиента. Инвесторы всегда спрашивают.',
+  'LTV':'Lifetime Value — суммарный доход от одного клиента за всё время.',
+  'Акселератор':'Программа поддержки стартапов: финансирование, менторы, связи (Y Combinator, Techstars).',
+  'AngelList':'Платформа для поиска бизнес-ангелов и венчурных инвесторов.',
+  'Crunchbase':'База стартапов и инвесторов с историей сделок и контактами.',
+  'Follow-up':'Письмо после встречи в течение 24 часов: резюме разговора, следующий шаг.',
+};
+const STAGES=[
+  {id:0,name:'Холодный контакт',cls:'cs0'},
+  {id:1,name:'Первый ответ',cls:'cs1'},
+  {id:2,name:'One Page отправлен',cls:'cs2'},
+  {id:3,name:'Встреча назначена',cls:'cs3'},
+  {id:4,name:'NDA / Deck показан',cls:'cs4'},
+  {id:5,name:'Сделка закрыта',cls:'cs5'},
+];
+const STAGECOLS=['#5c5a57','#5b9cf0','#e8a44a','#9b7fe8','#4caf81','#2a8a5a'];
+
+const PHASES=[
+{id:'p0',title:'Упаковка проекта',color:'#4caf81',weeks:[0,1],tasks:[
+  {id:'t01',name:'Сформировать инвестиционное предложение',day:'День 1',nda:false,hc:false,
+   tip:'Базовый документ, от которого зависит всё остальное. Без чёткого ответа на эти вопросы — нечего нести инвестору.',
+   subs:[
+    'Определить точную сумму привлечения (например: $300 000)',
+    'Составить таблицу расходов: разработка / маркетинг / команда / инфраструктура',
+    'Решить: что получает инвестор — доля % или % прибыли',
+    'Определить срок возврата инвестиций (3 или 5 лет)',
+    'Описать потенциал рынка: объём в $ и план оборота компании',
+    'Записать всё в один документ — это будет основой для всех материалов',
+   ]},
+  {id:'t02',name:'One Page — 1 страница PDF',tt:'One Page',day:'День 2',nda:false,hc:false,
+   tip:'Цель One Page — продать встречу, не раскрыть продукт. Пишите про боль рынка и масштаб. Детали — только лично.',
+   subs:[
+    'Написать 1–2 предложения: какую проблему решаете',
+    'Описать решение в общих чертах — без ноу-хау',
+    'Указать объём рынка (TAM/SAM/SOM)',
+    'Написать бизнес-модель: как зарабатываете',
+    'Указать текущий статус: MVP / первые клиенты / выручка',
+    'Написать условия для инвестора: сумма и что он получает',
+    'Добавить контакты и ссылку на calendly/telegram',
+    'Оформить в PDF — 1 страница, без лишнего текста',
+   ]},
+  {id:'t03',name:'Pitch Deck — 10–12 слайдов',tt:'Pitch Deck',day:'День 3',nda:true,hc:false,
+   tip:'Полная версия только под NDA или лично. В холодных письмах — только One Page.',
+   subs:[
+    'Слайд 1: Обложка — название, tagline, контакты',
+    'Слайд 2: Проблема — конкретная боль рынка с цифрами',
+    'Слайд 3: Решение — ваш продукт, без технических деталей',
+    'Слайд 4: Продукт — скриншоты/демо (общий вид)',
+    'Слайд 5: Размер рынка — TAM / SAM / SOM с источниками',
+    'Слайд 6: Бизнес-модель — как и сколько зарабатываете',
+    'Слайд 7: Конкуренты — таблица сравнения, ваши преимущества',
+    'Слайд 8: Traction — текущие показатели роста',
+    'Слайд 9: Финансовый прогноз — 3 года, 3 сценария',
+    'Слайд 10: Условия инвестиций — сумма, оценка, доля',
+    'Слайд 11: Команда — фото, опыт, роли',
+    'Слайд 12: Контакты и следующий шаг',
+    'Сохранить в PDF, размер до 15 МБ',
+   ]},
+  {id:'t04',name:'Финансовая модель — 3 сценария',day:'День 4',nda:true,hc:false,
+   tip:'Показывает инвестору, что вы понимаете экономику бизнеса. Без модели — серьёзного разговора не будет.',
+   subs:[
+    'Открыть Google Sheets или Excel',
+    'Заполнить плохой сценарий: минимальный рост, высокие расходы',
+    'Заполнить средний сценарий: реалистичный план',
+    'Заполнить хороший сценарий: если всё пойдёт по плану',
+    'Добавить: выручка / расходы / EBITDA / чистая прибыль по годам',
+    'Сделать прогноз на 3–5 лет с разбивкой по кварталам',
+    'Добавить CAC и LTV — инвестор обязательно спросит',
+    'Проверить: все формулы работают, нет ошибок',
+   ]},
+  {id:'t05',name:'Investor Brief — документ 5–10 стр',tt:'Investor Brief',day:'День 5',nda:true,hc:false,
+   tip:'Детальный документ для заинтересованных инвесторов. Передаётся только после первичного интереса.',
+   subs:[
+    'Раздел 1: Описание рынка с источниками (статистика, тренды)',
+    'Раздел 2: Бизнес и продукт — подробнее чем в Deck',
+    'Раздел 3: Стратегия роста на 3–5 лет',
+    'Раздел 4: Финансовые показатели и прогноз',
+    'Раздел 5: Команда — биографии, релевантный опыт',
+    'Раздел 6: Риски и способы их митигации',
+    'Оформить в PDF, добавить оглавление',
+   ]},
+  {id:'t06',name:'Data Room в Google Drive',tt:'Data Room',day:'День 6',nda:true,hc:false,
+   tip:'Папка для due diligence. Открывайте доступ только после NDA и только тем, кто реально заинтересован.',
+   subs:[
+    'Создать папку "Investor Data Room" в Google Drive',
+    'Создать подпапку 01_One_Page, загрузить файл',
+    'Создать подпапку 02_Pitch_Deck, загрузить файл',
+    'Создать подпапку 03_Financial_Model, загрузить файл',
+    'Создать подпапку 04_Product — скриншоты, демо-видео',
+    'Создать подпапку 05_Legal — регистрация, устав',
+    'Создать подпапку 06_Marketing — метрики, примеры',
+    'Настроить доступ: "только по ссылке" — и только конкретным людям',
+    'Проверить: все файлы открываются без лишних разрешений',
+   ]},
+  {id:'t07',name:'Скрипты: 1 предложение / 30 сек / 3 мин',day:'День 7',nda:false,hc:false,
+   tip:'Скрипты нужны, чтобы не теряться при любом формате — от случайной встречи до Zoom-колла.',
+   subs:[
+    'Написать pitch в 1 предложение: "Мы помогаем [кому] делать [что] через [как]"',
+    'Написать pitch 30 секунд: проблема → решение → рынок → запрос',
+    'Написать pitch 3 минуты: полный рассказ с цифрами',
+    'Записать себя на видео — послушать как звучит',
+    'Отрепетировать вслух минимум 3 раза каждый вариант',
+    'Попросить знакомого задать неудобные вопросы — потренироваться отвечать',
+   ]},
+]},
+{id:'p1',title:'Поиск инвесторов',color:'#5b9cf0',weeks:[1,3],tasks:[
+  {id:'t08',name:'База VC-фондов: 100–200 контактов',tt:'VC',day:'Дни 8–10',nda:false,hc:true,
+   tip:'Систематический сбор. Каждый контакт = потенциальный шанс. Нужен объём.',
+   subs:[
+    'Зарегистрироваться на Crunchbase — искать фонды по стране и стадии',
+    'Зарегистрироваться на AngelList — там профили инвесторов с контактами',
+    'Найти 20–30 VC-фондов в Казахстане и СНГ',
+    'Найти 30–40 VC-фондов в ОАЭ (хаб для региона)',
+    'Найти 20–30 VC-фондов в Европе по вашей нише',
+    'Для каждого записать: имя партнёра, фонд, email, LinkedIn',
+    'Проверить: фонд реально инвестирует в вашу стадию и нишу',
+    'Свести в таблицу Google Sheets с колонками: имя / фонд / страна / email / LinkedIn / стадия',
+   ]},
+  {id:'t09',name:'База бизнес-ангелов: 50–100 контактов',day:'День 11',nda:false,hc:true,
+   tip:'Ангелы часто решают быстрее фондов. Ищите тех, кто уже инвестировал в похожие проекты.',
+   subs:[
+    'Найти Forbes-списки предпринимателей Казахстана / СНГ / ОАЭ',
+    'Поискать в LinkedIn: "angel investor Kazakhstan", "angel investor Central Asia"',
+    'Найти бизнес-клубы в вашем городе — там много ангелов',
+    'Спросить знакомых предпринимателей: "кто из твоих знакомых инвестирует?"',
+    'Записать каждого в ту же таблицу с пометкой "ангел"',
+    'Приоритизировать: те, кто инвестировал в вашу нишу — в топ списка',
+   ]},
+  {id:'t10',name:'Подать заявки в акселераторы',tt:'Акселератор',day:'День 12',nda:false,hc:true,
+   tip:'Акселераторы дают не только деньги — но и менторов, связи, доверие. Заявки бесплатные.',
+   subs:[
+    'Найти акселераторы Казахстана: Astana Hub, QazTech Ventures',
+    'Найти региональные: Turn8 (ОАЭ), Flat6Labs (MENA)',
+    'Найти глобальные: Y Combinator (yc.com), Techstars',
+    'Для каждого проверить: дедлайн подачи заявки',
+    'Подготовить заявку — обычно там те же вопросы что в Pitch Deck',
+    'Подать заявки во все подходящие — чем больше, тем лучше',
+    'Записать в контакты с пометкой "акселератор" и датой ответа',
+   ]},
+  {id:'t11',name:'Telegram-каналы: найти и написать посты',day:'День 13',nda:false,hc:false,
+   tip:'В посте — только проблема и масштаб рынка. Никакого описания продукта. Цель: получить личные сообщения.',
+   subs:[
+    'Найти каналы: "стартапы СНГ", "инвестиции Казахстан", "ангел инвестор"',
+    'Найти чаты: поискать по тем же словам в поиске Telegram',
+    'Найти каналы ОАЭ: "startup UAE", "investors Dubai"',
+    'Написать шаблон поста: проблема → рынок → ищем инвестора → контакт',
+    'Разослать пост в 10–15 подходящих каналов/чатов',
+    'Ответить на все входящие сообщения в течение часа',
+   ]},
+  {id:'t12',name:'Конференции и форумы — найти и зарегистрироваться',tt:'Warm intro',day:'День 14',nda:false,hc:true,
+   tip:'На живых событиях проще сделать warm intro. Заранее изучите кто будет из инвесторов.',
+   subs:[
+    'Найти ближайшие стартап-конференции в Казахстане',
+    'Найти события в ОАЭ: GITEX, STEP Conference',
+    'Найти онлайн-питч сессии — их много, вход бесплатный',
+    'Зарегистрироваться на 3–5 ближайших событий',
+    'Изучить список спикеров — отметить инвесторов, с которыми хотите познакомиться',
+    'Написать им заранее в LinkedIn: "Буду на [событии], хотел бы познакомиться"',
+   ]},
+]},
+{id:'p2',title:'Массовый Outreach',color:'#9b7fe8',weeks:[3,7],tasks:[
+  {id:'t13',name:'Ежедневная рассылка: 20–30 сообщений в день',tt:'Outreach',day:'Каждый день, нед 3–6',nda:false,hc:true,
+   tip:'В письме — только проблема, рынок, запрос на встречу. Детали — только лично. Цель: получить ответ, не продать.',
+   subs:[
+    'Написать шаблон cold email: тема / приветствие / проблема / рынок / сумма / CTA',
+    'Написать шаблон LinkedIn message — до 300 символов',
+    'Утром: отправить 10–15 email из базы VC',
+    'Вечером: отправить 10–15 LinkedIn сообщений',
+    'Записать каждую отправку в таблицу контактов',
+    'Следить за открытиями — если нет ответа 3 дня: отправить follow-up',
+    'Еженедельно: анализировать что работает (тема письма, формулировка)',
+   ]},
+  {id:'t14',name:'Warm intro через знакомых',tt:'Warm intro',day:'Каждый день',nda:false,hc:true,
+   tip:'Один тёплый контакт стоит 50 холодных писем. Не стесняйтесь просить о знакомстве.',
+   subs:[
+    'Составить список: все знакомые предприниматели и их связи',
+    'Написать каждому: "Ищу инвестора в [ниша]. Ты никого не знаешь?"',
+    'Попросить конкретно: "Можешь познакомить с [имя инвестора]?"',
+    'Подготовить форвард-письмо: короткое, которое знакомый перешлёт инвестору',
+    'После intro — написать инвестору в течение 24 часов',
+    'Поблагодарить того, кто познакомил — вне зависимости от результата',
+   ]},
+  {id:'t15',name:'Вести таблицу контактов — воронка',day:'Каждую неделю',nda:false,hc:false,
+   tip:'Воронка инвестора — как воронка продаж. Нужно видеть на каком этапе каждый контакт.',
+   subs:[
+    'В таблице создать колонки: имя / компания / канал / дата контакта / стадия / следующий шаг',
+    'Каждый день обновлять стадии контактов',
+    'Каждую неделю: считать конверсию — сколько ответили из отправленных',
+    'Выявить: какой канал даёт больше ответов — туда направить больше усилий',
+    'Убрать из активной работы тех, кто не ответил после 3 follow-up',
+   ]},
+  {id:'t16',name:'KPI месяца: 500 сообщений / 50 ответов / 10 встреч',tt:'Traction',day:'Итог каждого месяца',nda:false,hc:false,
+   tip:'Если KPI не выполнен — значит нужно больше контактов или пересмотреть шаблоны писем.',
+   subs:[
+    'Считать отправленные сообщения еженедельно',
+    'Считать полученные ответы (любые, даже отказы)',
+    'Считать назначенные встречи',
+    'В конце месяца: сравнить с KPI',
+    'Если встреч меньше 10: увеличить объём или изменить шаблон',
+    'Если ответов меньше 10%: пересмотреть тему письма и первый абзац',
+   ]},
+]},
+{id:'p3',title:'Переговоры и встречи',color:'#e05c5c',weeks:[5,8],tasks:[
+  {id:'t17',name:'Подготовить Demo — только для личной встречи',day:'До первой встречи',nda:true,hc:false,
+   tip:'Demo — никогда не отправляйте запись незнакомым. Только вживую. Так нельзя скопировать.',
+   subs:[
+    'Подготовить живое demo продукта — рабочая версия',
+    'Сделать список из 5 ключевых фич, которые покажете',
+    'Отрепетировать demo: не более 7 минут',
+    'Подготовить запасной вариант — скриншоты, если интернет подведёт',
+    'Убедиться: demo работает стабильно, нет критических багов',
+   ]},
+  {id:'t18',name:'Провести встречу: Deck + финансы + Q&A',day:'День встречи',nda:false,hc:true,
+   tip:'Типовые вопросы инвестора: CAC, LTV, рынок, конкуренты, почему вы, риски.',
+   subs:[
+    'Перед встречей: изучить инвестора — его портфель, что он любит',
+    'Взять с собой: Deck, финансовую модель, демо',
+    'Начать со Story: почему вы это делаете — личная история',
+    'Сделать pitch по Deck: 10–15 минут',
+    'Показать Demo: 5–7 минут',
+    'Ответить на вопросы — честно, не уходить от сложных',
+    'В конце спросить: "Что вам нужно для принятия решения?"',
+    'Записать имена, вопросы, следующие шаги',
+   ]},
+  {id:'t19',name:'Follow-up в течение 24 часов после встречи',tt:'Follow-up',day:'После каждой встречи',nda:false,hc:false,
+   tip:'Follow-up — обязательный шаг. Большинство сделок срывается из-за его отсутствия.',
+   subs:[
+    'Написать письмо в течение 24 часов после встречи',
+    'В письме: поблагодарить, кратко резюмировать о чём говорили',
+    'Приложить краткий Deck (не полный) и One Page',
+    'Написать чёткий следующий шаг: "Жду вашего решения до [дата]"',
+    'Если нет ответа 5 дней — отправить второй follow-up',
+    'Если нет ответа 10 дней — финальный follow-up и закрыть контакт',
+   ]},
+  {id:'t20',name:'Подготовить ответы на вопросы инвестора',day:'До первой встречи',nda:false,hc:false,
+   tip:'Инвестор проверяет не только продукт — он проверяет вас. Уверенные ответы = доверие.',
+   subs:[
+    'Выучить ответ на: "Сколько стоит привлечение одного клиента (CAC)?"',
+    'Выучить ответ на: "Сколько платит один клиент за всё время (LTV)?"',
+    'Выучить ответ на: "Почему именно вы, а не конкуренты?"',
+    'Выучить ответ на: "Каковы главные риски?"',
+    'Выучить ответ на: "Почему сейчас? Почему этот рынок?"',
+    'Выучить ответ на: "Как вы потратите инвестиции?"',
+    'Попросить знакомого сыграть роль инвестора — порепетировать',
+   ]},
+]},
+{id:'p4',title:'Закрытие сделки',color:'#e8a44a',weeks:[7,10],tasks:[
+  {id:'t21',name:'Подписать NDA до передачи материалов',tt:'NDA',day:'Шаг 1',nda:true,hc:false,
+   tip:'NDA защищает вас от кражи идеи. Без подписи — никаких деталей продукта, финансов, технологий.',
+   subs:[
+    'Найти корпоративного юриста — не брать шаблон из интернета',
+    'Юрист готовит NDA под ваш проект и юрисдикцию',
+    'Отправить NDA инвестору на согласование',
+    'Внести правки если инвестор предложит — только через юриста',
+    'Подписать обеими сторонами — электронная подпись допустима',
+    'Сохранить подписанный NDA в папку Data Room / Legal',
+    'Только после подписания — открыть доступ к Data Room',
+   ]},
+  {id:'t22',name:'Due Diligence — документы для инвестора',tt:'Due Diligence',day:'Шаг 2',nda:true,hc:false,
+   tip:'Инвестор проверяет всё. Подготовьтесь заранее — любой сюрприз может убить сделку.',
+   subs:[
+    'Юрист проверяет все корпоративные документы',
+    'Бухгалтер готовит финансовую отчётность за всё время существования',
+    'Подготовить: учредительные документы, устав, список акционеров',
+    'Подготовить: все договора с клиентами, партнёрами',
+    'Подготовить: патенты, трейдмарки, права на код (если есть)',
+    'Подготовить: трудовые договора ключевых сотрудников',
+    'Открыть доступ к Data Room — только конкретному инвестору',
+    'Отвечать на вопросы DD в течение 24 часов',
+   ]},
+  {id:'t23',name:'Согласовать Term Sheet',tt:'Term Sheet',day:'Шаг 3',nda:false,hc:false,
+   tip:'Term Sheet фиксирует условия. Читайте каждый пункт. Не подписывайте без юриста.',
+   subs:[
+    'Получить Term Sheet от инвестора',
+    'Передать юристу на проверку — обязательно',
+    'Согласовать оценку компании (pre-money valuation)',
+    'Согласовать размер доли инвестора',
+    'Проверить: liquidation preference, anti-dilution, vesting',
+    'Убедиться что нет пунктов о полном контроле инвестора',
+    'Согласовать и подписать Term Sheet',
+   ]},
+  {id:'t24',name:'Подписать договор и получить деньги',day:'Шаг 4',nda:false,hc:false,
+   tip:'Финальный этап. Только юрист. После подписания — деньги на счёт компании, не личный.',
+   subs:[
+    'Юрист готовит финальный инвестиционный договор',
+    'Проверить договор самостоятельно — убедиться что всё совпадает с Term Sheet',
+    'Согласовать дату и порядок перевода денег',
+    'Подписать договор обеими сторонами',
+    'Проверить что деньги поступили на расчётный счёт компании',
+    'Выдать инвестору подтверждение его доли',
+    'Внести изменения в корпоративные документы (через юриста)',
+   ]},
+]},
+];
+
+const TotalW=10;
+const StartDate=new Date('2026-03-13');
+let state={phase:'p0',view:'tasks',tasks:{}};
+
+function gt(id){
+  if(!state.tasks[id]){
+    const ph=PHASES.flatMap(p=>p.tasks).find(t=>t.id===id);
+    state.tasks[id]={done:false,dl:'',notes:'',subs:(ph&&ph.subs?ph.subs.map((t,i)=>({id:id+'_'+i,txt:t,done:false})):[]),contacts:[]};
+  }
+  return state.tasks[id];
+}
+function sv(){try{localStorage.setItem('inv3',JSON.stringify(state));}catch(e){}}
+function ld(){try{const d=localStorage.getItem('inv3');if(d){const p=JSON.parse(d);state.tasks=p.tasks||{};if(p.phase)state.phase=p.phase;}}catch(e){}}
+
+function allT(){return PHASES.flatMap(p=>p.tasks);}
+function doneCount(){return allT().filter(t=>gt(t.id).done).length;}
+
+function isOD(id){const t=gt(id);if(!t.dl||t.done)return false;return new Date(t.dl)<TODAY;}
+function isTD(id){const t=gt(id);return t.dl===TODAYSTR&&!t.done;}
+function isSN(id){const t=gt(id);if(!t.dl||t.done)return false;const d=new Date(t.dl);const df=(d-TODAY)/86400000;return df>0&&df<=3;}
+function dlLabel(id){
+  const t=gt(id);if(!t.dl)return '';
+  const d=new Date(t.dl);const df=Math.round((d-TODAY)/86400000);
+  if(df<0)return 'просрочено '+Math.abs(df)+' дн';
+  if(df===0)return 'сегодня';
+  if(df===1)return 'завтра';
+  return 'через '+df+' дн';
+}
+function dlColor(id){return isOD(id)?'var(--red)':isTD(id)||isSN(id)?'var(--blue)':'var(--text3)';}
+function odCount(ph){return ph.tasks.filter(t=>isOD(t.id)).length;}
+
+function tip(key){if(!TW[key])return '';return '<span class="tip-ico">?<span class="tip-txt">'+TW[key]+'</span></span>';}
+
+function updOv(){
+  const d=doneCount(),tot=allT().length,pct=tot?Math.round(d/tot*100):0;
+  document.getElementById('ov-pct').textContent=pct+'%';
+  document.getElementById('ov-fill').style.width=pct+'%';
+  document.getElementById('ov-done').textContent=d+' готово';
+  document.getElementById('ov-tot').textContent=tot+' задач';
+  rendNav();
+  if(state.view==='gantt')rendGantt();
+}
+
+function rendNav(){
+  const c=document.getElementById('nav');c.innerHTML='';
+  PHASES.forEach(p=>{
+    const d=p.tasks.filter(t=>gt(t.id).done).length;
+    const pct=Math.round(d/p.tasks.length*100);
+    const el=document.createElement('div');
+    el.className='nph'+(state.phase===p.id?' active':'');
+    el.innerHTML='<div class="ndot" style="background:'+p.color+'"></div><div class="nlbl">'+p.title+'</div><div class="npct">'+pct+'%</div>';
+    el.onclick=()=>{state.phase=p.id;rendNav();rendMain();};
+    c.appendChild(el);
+  });
+}
+
+function setView(v){
+  state.view=v;
+  ['tasks','gantt'].forEach(x=>{document.getElementById('vb-'+x).classList.toggle('active',x===v);});
+  rendMain();
+}
+function rendMain(){state.view==='tasks'?rendTasks():rendGantt();}
+
+function rendTasks(){
+  const ph=PHASES.find(p=>p.id===state.phase);
+  const done=ph.tasks.filter(t=>gt(t.id).done).length;
+  const od=odCount(ph);
+  let h='<div class="mhdr"><div class="mhdr-title">'+ph.title+'</div><div class="dbadge">13 марта 2026</div></div>';
+  h+='<div class="content">';
+  h+='<div class="pstats">';
+  h+='<div class="scard"><div class="sval" style="color:'+ph.color+'">'+Math.round(done/ph.tasks.length*100)+'%</div><div class="slbl">Этап</div></div>';
+  h+='<div class="scard"><div class="sval">'+done+'</div><div class="slbl">Готово</div></div>';
+  h+='<div class="scard"><div class="sval">'+(ph.tasks.length-done)+'</div><div class="slbl">Осталось</div></div>';
+  h+='<div class="scard"><div class="sval" style="color:'+(od>0?'var(--red)':'inherit')+'">'+od+'</div><div class="slbl">Просрочено</div></div>';
+  h+='</div><div class="tasks">';
+
+  ph.tasks.forEach(t=>{
+    const ts=gt(t.id);
+    const od=isOD(t.id),td=isTD(t.id),sn=isSN(t.id)&&!td;
+    let tags='';
+    if(t.nda)tags+='<span class="tag tag-nda">NDA</span>';
+    if(od)tags+='<span class="tag tag-od">Просрочено</span>';
+    else if(td)tags+='<span class="tag tag-td">Сегодня</span>';
+    else if(sn)tags+='<span class="tag tag-sn">Скоро</span>';
+    const sdone=ts.subs.filter(s=>s.done).length,stot=ts.subs.length;
+    const dlCol=dlColor(t.id);
+    const dlStr=ts.dl?'<span style="color:'+dlCol+'">&#128197; '+ts.dl+' ('+dlLabel(t.id)+')</span>':'';
+    const subStr=stot>0?'<span>&#9642; '+sdone+'/'+stot+' подзадач</span>':'';
+    const ctStr=ts.contacts&&ts.contacts.length?'<span>&#128100; '+ts.contacts.length+' контакт'+(ts.contacts.length>1?'ов':'')+'</span>':'';
+    const ntStr=ts.notes?'<span>&#128221; Заметка</span>':'';
+
+    h+='<div class="tc'+(od?' overdue':'')+(ts.done?' done-card':'')+'" id="card-'+t.id+'">';
+    h+='<div class="thdr">';
+    h+='<div class="tcb'+(ts.done?' ck':'')+'" id="cb-'+t.id+'" onclick="tgTask(\''+t.id+'\')"></div>';
+    h+='<div class="tmain" onclick="tgExp(\''+t.id+'\')">';
+    h+='<div class="tnrow"><span class="tname'+(ts.done?' sk':'')+'" id="tn-'+t.id+'">'+t.name+'</span>'+(t.tt?tip(t.tt):'')+tags+'</div>';
+    h+='<div class="tmeta"><span class="tmi">'+t.day+'</span>'+(dlStr?'<span class="tmi">'+dlStr+'</span>':'')+(subStr?'<span class="tmi">'+subStr+'</span>':'')+(ctStr?'<span class="tmi">'+ctStr+'</span>':'')+(ntStr?'<span class="tmi">'+ntStr+'</span>':'')+'</div>';
+    h+='</div>';
+    h+='<div class="texp" id="ex-'+t.id+'" onclick="tgExp(\''+t.id+'\')">&#9654;</div>';
+    h+='</div>';
+    h+='<div class="tbody" id="tb-'+t.id+'">';
+    h+='<div class="tbi">';
+    if(t.tip)h+='<div><div class="sec-lbl">Подсказка</div><div class="tipbox">'+t.tip+'</div></div>';
+    // Deadline
+    h+='<div><div class="sec-lbl">Дедлайн</div><div class="dl-row">';
+    h+='<span class="dl-lbl">Выполнить до:</span>';
+    h+='<input type="date" class="dl-inp" value="'+(ts.dl||'')+'" onchange="setDL(\''+t.id+'\',this.value)" min="2026-03-13">';
+    if(ts.dl)h+='<button class="dl-clr" onclick="setDL(\''+t.id+'\',\'\')">&#10005; Убрать</button>';
+    h+='</div></div>';
+    // Subtasks
+    h+='<div class="subs-wrap"><div class="subs-hdr"><span class="subs-ttl">Подзадачи</span><button class="add-btn" onclick="showAS(\''+t.id+'\')">+ Добавить</button></div>';
+    h+='<div class="slist" id="sl-'+t.id+'">'+rendSubs(t.id)+'</div>';
+    h+='<div id="as-'+t.id+'" style="display:none"><div class="sinp-row"><input class="sinp" placeholder="Текст подзадачи..." id="si-'+t.id+'" onkeydown="if(event.key===\'Enter\')saveSub(\''+t.id+'\')"><button class="ssave" onclick="saveSub(\''+t.id+'\')">Добавить</button></div></div>';
+    h+='</div>';
+    // Contacts
+    if(t.hc){
+      h+='<div class="ct-wrap"><div class="ct-hdr"><span class="sec-lbl">Контакты и стадии</span><button class="add-btn" onclick="showAC(\''+t.id+'\')">+ Добавить</button></div>';
+      h+='<div class="stage-flow">';
+      STAGES.forEach((s,i)=>{h+='<span class="sf-step"><span class="sf-dot" style="background:'+STAGECOLS[i]+'"></span><span class="sf-nm">'+s.name+'</span>'+(i<STAGES.length-1?'<span class="sf-arr">&#9654;</span>':'')+'</span>';});
+      h+='</div>';
+      h+='<div id="ct-'+t.id+'">'+rendCT(t.id)+'</div>';
+      h+='<div id="ac-'+t.id+'" style="display:none"><div class="ac-form"><input class="ci" placeholder="ФИО" id="cn-'+t.id+'"><input class="ci" placeholder="Компания" id="cc-'+t.id+'"><input class="ci" placeholder="Телефон" id="cp-'+t.id+'"><input class="ci" placeholder="Email" id="ce-'+t.id+'"><button class="ssave" onclick="saveC(\''+t.id+'\')">Добавить</button></div></div>';
+      h+='</div>';
+    }
+    // Notes
+    h+='<div><div class="sec-lbl">Заметки</div>';
+    h+='<textarea class="nt-area" id="nt-'+t.id+'" placeholder="Ваши заметки...">'+(ts.notes||'')+'</textarea>';
+    h+='<div class="nt-bot"><button class="nt-save" onclick="saveNt(\''+t.id+'\')">Сохранить</button><span class="nt-ok" id="nok-'+t.id+'">&#10003; Сохранено</span></div>';
+    h+='</div>';
+    h+='</div></div></div>';
+  });
+  h+='</div></div>';
+  document.getElementById('main').innerHTML=h;
+}
+
+function rendSubs(id){
+  const ts=gt(id);
+  if(!ts.subs.length)return '<div class="emp">Нет подзадач</div>';
+  return ts.subs.map(s=>'<div class="si" id="si-item-'+s.id+'"><div class="scb'+(s.done?' ck':'')+'" onclick="tgSub(\''+id+'\',\''+s.id+'\')"></div><div class="stxt'+(s.done?' sk':'')+'" id="st-'+s.id+'">'+s.txt+'</div><button class="sdel" onclick="delSub(\''+id+'\',\''+s.id+'\')">&#10005;</button></div>').join('');
+}
+function rendCT(id){
+  const ts=gt(id);
+  if(!ts.contacts||!ts.contacts.length)return '<div class="emp">Нет контактов</div>';
+  let h='<table class="ct"><tr><th>ФИО</th><th>Компания</th><th>Телефон</th><th>Email</th><th>Стадия</th><th></th></tr>';
+  ts.contacts.forEach(c=>{
+    h+='<tr><td>'+( c.name||'—')+'</td><td>'+(c.company||'—')+'</td><td>'+(c.phone||'—')+'</td><td>'+(c.email||'—')+'</td>';
+    h+='<td><select class="cstg-sel" onchange="setCStg(\''+id+'\',\''+c.id+'\',this.value)">';
+    STAGES.forEach(s=>{h+='<option value="'+s.id+'"'+(c.stage==s.id?' selected':'')+'>'+s.name+'</option>';});
+    h+='</select></td><td><button class="cdel" onclick="delC(\''+id+'\',\''+c.id+'\')">&#10005;</button></td></tr>';
+  });
+  h+='</table>';return h;
+}
+
+function tgTask(id){
+  const ts=gt(id);ts.done=!ts.done;sv();
+  document.getElementById('cb-'+id).classList.toggle('ck',ts.done);
+  document.getElementById('tn-'+id).classList.toggle('sk',ts.done);
+  document.getElementById('card-'+id).classList.toggle('done-card',ts.done);
+  updOv();
+}
+function tgExp(id){
+  document.getElementById('tb-'+id).classList.toggle('op');
+  document.getElementById('ex-'+id).classList.toggle('op');
+}
+function setDL(id,v){gt(id).dl=v;sv();rendTasks();}
+function showAS(id){
+  const el=document.getElementById('as-'+id);
+  el.style.display=el.style.display==='none'?'':'none';
+  if(el.style.display!=='none'){
+    const tb=document.getElementById('tb-'+id);if(!tb.classList.contains('op'))tgExp(id);
+    setTimeout(()=>{const i=document.getElementById('si-'+id);if(i)i.focus();},50);
+  }
+}
+function saveSub(id){
+  const inp=document.getElementById('si-'+id);
+  const txt=(inp?inp.value:'').trim();if(!txt)return;
+  gt(id).subs.push({id:id+'_'+Date.now(),txt,done:false});
+  if(inp)inp.value='';sv();
+  const sl=document.getElementById('sl-'+id);if(sl)sl.innerHTML=rendSubs(id);
+}
+function tgSub(tid,sid){
+  const ts=gt(tid);const s=ts.subs.find(x=>x.id===sid);if(!s)return;
+  s.done=!s.done;sv();
+  const cb=document.querySelector('#si-item-'+sid+' .scb');
+  const tx=document.getElementById('st-'+sid);
+  if(cb)cb.classList.toggle('ck',s.done);
+  if(tx)tx.classList.toggle('sk',s.done);
+}
+function delSub(tid,sid){
+  gt(tid).subs=gt(tid).subs.filter(x=>x.id!==sid);sv();
+  const sl=document.getElementById('sl-'+tid);if(sl)sl.innerHTML=rendSubs(tid);
+}
+function showAC(id){
+  const el=document.getElementById('ac-'+id);
+  el.style.display=el.style.display==='none'?'':'none';
+  const tb=document.getElementById('tb-'+id);if(!tb.classList.contains('op'))tgExp(id);
+}
+function saveC(id){
+  const n=(document.getElementById('cn-'+id)||{}).value||'';
+  const co=(document.getElementById('cc-'+id)||{}).value||'';
+  const p=(document.getElementById('cp-'+id)||{}).value||'';
+  const e=(document.getElementById('ce-'+id)||{}).value||'';
+  if(!n&&!co&&!e)return;
+  const ts=gt(id);if(!ts.contacts)ts.contacts=[];
+  ts.contacts.push({id:'c'+Date.now(),name:n.trim(),company:co.trim(),phone:p.trim(),email:e.trim(),stage:0});
+  ['cn','cc','cp','ce'].forEach(x=>{const el=document.getElementById(x+'-'+id);if(el)el.value='';});
+  sv();const ct=document.getElementById('ct-'+id);if(ct)ct.innerHTML=rendCT(id);
+}
+function setCStg(tid,cid,v){
+  const ts=gt(tid);const c=ts.contacts.find(x=>x.id===cid);if(c){c.stage=parseInt(v);sv();}
+}
+function delC(tid,cid){
+  gt(tid).contacts=gt(tid).contacts.filter(x=>x.id!==cid);sv();
+  const ct=document.getElementById('ct-'+tid);if(ct)ct.innerHTML=rendCT(tid);
+}
+function saveNt(id){
+  const ta=document.getElementById('nt-'+id);if(!ta)return;
+  gt(id).notes=ta.value;sv();
+  const ok=document.getElementById('nok-'+id);if(ok){ok.style.opacity='1';setTimeout(()=>{ok.style.opacity='0';},2000);}
+}
+
+function rendGantt(){
+  const main=document.getElementById('main');
+  let h='<div class="gv">';
+  h+='<div class="g-hdr"><div class="g-title">Диаграмма Ганта</div><div class="g-sub">Старт: 13 марта 2026 · '+TotalW+' недель</div></div>';
+  h+='<div class="g-legend">';
+  h+='<div class="g-li"><div class="g-li-dot" style="background:var(--green);opacity:.8"></div>Выполнено</div>';
+  h+='<div class="g-li"><div class="g-li-dot" style="background:#5b9cf0;opacity:.4"></div>Запланировано</div>';
+  h+='<div class="g-li"><div style="width:2px;height:12px;background:var(--amber);border-radius:1px"></div>Дедлайн</div>';
+  h+='<div class="g-li"><div style="width:1.5px;height:12px;background:var(--blue);border-radius:1px"></div>Сегодня</div>';
+  h+='<div class="g-li"><div style="width:2px;height:12px;background:var(--red);border-radius:1px"></div>Просрочено</div>';
+  h+='</div>';
+  h+='<div class="g-wlbl-row">';
+  for(let w=0;w<TotalW;w++){const d=new Date(StartDate);d.setDate(d.getDate()+w*7);h+='<div class="g-wlbl">'+d.getDate()+' '+(d.toLocaleDateString('ru',{month:'short'}))+'</div>';}
+  h+='</div><div>';
+  PHASES.forEach(ph=>{
+    h+='<div class="g-slbl" style="color:'+ph.color+'">'+ph.title+'</div>';
+    ph.tasks.forEach(t=>{
+      const ts=gt(t.id);
+      const lf=ph.weeks[0]/TotalW*100,sf=(ph.weeks[1]-ph.weeks[0])/TotalW*100;
+      let dlLine='';
+      if(ts.dl){
+        const dd=new Date(ts.dl);
+        const dfDays=(dd-StartDate)/86400000;
+        const dfPct=Math.min(100,Math.max(0,dfDays/(TotalW*7)*100));
+        const ov=dd<TODAY&&!ts.done;
+        dlLine='<div class="g-dl" style="left:'+dfPct+'%;background:'+(ov?'var(--red)':'var(--amber)')+'"></div>';
+      }
+      const nm=t.name.length>30?t.name.substring(0,28)+'…':t.name;
+      h+='<div class="g-row">';
+      h+='<div class="g-lc"><strong>'+nm+'</strong><span>'+(ts.done?'✓ готово':ts.dl?dlLabel(t.id):'')+'</span></div>';
+      h+='<div class="g-tl">';
+      h+='<div class="g-bg">'+'<div class="g-bgc"></div>'.repeat(TotalW)+'</div>';
+      h+='<div class="g-bt">';
+      h+='<div class="g-bbg" style="left:'+lf+'%;width:'+sf+'%;background:'+ph.color+'"></div>';
+      h+='<div class="g-bfill" style="left:'+lf+'%;width:'+(ts.done?sf:0)+'%;background:'+ph.color+'"></div>';
+      h+=dlLine;
+      h+='<div class="g-today" style="left:0%"><div class="g-today-lbl">сегодня</div></div>';
+      h+='</div></div></div>';
+    });
+  });
+  h+='</div></div>';
+  main.innerHTML=h;
+}
+
+ld();rendNav();rendMain();updOv();
+</script>
+</body>
+</html>
